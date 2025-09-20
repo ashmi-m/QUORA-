@@ -1,0 +1,70 @@
+/* basic resets */
+* { box-sizing: border-box; }
+body { margin: 0; font-family: "Segoe UI", Arial, sans-serif; background:#f7f7f7; color:#222; }
+
+/* header/footer basic styling (so the partials look ok) */
+.site-header { background: #ffffff; border-bottom: 1px solid #eee; }
+.header-inner { display:flex; justify-content:space-between; align-items:center; padding:12px 28px; max-width:1100px;margin:0 auto; }
+.logo { font-weight:700; letter-spacing:1px; text-decoration:none; color:#111; }
+.main-nav a{ margin-left:14px; text-decoration:none; color:#333; font-size:14px; }
+
+/* page container */
+.signup-wrap { display:flex; justify-content:center; padding:40px 20px; }
+
+/* white card */
+.card {
+  display:flex;
+  background:#fff;
+  width:980px;
+  border-radius:8px;
+  overflow:hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+/* left image */
+.left { flex: 1; min-width:360px; max-width:440px; background:#fafafa; display:flex; align-items:center; justify-content:center; padding:40px; }
+.left img { width:100%; height:auto; object-fit:cover; border-radius:4px; }
+
+/* right form column */
+.right { flex: 1; padding:36px 48px; }
+.title { text-align:center; margin:6px 0 18px; font-family: 'Georgia', serif; font-size:28px; }
+
+/* form */
+.signup-form label { display:block; font-size:13px; margin-top:10px; color:#444; }
+.signup-form input[type="text"],
+.signup-form input[type="email"],
+.signup-form input[type="password"] {
+  width:100%;
+  padding:9px 10px;
+  margin-top:6px;
+  border:1px solid #d6cfcf;
+  border-radius:6px;
+  background:#fff;
+  font-size:14px;
+}
+
+/* terms */
+.terms { display:flex; gap:8px; align-items:center; margin-top:12px; font-size:13px; color:#666; }
+
+/* buttons */
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:9px 12px; border-radius:4px; cursor:pointer; }
+.signup-btn { width:100%; margin-top:12px; background:#484400; color:#fff; border:none; }
+.google-btn { width:100%; margin-top:10px; background:#fff; border:1px solid #d8d8d8; color:#333; }
+.google-btn img { width:18px; height:18px; }
+
+/* OR separator */
+.or { text-align:center; margin:12px 0; color:#999; font-size:13px; }
+
+/* footer link */
+.have-account { font-size:13px; text-align:center; margin-top:14px; color:#666; }
+.have-account a { color:#b58600; text-decoration:none; }
+
+/* error */
+.error { background:#ffe6e6; color:#8b0000; padding:8px 10px; border-radius:4px; margin-bottom:10px; font-size:13px; }
+
+/* responsive */
+@media (max-width:880px){
+  .card{ flex-direction:column; width:92%; }
+  .left { max-height:260px; padding:20px; }
+  .right { padding:20px; }
+}     

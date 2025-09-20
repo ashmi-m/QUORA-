@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm with OTP - QUORA</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+        }
+
+        .main-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .left-section {
+            background: white;
+            padding: 60px 40px;
+            border-radius: 20px;
+
+
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        }
+
+        .sign {
+            max-width: 700px;
+            margin: auto;
+        }
+
+        .right-section {
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600"><rect width="400" height="600" fill="%23f8f5f0"/><circle cx="350" cy="150" r="80" fill="%23deb887" opacity="0.3"/><circle cx="100" cy="400" r="60" fill="%23cd853f" opacity="0.2"/></svg>') no-repeat center;
+            background-size: cover;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-showcase {
+            position: absolute;
+            bottom: 50px;
+            right: 50px;
+            width: 280px;
+            height: 280px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .products {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .product-item {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #deb887, #cd853f);
+            border-radius: 8px;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(222, 184, 135, 0.3);
+        }
+
+        .product-item:nth-child(2) {
+            background: linear-gradient(45deg, #bc8f8f, #a0522d);
+            transform: translateX(20px);
+        }
+
+        .product-item:nth-child(3) {
+            background: linear-gradient(45deg, #f4a460, #daa520);
+            transform: translateX(-15px);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+
+        .subtitle {
+            color: #6c757d;
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+        }
+
+        .otp-container {
+            margin-bottom: 40px;
+        }
+
+        .otp-inputs {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .otp-input {
+            width: 60px;
+            height: 60px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+            transition: all 0.3s ease;
+        }
+
+        .otp-input:focus {
+            border-color: #6c5ce7;
+            box-shadow: 0 0 0 0.2rem rgba(108, 92, 231, 0.15);
+            outline: none;
+        }
+
+        .btn-confirm {
+            background: linear-gradient(135deg, #4a5d23 0%, #6b7c3a 100%);
+            border: none;
+            padding: 15px 60px;
+            border-radius: 50px;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(74, 93, 35, 0.3);
+        }
+
+        .btn-confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(74, 93, 35, 0.4);
+            background: linear-gradient(135deg, #5a6d33 0%, #7b8c4a 100%);
+        }
+
+        .resend-section {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .resend-text {
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+
+        .countdown {
+            color: #6c5ce7;
+            font-weight: 600;
+        }
+
+        .back-link {
+            color: #6c5ce7;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: #5a4fcf;
+            text-decoration: underline;
+        }
+
+        .brand-logo {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #2c3e50;
+            letter-spacing: 2px;
+        }
+
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .floating-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(222, 184, 135, 0.1);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .floating-circle:nth-child(1) {
+            width: 100px;
+            height: 100px;
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .floating-circle:nth-child(2) {
+            width: 60px;
+            height: 60px;
+            top: 60%;
+            left: 20%;
+            animation-delay: 2s;
+        }
+
+        .floating-circle:nth-child(3) {
+            width: 80px;
+            height: 80px;
+            top: 30%;
+            left: 80%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+            }
+        }
+
+        .forgot-otp {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #6c757d;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .forgot-otp:hover {
+            color: #6c5ce7;
+        }
+
+        @media (max-width: 768px) {
+            .right-section {
+                display: none;
+            }
+
+            .left-section {
+                padding: 40px 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .otp-input {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid main-container">
+        <a href="#" class="forgot-otp">
+            <i class="fas fa-arrow-left me-2"></i>forgot OTP
+        </a>
+
+        <div class="row w-100">
+            <div class="d-flex align-items-center justify-content-center sign">
+                <div class="left-section">
+                    <div class="row align-items-center">
+                    
+                        <div class="col-md-5 text-center">
+                            <img src="/images/1d15fd89-b7ec-41de-b7b5-ca06dd3a9b14.jpeg" alt="OTP Illustration"
+                                class="img-fluid" style="max-width: 100%; border-radius: 10px;">
+                        </div>
+
+                        <div class="col-md-7">
+                            <h1>Confirm with OTP</h1>
+                            <p class="subtitle">Please check your mail address for OTP</p>
+
+                            <div class="otp-container">
+                                <div class="otp-inputs">
+                                    <input type="text" class="form-control otp-input" maxlength="1" id="otp1">
+                                    <input type="text" class="form-control otp-input" maxlength="1" id="otp2">
+                                    <input type="text" class="form-control otp-input" maxlength="1" id="otp3">
+                                    <input type="text" class="form-control otp-input" maxlength="1" id="otp4">
+                                </div>
+
+                                <div class="text-center">
+                                    <button class="btn btn-confirm" onclick="confirmOTP()">Confirm</button>
+                                </div>
+                            </div>
+
+                            <div class="resend-section">
+                                <div class="resend-text">
+                                    Resend OTP in <span id="countdown">60</span> seconds
+                                    <button id="resendBtn" onclick="ResendOTP()">Resend OTP</button>
+                                </div>
+                                <a href="#" class="back-link">Go back to login page</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 d-none d-lg-block">
+                        <div class="right-section">
+                            <div class="floating-elements">
+                                <div class="floating-circle"></div>
+                                <div class="floating-circle"></div>
+                                <div class="floating-circle"></div>
+                            </div>
+
+                            <div class="product-showcase">
+                                <div class="products">
+                                    <div class="product-item"></div>
+                                    <div class="product-item"></div>
+                                    <div class="product-item"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="brand-logo">QUORA</div>
+            </div>
+
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                
+                document.addEventListener('DOMContentLoaded', function () {
+                    const otpInputs = document.querySelectorAll('.otp-input');
+
+                    otpInputs.forEach((input, index) => {
+                        input.addEventListener('input', function (e) {
+                            const value = e.target.value;
+
+                            if (!/^\d*$/.test(value)) {
+                                e.target.value = '';
+                                return;
+                            }
+
+                           
+                            if (value && index < otpInputs.length - 1) {
+                                otpInputs[index + 1].focus();
+                            }
+                        });
+
+                        input.addEventListener('keydown', function (e) {
+                            
+                            if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                                otpInputs[index - 1].focus();
+                            }
+                        });
+                    });
+                });
+
+            
+                let time = 60;
+                let timerInterval;
+                const countdownElement = document.getElementById("countdown");
+
+                function startTimer() {
+                    timerInterval = setInterval(() => {
+                        if (time <= 0) {
+                            clearInterval(timerInterval);
+                            countdownElement.textContent = "0";
+                        } else {
+                            countdownElement.textContent = time;
+                            time--;
+                        }
+                    }, 1000);
+                }
+                startTimer();
+
+                function confirmOTP() {
+                    console.log('confirm otp accessed');
+
+                    const otp1 = document.getElementById("otp1").value.trim();
+                    const otp2 = document.getElementById("otp2").value.trim();
+                    const otp3 = document.getElementById("otp3").value.trim();
+                    const otp4 = document.getElementById("otp4").value.trim();
+
+                    const otpValue = otp1 + otp2 + otp3 + otp4;
+
+                   
+                    if (otpValue.length !== 4 || !/^\d{4}$/.test(otpValue)) {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Invalid OTP",
+                            text: "Please enter a valid 4-digit OTP."
+                        });
+                        return;
+                    }
+
+                    const otp = { otp: otpValue };
+                    console.log('the data from frontend is', otp);
+
+                    fetch("/verify-otp", {
+                        method: "post",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(otp)
+                    })
+                        .then((res) => res.json())
+                        .then((res) => {
+                            if (res.success) {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: 'Success',
+                                    text: res.message || "OTP Verified Successfully!"
+                                }).then(() => {
+                                    window.location.href = '/login';
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Error",
+                                    text: res.message || "Invalid OTP. Please try again."
+                                });
+                            }
+                        })
+                        .catch((error) => {
+                            console.error(error);
+                            Swal.fire({
+                                icon: "error",
+                                title: "Error",
+                                text: "Something went wrong. Please try again later."
+                            });
+                        });
+                }
+
+                
+                function ResendOTP() {
+                    if (time > 0) {
+                        Swal.fire({
+                            icon: "warning",
+                            title: "Please wait",
+                            text: "You can resend OTP only after the timer ends."
+                        });
+                        return;
+                    }
+                    clearInterval(timerInterval);
+                    time = 60;
+                    startTimer();
+                    alert("Resend OTP called!");
+                }
+            </script>
+</body>
+</html>

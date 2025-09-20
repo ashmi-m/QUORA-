@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirm With OTP</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      display: flex;
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 750px;
+      max-width: 95%;
+    }
+
+    .left {
+      flex: 1;
+      padding: 40px;
+      text-align: center;
+    }
+
+    .left h2 {
+      font-size: 26px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .left p {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .otp-inputs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .otp-inputs input {
+      width: 50px;
+      height: 50px;
+      font-size: 22px;
+      text-align: center;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    button {
+      background-color: #3b2a12;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 25px;
+      width: 100%;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background-color: #2a1d0c;
+    }
+
+    .resend {
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    .resend a {
+      color: #3b2a12;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .error-message {
+      color: red;
+      margin-top: 12px;
+    }
+
+    .right {
+      flex: 1;
+      background: url("/images/1d15fd89-b7ec-41de-b7b5-ca06dd3a9b14.jpeg")
+        no-repeat center center/cover;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Left section -->
+    <div class="left">
+      <h2>Confirm With OTP</h2>
+      <p>Please check your mail address for OTP</p>
+
+      <form id="otpForm" action="/verify-reset-otp" method="POST">
+        <div class="otp-inputs">
+          <input type="text" maxlength="1" name="otp1" required>
+          <input type="text" maxlength="1" name="otp2" required>
+          <input type="text" maxlength="1" name="otp3" required>
+          <input type="text" maxlength="1" name="otp4" required>
+        </div>
+        <input type="hidden" id="otp" name="otp">
+        <button type="submit">Confirm</button>
+      </form>
+
+      <div class="resend">
+        <span id="timer">Resend OTP in 30s</span> |
+        <a href="/resend-otp" id="resendLink" style="display:none;">Resend OTP</a>
+      </div>
+
+      <p><a href="/login">Go back to login page</a></p>
+
+      <% if (locals.message) { %>
+        <p class="error-message"><%= locals.message %></p>
+      <% } %>
+    </div>
+
+    <!-- Right section -->
+    <div class="right"></div>
+  </div>
+
+  <script>
+    // OTP auto-focus
+    const inputs = document.querySelectorAll(".otp-inputs input");
+    inputs.forEach((input, index) => {
+      input.addEventListener("input", () => {
+        if (input.value && index < inputs.length - 1) {
+          inputs[index + 1].focus();
+        }
+      });
+    });
+
+    // Collect OTP into hidden field
+    document.getElementById("otpForm").addEventListener("submit", (e) => {
+      const otp = Array.from(inputs).map(i => i.value).join("");
+      document.getElementById("otp").value = otp;
+    });
+
+    // Countdown for resend
+    let timeLeft = 30;
+    const timerEl = document.getElementById("timer");
+    const resendLink = document.getElementById("resendLink");
+
+    const countdown = setInterval(() => {
+      if (timeLeft <= 0) {
+        clearInterval(countdown);
+        timerEl.style.display = "none";
+        resendLink.style.display = "inline";
+      } else {
+        timerEl.textContent = `Resend OTP in ${timeLeft--}s`;
+      }
+    }, 1000);
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,184 @@
+
+  <%-include("../partials/admin/header")%>
+
+  <title>Customer Dashboard</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      color: #333;
+    }
+    
+    .main-content1 {
+      margin-left: 220px;
+      
+    }
+    .topbar1 {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .search-box1 {
+      display: flex;
+      align-items: center;
+      margin-top: 30px;
+    }
+    .search-box1 input {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 20px 0 0 20px;
+      outline: none;
+    }
+    .search-box1 button {
+      padding: 8px 12px;
+      border: none;
+      background: #4b3f1d;
+      color: white;
+      border-radius: 0 20px 20px 0;
+      cursor: pointer;
+    }
+   
+    .table-container {
+      margin-top: 50px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
+      overflow: hidden;
+      width: 1000px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table thead {
+      background: #4b3f1d;
+      color: #fff;
+    }
+    table th, table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    .status {
+      padding: 5px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+    }
+    .active {
+      background: #e6f9e6;
+      color: green;
+    }
+    .blocked {
+      background: #ffe6e6;
+      color: red;
+    }
+    .actions {
+      display: flex;
+      gap: 10px;
+    }
+    .actions span {
+      cursor: pointer;
+      font-size: 18px;
+    }
+    .actions .check {
+      color: green;
+    }
+    .actions .close {
+      color: red;
+    }
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+      gap: 5px;
+    }
+    .pagination button {
+      border: 1px solid #ccc;
+      background: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .pagination .active-page {
+      background: #4b3f1d;
+      color: #fff;
+    }
+  </style>
+<body>
+  <div class="main-content1">
+    <div class="topbar1">
+      <div class="search-box1">
+        <input type="text" placeholder="Search">
+        <button>🔍</button>
+      </div>
+      <!-- <div class="avatar"></div> -->
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Customer</th>
+            <th>Customer ID</th>
+            <th>Orders</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% for (let i = 0; i < data.length; i++) { %>
+            <tr>
+              <td><%= data[i].name %></td>
+              <td><%= data[i].email %></td>
+              <td><%= data[i].phone %></td>
+              <td>
+                <% if (data[i].isBlocked === false) { %>
+                  <button class="btn btn-danger" style="width:80px;"
+                    onclick="toggleBlock('<%= data[i]._id %>', 'block')">
+                    Block
+                  </button>
+                <% } else { %>
+                  <button class="btn btn-success" style="width:80px;"
+                    onclick="toggleBlock('<%= data[i]._id %>', 'unblock')">
+                    Unblock
+                  </button>
+                <% } %>
+              </td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+
+      <div class="container mt-3">
+        <nav aria-label="Page navigation">
+          <ul class="pagination justify-content-center mb-3">
+            <% for (let i = 1; i <= totalPages; i++) { %>
+              <li class="page-item <%= (i == currentPage) ? 'active' : '' %>">
+                <a class="page-link" href="?page=<%= i %>&search=<%= search %>"><%= i %></a>
+              </li>
+            <% } %>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</body>
+
+<script>
+  async function toggleBlock(userId, action) {
+    try {
+      const res = await fetch(`/admin/${action}Customer?id=${userId}`, {
+        method: "GET"
+      });
+
+      if (res.ok) {
+        location.reload();
+      } else {
+        alert("Something went wrong!");
+      }
+    } catch (error) {
+      console.error("Fetch error:", error);
+    }
+  }
+</script>

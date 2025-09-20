@@ -1,0 +1,103 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Page not found</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      color: #333;
+    }
+    header {
+      background: white;
+      padding: 15px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #ddd;
+    }
+    header nav a {
+      margin: 0 10px;
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+    }
+    header nav a:hover {
+      color: #007BFF;
+    }
+    .breadcrumbs {
+      background: #ffe9d8;
+      padding: 12px 40px;
+      font-size: 14px;
+    }
+    .breadcrumbs a {
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .container img {
+      max-width: 350px;
+      margin-bottom: 20px;
+    }
+    .error-title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #333;
+    }
+    .error-code {
+      color: #00c853;
+      font-weight: bold;
+    }
+    .error-text {
+      font-size: 16px;
+      margin-bottom: 20px;
+      color: #555;
+    }
+    .home-link {
+      text-decoration: none;
+      color: #007bff;
+      font-weight: bold;
+    }
+    .home-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo"><strong>QUORA</strong></div>
+    <nav>
+      <a href="/">HOME</a>
+      <a href="/about">ABOUT</a>
+      <a href="/shop">SHOP</a>
+      <a href="/login">Login/Register</a>
+    </nav>
+  </header>
+
+  <div class="breadcrumbs">
+    <a href="/">Home</a> | Products
+  </div>
+
+  <div class="container">
+    <img src="/image 130.png" alt="404 error" />
+    <div class="error-title">Page not found <span class="error-code">ERROR 404</span></div>
+    <div class="error-text">Looks like the page doesn’t exist</div>
+    <a class="home-link" href="/">Back to home</a>
+  </div>
+</body>
+</html>

@@ -1,0 +1,151 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  display: flex;
+  min-height: 100vh;
+  background: #f4f6f9;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 240px;
+  background: #1e1e2d;
+  color: #fff;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  padding: 20px 0;
+}
+
+.sidebar .logo {
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 30px;
+  letter-spacing: 2px;
+  color: #f9f9f9;
+}
+
+.sidebar .menu {
+  list-style: none;
+}
+
+.sidebar .menu li {
+  margin: 15px 0;
+}
+
+.sidebar .menu a {
+  text-decoration: none;
+  color: #bdbdbd;
+  font-size: 15px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  transition: 0.3s;
+  border-radius: 6px;
+}
+
+.sidebar .menu a i {
+  margin-right: 12px;
+  font-size: 16px;
+}
+
+.sidebar .menu a:hover,
+.sidebar .menu a.active {
+  background: #3b3b54;
+  color: #fff;
+}
+
+/* Main Content */
+/* .main-content { */
+  /*margin-left: 240px;  same as sidebar width */
+  /* flex: 1;
+  display: flex;
+  flex-direction: column; */
+/* } */
+
+/* Topbar */
+.topbar {
+  height: 70px;
+  background:#1e1e2d;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 25px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+ 
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ddd;
+  border-radius: 25px;
+  overflow: hidden;
+}
+
+.search-box input {
+  border: none;
+  outline: none;
+  padding: 8px 12px;
+  width: 200px;
+}
+
+.search-box button {
+  border: none;
+  background: #3b3b54;
+  color: #fff;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+
+.profile {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: #fff;
+}
+
+
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 200px;
+  }
+
+  .main-content {
+    margin-left: 200px;
+  }
+
+  .search-box input {
+    width: 140px;
+  }
+}
+
+@media (max-width: 576px) {
+  .sidebar {
+    position: absolute;
+    left: -240px;
+    transition: left 0.3s;
+  }
+
+  .sidebar.active {
+    left: 0;
+  }
+
+  .main-content {
+    margin-left: 0;
+  }
+
+  .search-box input {
+    width: 100px;
+  }
+}

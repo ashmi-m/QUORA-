@@ -1,0 +1,56 @@
+<%-include("../partials/admin/header")%>
+<head>
+  <style>
+    /* Reset some default styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      display: flex;
+      /* min-height: 100vh; */
+      background-color: #ffffff;
+    }
+
+ 
+    
+    
+
+    /* Main content */
+    main {
+      margin-left: 220px;
+      margin-top: 60px;
+      padding: 20px;
+      flex: 1;
+    }
+
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      aside {
+        width: 60px;
+      }
+
+      aside ul li {
+        text-align: center;
+        padding: 15px 0;
+      }
+
+      main {
+        margin-left: 60px;
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <main>
+    <h2>Welcome, Admin!</h2>
+
+    <div class="stat"></div>
+  </main>
+</body>

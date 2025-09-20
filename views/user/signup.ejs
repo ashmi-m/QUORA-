@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign Up - QUORA</title>
+  <link rel="stylesheet" href="/css/signup.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="/css/header.css">
+  <style>
+    .error-message {
+      color: red;
+      font-size: 14px;
+      margin-top: 4px;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="navbar">
+      <div class="left-section">
+        <h1 class="logo">QUORA</h1>
+      </div>
+    </div>
+  </header>
+
+  <main class="signup-wrap">
+    <div class="card">
+      <div class="left">
+        <img src="/images/9d1ac8e1-a5c9-4455-9736-10180866e2fe.jpeg" alt="product" />
+      </div>
+
+      <div class="right">
+        <h1 class="title">Get started now</h1>
+        
+
+        <% if (typeof error !=='undefined' && error) { %>
+          <div class="error">
+            <%= error %>
+          </div>
+          <% } %>
+
+            <form id="signform" action="/signup" method="POST" class="signup-form">
+              <label>Name</label>
+              <input type="text" id="name" name="name" placeholder="Enter your Name">
+              <div id="error1" class="error-message"></div>
+
+              <label>Phone Number</label>
+              <input type="text" id="phone" name="phone" placeholder="Enter your phone number">
+              <div id="error3" class="error-message"></div>
+
+              <label>Email address</label>
+              <input type="email" id="email" name="email" placeholder="Enter your Email">
+              <div id="error2" class="error-message"></div>
+
+              <label>Password</label>
+              <input type="password" id="password" name="password" placeholder="Enter your Password">
+              <div id="error4" class="error-message"></div>
+
+              <label>Confirm Password</label>
+              <input type="password" id="confirm-password" name="confirmPassword" placeholder="Confirm Password">
+              <div id="error5" class="error-message"></div>
+
+              <div id="error2" class="error-message"></div>
+ 
+               <% if (locals.message && message.length> 0) { %>
+                <div class="alert alert-danger text-center">
+                  <%= message %>
+                </div>
+                <% } %> 
+
+
+                  <label class="terms">
+                    <input type="checkbox" id="terms" name="terms"> I agree to the terms & policy
+                  </label>
+
+                  <button type="submit" class="btn signup-btn">SignUp</button>
+
+                  <div class="or">OR</div>
+
+                  <a href="/auth/google" class="btn google-btn">
+                    <img src="/images/image 2.png" alt="google"> Sign in with Google
+                  </a>
+
+                  <p class="have-account">Have an account? <a href="/login">Sign in</a></p>
+            </form>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const nameid = document.getElementById("name");
+    const emailid = document.getElementById("email");
+    const phoneid = document.getElementById("phone");
+    const passid = document.getElementById("password");
+    const cpassid = document.getElementById("confirm-password");
+    const signform = document.getElementById("signform");
+
+    const error1 = document.getElementById("error1");
+    const error2 = document.getElementById("error2");
+    const error3 = document.getElementById("error3");
+    const error4 = document.getElementById("error4");
+    const error5 = document.getElementById("error5");
+
+    function nameValidate() {
+      const nameVal = nameid.value.trim();
+      const pattern = /^[A-Za-z\s]+$/;
+      if (nameVal === "") {
+        error1.textContent = "Please enter a valid name";
+        error1.style.display = "block";
+        return false;
+      } else if (!pattern.test(nameVal)) {
+        error1.textContent = "Name can only contain alphabets and spaces";
+        error1.style.display = "block";
+        return false;
+      }
+      error1.style.display = "none";
+      return true;
+    }
+
+    function emailValidate() {
+      const emailVal = emailid.value;
+      const pattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!pattern.test(emailVal)) {
+        error2.textContent = "Invalid email format";
+        error2.style.display = "block";
+        return false;
+      }
+      error2.style.display = "none"
+
+      return true;
+    }
+
+    function phoneValidate() {
+      const phoneVal = phoneid.value.trim();
+      if (phoneVal.length !== 10 || !/^\d+$/.test(phoneVal)) {
+        error3.textContent = "Enter exactly 10 digits";
+        error3.style.display = "block";
+        return false;
+      }
+      error3.style.display = "none";
+      return true;
+    }
+
+    function passwordValidate() {
+      const passVal = passid.value;
+      const cpassVal = cpassid.value;
+      const alpha = /[a-zA-Z]/;
+      const digit = /\d/;
+
+      let valid = true;
+
+      if (passVal.length < 8) {
+        error4.textContent = "Should contain at least 8 characters";
+        error4.style.display = "block";
+        valid = false;
+      } else if (!alpha.test(passVal) || !digit.test(passVal)) {
+        error4.textContent = "Should contain both letters and numbers";
+        error4.style.display = "block";
+        valid = false;
+      } else {
+        error4.style.display = "none";
+      }
+
+      if (passVal !== cpassVal) {
+        error5.textContent = "Passwords do not match";
+        error5.style.display = "block";
+        valid = false;
+      } else {
+        error5.style.display = "none";
+      }
+
+      return valid;
+    }
+
+    function termsValidate() {
+      const checkbox = document.getElementById("terms");
+      if (!checkbox.checked) {
+        alert("Please check the terms box to proceed.");
+        return false;
+      }
+      return true;
+    }
+
+    signform.addEventListener("submit", function (e) {
+      const validName = nameValidate();
+      const validEmail = emailValidate();
+      const validPhone = phoneValidate();
+      const validPassword = passwordValidate();
+      const validTerms = termsValidate();
+
+      if (!(validName && validEmail && validPhone && validPassword && validTerms)) {
+        e.preventDefault(); 
+      }
+    });
+
+   
+    nameid.addEventListener("blur", nameValidate);
+    emailid.addEventListener("blur", emailValidate);
+    phoneid.addEventListener("blur", phoneValidate);
+    passid.addEventListener("blur", passwordValidate);
+    cpassid.addEventListener("blur", passwordValidate);
+  </script>
+</body>
+
+</html>
