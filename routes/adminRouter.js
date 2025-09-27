@@ -37,9 +37,14 @@ router.delete("/deleteBrand/:id", adminAuth, brandController.deleteBrand);
 router.post("/addBrand", upload.single("brandImage"), adminAuth, brandController.addBrand);
 
 //Product Management//
-router.get("/products", adminAuth, productController.getProductAddPage);
-router.post("/addProduct", adminAuth, upload.array("images", 4), productController.addProducts);
-// upload.any()
+router.get("/addproducts", adminAuth, productController.getProductAddPage);
+router.post("/addProduct", adminAuth, upload.any(), productController.addProducts);
+router.get("/products",adminAuth, productController.getProductpage);
+router.get("/products/data", adminAuth, productController.getProductsData);
+router.delete("/products/:id", adminAuth, productController.deleteProduct);
+router.get("/editproduct/:id", adminAuth, productController.getEditProductPage);
+router.post("/products/edit/:id", adminAuth, upload.any(), productController.updateProduct);
+
 
 
 module.exports = router;

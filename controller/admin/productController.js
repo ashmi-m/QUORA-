@@ -1,19 +1,11 @@
 const Product = require("../../models/productSchema");
 const Category = require("../../models/categorySchema");
 const Brand = require("../../models/brandSchema");
-const fs = require("fs");
+const fs = require("fs").promises;
 const path = require("path");
 const sharp = require("sharp");
-const cloudinary = require("cloudinary").v2;
+const cloudinary = require("../../config/cloudinary"); 
 
-// Configure cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
-// 👉 GET Add Product Page
 const getProductAddPage = async (req, res) => {
   try {
     const category = await Category.find({ isListed: true });
@@ -28,69 +20,176 @@ const getProductAddPage = async (req, res) => {
     res.redirect("/admin/pageerror");
   }
 };
+
+const loadShopPage = async(req,res)=>{
+  try {
+    res.render("shop");
+  } catch (error) {
+    console.error("Error loading shop page",error);
+    res.status(500).send("Server Error");
+  }
+};
+
+
+
+const getProductsData = async (req, res) => {
+  try {
+   const page = parseInt(req.query.page) || 1;
+   const limit = parseInt(req.query.limit) || 10;
+   const skip = (page-1)*limit;
+
+   const total = await Product.countDocuments();
+
+   const products = await Product.find()
+   .populate("category","name")
+   .populate("brand","brandName")
+    .sort({ createdOn: -1 })
+    
+   .skip(skip)
+   .limit(limit)
+   .lean();
+
+
+   res.json({
+     success: true,
+      products,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit)
+   });
+
+  } catch (err) {
+    console.error("Error fetching products:", err);
+    res.json({ success: false, message: "Error fetching products" });
+  }
+};
+
+const deleteProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Product.findByIdAndDelete(id);
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Error deleting product:", err);
+    res.json({ success: false, message: "Error deleting product" });
+  }
+};
+
+const getProductpage = async (req, res) => {
+  try {
+    res.render("products"); 
+  } catch (error) {
+    console.log(error);
+    res.redirect("/admin/pageerror");
+  }
+};
+
+
+
 const addProducts = async (req, res) => {
   try {
     console.log("req.body is", req.body);
-    console.log("req.files is", req.files && req.files.length ? req.files.map(f => ({ originalname: f.originalname, path: f.path ? true : false, buffer: f.buffer ? true : false })) : req.files);
+    console.log(
+      "req.files is",
+      req.files && req.files.length
+        ? req.files.map((f) => ({
+          originalname: f.originalname,
+          path: !!f.path,
+          buffer: !!f.buffer,
+        }))
+        : req.files
+    );
 
     const products = req.body;
 
-    // check existing
-    const productExists = await Product.findOne({ productName: products.productName });
+
+    const productExists = await Product.findOne({
+      productName: products.productName,
+    });
     if (productExists) {
-      return res.status(400).json({ ok: false, error: "Product already exists, please try with another name" });
+      return res.status(400).json({
+        ok: false,
+        error: "Product already exists, please try with another name",
+      });
     }
 
-    // images
     const imageUrls = [];
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
-        // handle memoryStorage (buffer present)
         if (file.buffer) {
-          // resize buffer with sharp then upload via upload_stream
+
           const resizedBuffer = await sharp(file.buffer)
             .resize(440, 440, { fit: "inside" })
             .toBuffer();
 
           const uploadResult = await new Promise((resolve, reject) => {
-            const stream = cloudinary.uploader.upload_stream({ folder: "quora_products" }, (err, result) => {
-              if (err) return reject(err);
-              resolve(result);
-            });
+            const stream = cloudinary.uploader.upload_stream(
+              { folder: "quora_products" },
+              (err, result) => {
+                if (err) return reject(err);
+                resolve(result);
+              }
+            );
             stream.end(resizedBuffer);
           });
 
           imageUrls.push(uploadResult.secure_url);
-        }
-        // handle diskStorage (file.path present)
+        } 
         else if (file.path) {
-          const processedPath = path.join("uploads", `${Date.now()}-${file.originalname}`);
-          await sharp(file.path).resize(440, 440, { fit: "inside" }).toFile(processedPath);
 
-          const result = await cloudinary.uploader.upload(processedPath, { folder: "quora_products" });
-          imageUrls.push(result.secure_url);
+          const processedPath = path.join(
+            "uploads",
+            `${Date.now()}-${file.originalname}`
+          );
 
-          // safe cleanup
-          try { fs.unlinkSync(file.path); } catch (e) { console.warn('could not unlink temp file', e.message); }
-          try { fs.unlinkSync(processedPath); } catch (e) { console.warn('could not unlink processed file', e.message); }
-        } else {
-          return res.status(400).json({ ok: false, error: "Uploaded file format not supported by server" });
+
+          // console.log(file)
+
+          // await sharp(file.path)
+          //   .resize(440, 440, { fit: "inside" })
+          //   .toFile(processedPath);
+
+
+          // const result = await cloudinary.uploader.upload(processedPath, {
+          //   folder: "quora_products",
+          // });
+
+          // console.log(result)
+          imageUrls.push(file.path);
+
+          try {
+            await fs.unlink(file.path);
+            await fs.unlink(processedPath);
+          } catch (e) {
+            console.warn("Cleanup failed:", e.message);
+          }
+        }
+         else {
+          return res
+            .status(400)
+            .json({ ok: false, error: "Uploaded file format not supported" });
         }
       }
     } else {
-      return res.status(400).json({ ok: false, error: "At least one image is required" });
+      return res
+        .status(400)
+        .json({ ok: false, error: "At least one image is required" });
     }
 
-    // validate category
+
     const categoryDoc = await Category.findById(products.category);
     if (!categoryDoc) {
-      return res.status(400).json({ ok: false, error: "Invalid category selected" });
+      return res
+        .status(400)
+        .json({ ok: false, error: "Invalid category selected" });
     }
 
-    // convert numeric fields
     const regularPrice = parseFloat(products.regularPrice) || 0;
-    const salePrice = products.salePrice ? parseFloat(products.salePrice) : null;
+    const salePrice = products.salePrice
+      ? parseFloat(products.salePrice)
+      : null;
     const quantity = parseInt(products.quantity, 10) || 0;
+
 
     const newProduct = new Product({
       productName: products.productName,
@@ -109,16 +208,103 @@ const addProducts = async (req, res) => {
 
     await newProduct.save();
 
-    // return JSON so client-side fetch can parse it cleanly
-    return res.status(201).json({ ok: true, message: "Product added successfully" });
+    return res
+      .status(201)
+      .json({ ok: true, message: "Product added successfully" });
   } catch (error) {
     console.error("Error saving product", error);
     return res.status(500).json({ ok: false, error: "Server error" });
   }
 };
 
- 
+   const getEditProductPage = async(req,res)=>{
+    try{
+      console.log("req.params ",req.params)
+      const {id}=req.params;
+      const product = await Product.findById(id)
+      .populate("category", "name")
+      .populate("brand", "brandName")
+      .lean();
+
+       if (!product) return res.redirect("/admin/products");
+
+    const categories = await Category.find({ isListed: true });
+    const brands = await Brand.find({ isBlocked: false });
+
+    res.render("editProduct",{
+       product,
+      categories,
+      brands,
+    });
+
+    }catch(err){
+      console.error("Error loading edit product page:",err);
+      res.redirect("/admin/pageerror");
+    }
+   };
+
+   const updateProduct = async(req,res)=>{
+    try{
+      console.log("req.params",req.params)
+      const {id}=req.params;
+      const updates = req.body;
+
+      let imageUrls =[];
+      if(req.files && req.files.length>0){
+        for(const file of req.files){
+           const resizedBuffer = await sharp(file.buffer)
+          .resize(440, 440, { fit: "inside" })
+          .toBuffer();
+
+           const uploadResult = await new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { folder: "quora_products" },
+            (err, result) => {
+              if (err) return reject(err);
+              resolve(result);
+        }
+          );
+       stream.end(resizedBuffer);
+    });
+
+     imageUrls.push(uploadResult.secure_url);
+   }
+  }
+
+      const product = await Product.findById(id);
+    if (!product) return res.redirect("/admin/products");
+
+    product.productName = updates.productName;
+    product.description = updates.description;
+    product.regularPrice = parseFloat(updates.regularPrice) || 0;
+    product.salePrice = updates.salePrice
+      ? parseFloat(updates.salePrice)
+      : null;
+    product.category = updates.category;
+    product.brand = updates.brand;
+    product.quantity = parseInt(updates.quantity, 10) || 0;
+
+      if (imageUrls.length > 0) {
+      product.productImage = imageUrls;
+    }
+
+      await product.save();
+     res.redirect("/admin/products?editSuccess=true");
+  } catch (err) {
+    console.error("Error updating product:", err);
+    res.redirect("/admin/pageerror");
+  }
+};
+
+
 module.exports = {
   getProductAddPage,
   addProducts,
+  getProductpage,
+   getProductsData, 
+  deleteProduct, 
+   getEditProductPage,
+    updateProduct,
+    loadShopPage ,
+
 };

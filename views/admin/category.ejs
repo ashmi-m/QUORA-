@@ -182,7 +182,10 @@
     <h2>Category Management</h2>
 
     <div class="actions">
-      <input type="search" placeholder="Search here">
+      <form action="/admin/categories" method="get">
+      <input type="search" name="search" placeholder="Search here"  value="<%= search || '' %>">
+       <button type="submit">🔍</button>
+      </form>
       <button class="add-btn" onclick="openModal()">➕ Add Category</button>
     </div>
 
@@ -227,7 +230,8 @@
         <% if(i === currentPage){ %>
           <strong><%= i %></strong>
         <% } else { %>
-          <a href="/admin/category?page=<%= i %>"><%= i %></a>
+          <a href="/admin/categories?page=<%= i %>&search=<%= search %>"><%= i %></a>
+
         <% } %>
       <% } %>
     </div>
@@ -236,8 +240,9 @@
   <!-- Modal -->
   <div class="modal" id="categoryModal">
     <div class="modal-content">
-      <h3>Add Category</h3>
+      <h3 id="modalTitle">Add Category</h3>
       <form id="categoryForm" onsubmit="return handleFormsubmit(event)">
+         <input type="hidden" id="catId">
         <input type="text" id="catName" placeholder="Category Name" required>
         <textarea id="catDesc" placeholder="Category Description" required></textarea>
         <div>
@@ -253,11 +258,22 @@
   const modal = document.getElementById("categoryModal");
   const catName = document.getElementById("catName");
   const catDesc = document.getElementById("catDesc");
+   const catId = document.getElementById("catId");
+  const modalTitle = document.getElementById("modalTitle");
 
   function openModal() {
     modal.style.display = "flex";
+    catId.value = "";
     catName.value = "";
     catDesc.value = "";
+    modalTitle.textContent = "Add Category";
+  }
+    function openEditModal(id, name, description){
+    modal.style.display = "flex";
+    catId.value = id;
+    catName.value = name;
+    catDesc.value = description;
+    modalTitle.textContent = "Edit Category";
   }
 
   function closeModal() {
@@ -266,10 +282,11 @@
 
   async function handleFormsubmit(event){
     event.preventDefault();
+     const id = catId.value.trim();
     const name = catName.value.trim();
     const description = catDesc.value.trim();
 
-    // ✅ Frontend validation
+  
     if(name.length < 3){
       Swal.fire("Invalid Input", "Category name must be at least 3 characters", "warning");
       return;
@@ -284,6 +301,8 @@
     }
 
     try {
+        const url = id ? `/admin/editCategory/${id}` : '/admin/addCategory';
+      const method = id ? 'PUT' : 'POST';
       const response = await fetch('/admin/addCategory',{
         method:"POST",
         headers:{ 'Content-Type':'application/json' },
@@ -335,6 +354,31 @@
       Swal.fire("Error", "Server error occurred", "error");
     }
   }
+  
+  async function toggleStatus(id, checked){
+    try{
+      const response = await fetch(`/admin/toggleCategoryStatus/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: checked })
+      });
+      const data = await response.json();
+      if(!response.ok) Swal.fire("Error", data.error || "Failed to update status", "error");
+    }catch(e){
+      Swal.fire("Error", "Server error", "error");
+    }
+  }
+
+  function filterCategories(input){
+    const filter = input.value.toUpperCase();
+    const rows = document.querySelectorAll("#categoryTable tbody tr");
+    rows.forEach(row=>{
+      const name = row.querySelector(".cat-name").textContent;
+      row.style.display = name.toUpperCase().includes(filter) ? "" : "none";
+    });
+  }
+
+
 </script>
 </body>
 

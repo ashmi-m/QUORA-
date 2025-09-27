@@ -252,7 +252,7 @@
       const brandName = document.getElementById("brandName").value.trim();
       const brandImage = document.getElementById("brandImage").files[0];
       if (!brandName || !brandImage) {
-        Swal.fire("⚠️ Oops!", "Please fill all fields", "warning");
+        Swal.fire(" Oops!", "Please fill all fields", "warning");
         return;
       }
       const formData = new FormData();
@@ -265,6 +265,8 @@
           Swal.fire("✅ Success", "Brand added successfully!", "success").then(() => {
             location.reload();
           });
+          
+        document.getElementById("addBrandForm").reset()
         } else {
          Swal.fire("❌ Error", data.error, "error");
         }
@@ -301,17 +303,9 @@
       Swal.fire("❌ Error", "Failed to delete brand", "error");
     }
      }else{
-      Swal.fire({
-        icon:"error",
-        title:"OOPS",
-        text:"Internal Server Error",
-        showConfirmButton:true
-      })
+      Swal.fire("Cancelled","Your brand is safe","info");
      }
-    })
-    
-
-   
+    });
   }
 
 
@@ -354,8 +348,6 @@
     } catch (err) {
       console.error("Unblock error:", err);
       Swal.fire("❌ Error", err.message, "error");
-  
-    
       }
     }
   </script>

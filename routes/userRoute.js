@@ -2,7 +2,10 @@
 
 const express = require("express");
 const router = express.Router();
-const userController = require("../controller/user/userController.js");
+const userController = require("../controller/user/userController");
+const shopController = require("../controller/user/shopController");
+
+
 const passport = require("../config/passport.js");
 
 router.get("/pageNotFound",userController.pageNotFound);
@@ -17,7 +20,7 @@ router.post("/resend-otp",userController.resendOtp);
 router.get('/auth/google',passport.authenticate('google',{scope:['profile','email']}));
 
 router.get('/auth/google/callback',passport.authenticate('google',{failureRedirect:'/login'}),(req,res)=>{
-      console.log("✅ Google login success:", req.user);
+      console.log("Google login success:", req.user);
     res.redirect('/')
 });
 
@@ -29,6 +32,14 @@ router.post("/forgot-password", userController.forgotPassword);
 router.post("/verify-reset-otp", userController.verifyResetOtp);
 router.post("/reset-password", userController.resetPassword);
 
+
+//shoppage//
+
+router.get("/shop",shopController.loadShopPage);
+// router.get("/shop/products/data",shopController.getProductsData);
+// router.post("/shop/addProduct", shopController.addProducts);
+
+router.get("/product/:id", shopController.loadProductDetails);
 
 
 module.exports = router;

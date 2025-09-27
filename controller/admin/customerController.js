@@ -2,53 +2,40 @@ const User = require("../../models/userSchema");
 
 const customerInfo = async (req, res) => {
     try {
+        let search = req.query.search || "";
+        let page = parseInt(req.query.page) || 1;
+        const limit = 3;
 
-        let search = "";
-        if (req.query.search) {
-            search = req.query.search;
-
-        }
-        let page = 1;
-        if (req.query.page) {
-            page = req.query.page
-        }
-        const limit = 3
-        const userData = await User.find({
+        const query = {
             isAdmin: false,
             $or: [
-                { name: { $regex: ".*" + search + ".*" } },
-                { email: { $regex: ".*" + search + ".*" } },
-            ],
+                { name: { $regex: search, $options: "i" } },
+                { email: { $regex: search, $options: "i" } }
+            ]
+        };
 
-        })
-            .limit(limit * 1)
-            .skip((page - 1) * limit)
-            .exec();
+        const userData = await User.find(query)
+        .sort({_id:-1})
+        .limit(limit)
+        .skip((page - 1)*limit)
+        .exec();
+        
 
-        const count = await User.countDocuments({
-            isAdmin: false,
-            $or: [
-                { name: { $regex: ".*" + search + ".*" } },
-                { email: { $regex: ".*" + search + ".*" } },
-            ],
+        const count = await User.countDocuments(query);
 
-        });
-
-        res.render("customer", {
-            data: userData,
-            totalUsers: count,
-            currentPage: page,
-            totalPages: Math.ceil(count / limit),
+        res.render("customer",{
+            data:userData,
+            totalUsers:count,
+            currentPage:page,
+            totalPages:Math.ceil(count/limit),
             search,
         });
-    } catch (error) {
-        console.error("Error in customerInfo:", error.message);
-        res.status(500).send("Internal Server Error");
 
-    }
-
-};
-
+        }catch(error){
+            console.error("Error in customerInfo:",error.message);
+            res.status(500).send("Internal  Server Error");
+        }
+    };
 const customerBlocked = async (req, res) => {
     try {
         let id = req.query.id;
