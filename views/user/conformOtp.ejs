@@ -454,7 +454,14 @@
                     clearInterval(timerInterval);
                     time = 60;
                     startTimer();
+                    fetch('/resend-otp',{
+                        method : 'POST',
+                        headers : {
+                            'Content-type' : 'application/json'
+                        }
+                    })
                     alert("Resend OTP called!");
+
                 }
             </script>
 </body>

@@ -45,7 +45,7 @@ router.delete("/products/:id", adminAuth, productController.deleteProduct);
 router.get("/editproduct/:id", adminAuth, productController.getEditProductPage);
 router.post("/products/edit/:id", adminAuth, upload.any(), productController.updateProduct);
 
-
+router.post("/delete-product-image",adminAuth,productController.deleteImage);
 
 module.exports = router;
 

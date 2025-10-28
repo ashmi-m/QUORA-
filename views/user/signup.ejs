@@ -84,9 +84,11 @@
                   <a href="/auth/google" class="btn google-btn">
                     <img src="/images/image 2.png" alt="google"> Sign in with Google
                   </a>
+                 
 
                   <p class="have-account">Have an account? <a href="/login">Sign in</a></p>
             </form>
+      </div>
       </div>
     </div>
   </main>
@@ -121,19 +123,22 @@
       return true;
     }
 
-    function emailValidate() {
-      const emailVal = emailid.value;
-      const pattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-      if (!pattern.test(emailVal)) {
-        error2.textContent = "Invalid email format";
-        error2.style.display = "block";
-        return false;
-      }
-      error2.style.display = "none"
+     function emailValidate() {
+    const emailVal = document.getElementById("email").value.trim();
+    const error2 = document.getElementById("error2");
 
-      return true;
+  
+    const pattern = /^[a-zA-Z][a-zA-Z0-9._%+-]{2,}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+
+    if (!pattern.test(emailVal)) {
+      error2.textContent = "Please enter a valid email (example: user@gmail.com)";
+      error2.style.display = "block";
+      return false;
     }
+    error2.style.display = "none";
+    return true;
 
+    }
     function phoneValidate() {
       const phoneVal = phoneid.value.trim();
       if (phoneVal.length !== 10 || !/^\d+$/.test(phoneVal)) {

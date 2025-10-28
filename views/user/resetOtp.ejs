@@ -99,7 +99,7 @@
 </head>
 <body>
   <div class="container">
-    <!-- Left section -->
+  
     <div class="left">
       <h2>Confirm With OTP</h2>
       <p>Please check your mail address for OTP</p>
@@ -112,12 +112,13 @@
           <input type="text" maxlength="1" name="otp4" required>
         </div>
         <input type="hidden" id="otp" name="otp">
+        <input type="hidden" id="email" name="email" value="<%= email %>">
         <button type="submit">Confirm</button>
       </form>
 
       <div class="resend">
-        <span id="timer">Resend OTP in 30s</span> |
-        <a href="/resend-otp" id="resendLink" style="display:none;">Resend OTP</a>
+        <span id="timer">Resend OTP in 30s</span> 
+        <a href="#" id="resendLink" style="display:none;">Resend OTP</a>
       </div>
 
       <p><a href="/login">Go back to login page</a></p>
@@ -127,33 +128,37 @@
       <% } %>
     </div>
 
-    <!-- Right section -->
+ 
     <div class="right"></div>
   </div>
 
-  <script>
-    // OTP auto-focus
-    const inputs = document.querySelectorAll(".otp-inputs input");
-    inputs.forEach((input, index) => {
-      input.addEventListener("input", () => {
-        if (input.value && index < inputs.length - 1) {
-          inputs[index + 1].focus();
-        }
-      });
+ <script>
+  const inputs = document.querySelectorAll(".otp-inputs input");
+  inputs.forEach((input, index) => {
+    input.addEventListener("input", () => {
+      if (input.value && index < inputs.length - 1) {
+        inputs[index + 1].focus();
+      }
     });
+  });
 
-    // Collect OTP into hidden field
-    document.getElementById("otpForm").addEventListener("submit", (e) => {
-      const otp = Array.from(inputs).map(i => i.value).join("");
-      document.getElementById("otp").value = otp;
-    });
+  document.getElementById("otpForm").addEventListener("submit", (e) => {
+    const otp = Array.from(inputs).map(i => i.value).join("");
+    document.getElementById("otp").value = otp;
+  });
 
-    // Countdown for resend
-    let timeLeft = 30;
-    const timerEl = document.getElementById("timer");
-    const resendLink = document.getElementById("resendLink");
+  let timeLeft = 10;
+  const timerEl = document.getElementById("timer");
+  const resendLink = document.getElementById("resendLink");
+  let countdown;
 
-    const countdown = setInterval(() => {
+  function startCountdown() {
+    clearInterval(countdown); // clear old timer if any
+    timeLeft = 10;
+    timerEl.style.display = "inline";
+    resendLink.style.display = "none";
+
+    countdown = setInterval(() => {
       if (timeLeft <= 0) {
         clearInterval(countdown);
         timerEl.style.display = "none";
@@ -162,7 +167,34 @@
         timerEl.textContent = `Resend OTP in ${timeLeft--}s`;
       }
     }, 1000);
-  </script>
+  }
+
+  // Start first countdown
+  startCountdown();
+
+  resendLink.addEventListener("click", async (e) => {
+    e.preventDefault();
+    try {
+      const email = document.getElementById('email').value;
+      const res = await fetch("/resend-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body : JSON.stringify({email})
+      });
+
+      if (res.ok) {
+        alert("A new OTP has been sent to your email.");
+        startCountdown();
+      } else {
+        alert("Failed to resend OTP. Try again.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error connecting to server.");
+    }
+  });
+</script>
+
 </body>
 </html>
 

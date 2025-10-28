@@ -15,22 +15,20 @@
   <div class="sidebar">
     <h2 class="logo">QUORA</h2>
     <ul class="menu">
-      <li><a href="/admin/dashboard" class="active"><i class="fa fa-home"></i> Dashboard</a></li>
-      <li><a href="/admin/orders"><i class="fa fa-shopping-cart"></i> Orders</a></li>
-      <li><a href="/admin/Addproducts"><i class="fa fa-box"></i> Addproduct</a></li>
-      <li><a href="/admin/products"><i class="fa fa-box"></i> Products</a></li>
+  <li><a href="/admin/dashboard" class="<%= active === 'dashboard' ? 'active' : '' %>"><i class="fa fa-home"></i> Dashboard</a></li>
+  <li><a href="/admin/orders" class="<%= active === 'orders' ? 'active' : '' %>"><i class="fa fa-shopping-cart"></i> Orders</a></li>
+  <li><a href="/admin/Addproducts" class="<%= active === 'addProduct' ? 'active' : '' %>"><i class="fa fa-box"></i> Add Product</a></li>
+  <li><a href="/admin/products" class="<%= active === 'products' ? 'active' : '' %>"><i class="fa fa-box"></i> Products</a></li>
+  <li><a href="/admin/sales-report" class="<%= active === 'sales' ? 'active' : '' %>"><i class="fa fa-chart-line"></i> Sales Report</a></li>
+  <li><a href="/admin/user" class="<%= active === 'customers' ? 'active' : '' %>"><i class="fa fa-users"></i> Customers</a></li>
+  <li><a href="/admin/coupons" class="<%= active === 'coupons' ? 'active' : '' %>"><i class="fa fa-ticket"></i> Coupons</a></li>
+  <li><a href="/admin/categories" class="<%= active === 'categories' ? 'active' : '' %>"><i class="fa fa-list"></i> Categories</a></li>
+  <li><a href="/admin/brands" class="<%= active === 'brands' ? 'active' : '' %>"><i class="fa fa-briefcase"></i> Brands</a></li>
+  <li><a href="/admin/banner" class="<%= active === 'banner' ? 'active' : '' %>"><i class="fa fa-image"></i> Banner</a></li>
+  <li><a href="/admin/refund" class="<%= active === 'refund' ? 'active' : '' %>"><i class="fa fa-undo"></i> Refund/Return</a></li>
+  <li><a href="/admin/logout"><i class="fa fa-sign-out-alt"></i> Sign Out</a></li>
+</ul>
 
-      <li><a href="/admin/sales-report"><i class="fa fa-chart-line"></i> Sales Report</a></li>
-      <li><a href="/admin/user"><i class="fa fa-users"></i> Customers</a></li>
-      <li><a href="/admin/coupons"><i class="fa fa-ticket"></i> Coupons</a></li>
-      <li><a href="/admin/categories"><i class="fa fa-list"></i> Categories</a></li>
-
-      <li><a href="/admin/brands"><i class="fa fa-briefcase"></i> Brands</a></li>
-
-      <li><a href="/admin/banner"><i class="fa fa-image"></i> Banner</a></li>
-      <li><a href="/admin/refund"><i class="fa fa-undo"></i> Refund/Return</a></li>
-      <li><a href="/admin/logout"><i class="fa fa-sign-out-alt"></i> Sign Out</a></li>
-    </ul>
   </div>
     <header class="topbar">
 

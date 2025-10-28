@@ -17,6 +17,7 @@ router.post('/signup', userController.signup);
 router.post('/verify-otp', userController.conformOtp);
 router.post("/resend-otp",userController.resendOtp);
 
+
 router.get('/auth/google',passport.authenticate('google',{scope:['profile','email']}));
 
 router.get('/auth/google/callback',passport.authenticate('google',{failureRedirect:'/login'}),(req,res)=>{
@@ -35,10 +36,10 @@ router.post("/reset-password", userController.resetPassword);
 
 //shoppage//
 
-router.get("/shop",shopController.loadShopPage);
+
 // router.get("/shop/products/data",shopController.getProductsData);
 // router.post("/shop/addProduct", shopController.addProducts);
-
+router.get("/shop", shopController.loadShopPage);
 router.get("/product/:id", shopController.loadProductDetails);
 
 

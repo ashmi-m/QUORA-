@@ -90,7 +90,7 @@ navbar {
       <% if (locals.user) { %>
         <div class="dropdown">
           <a href="#" class="sign-in-link text-dark">
-            <%= user.name %>
+            <%= user.name || "Username" %>
           </a>
           <div class="dropdown-content">
             <a href="/userProfile">Profile</a>

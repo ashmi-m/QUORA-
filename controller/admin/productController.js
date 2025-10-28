@@ -37,10 +37,16 @@ const getProductsData = async (req, res) => {
    const page = parseInt(req.query.page) || 1;
    const limit = parseInt(req.query.limit) || 10;
    const skip = (page-1)*limit;
+   const search = req.query.search?.trim()||"";
 
-   const total = await Product.countDocuments();
+   const filter ={};
+   if(search){
+    filter.productName = {$regex:search,$options:"i"};
+   }
 
-   const products = await Product.find()
+   const total = await Product.countDocuments(filter);
+
+   const products = await Product.find(filter)
    .populate("category","name")
    .populate("brand","brandName")
     .sort({ createdOn: -1 })
@@ -55,7 +61,8 @@ const getProductsData = async (req, res) => {
       products,
       total,
       page,
-      totalPages: Math.ceil(total / limit)
+      totalPages: Math.ceil(total / limit),
+      total
    });
 
   } catch (err) {
@@ -77,9 +84,11 @@ const deleteProduct = async (req, res) => {
 
 const getProductpage = async (req, res) => {
   try {
-    res.render("products"); 
+    const product = await Product.find()
+    // console.log("product is",product)
+    res.render("products",{product}); 
   } catch (error) {
-    console.log(error);
+    console.log("error  in the get product page",error);
     res.redirect("/admin/pageerror");
   }
 };
@@ -88,7 +97,7 @@ const getProductpage = async (req, res) => {
 
 const addProducts = async (req, res) => {
   try {
-    console.log("req.body is", req.body);
+    console.log("req.body is addProducts", req.body);
     console.log(
       "req.files is",
       req.files && req.files.length
@@ -219,7 +228,7 @@ const addProducts = async (req, res) => {
 
    const getEditProductPage = async(req,res)=>{
     try{
-      console.log("req.params ",req.params)
+      console.log("req.params getEditProductPage",req.params)
       const {id}=req.params;
       const product = await Product.findById(id)
       .populate("category", "name")
@@ -295,7 +304,23 @@ const addProducts = async (req, res) => {
     res.redirect("/admin/pageerror");
   }
 };
+   const deleteImage =async(req,res)=>{
+    try {
+      const{ productId, image} = req.body;
+      const product = await Product.findById(productId);
+      if(!product) return res.json({success:false,message:'Product not found'})
 
+         
+    product.productImage = product.productImage.filter((img)=> img !== image);
+    console.log(product)
+    await product.save();
+
+    res.json({ success: true });
+    } catch (error) {
+     console.error(error);
+    res.json({ success: false });
+    }
+   }
 
 module.exports = {
   getProductAddPage,
@@ -306,5 +331,5 @@ module.exports = {
    getEditProductPage,
     updateProduct,
     loadShopPage ,
-
+    deleteImage,
 };

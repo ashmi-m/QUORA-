@@ -31,41 +31,61 @@
           <img 
             src="<%= img %>" 
             class="thumbnail-image" 
+            data-src="<%= img %>" 
             style="width:60px; height:60px; object-fit:cover; border:1px solid #ddd; cursor:pointer; transition: transform 0.3s ease;"
           >
         <% }) %>
       </div>
     </div>
 
-  </div>
-
-</div>
 
     <div style="flex:2;">
       <h2 style="margin-top:0;"><%= product.productName %></h2>
-      <p style="font-size:14px; line-height:1.5;"><%= product.description %></p>
-      <p style="font-weight:bold; font-size:18px; margin:10px 0;">₹<%= product.regularPrice %></p>
+
+     <div style="margin:15px 0; padding:15px; border:1px solid #eee; border-radius:8px; background:#fafafa;">
+     <h4 style="margin:0 0 10px; font-size:18px; color:#ff6f61;">Product Description</h4>
+       <p style="font-size:15px; line-height:1.7; color:#444; text-align:justify;">
+       <%= product.description %>
+       </p>
+     </div>
+
+
+      <div style="margin:10px 0;">
+        <span style="font-size:26px; font-weight:bold; color:#000;">
+          ₹<%= product.salePrice || product.regularPrice %>
+        </span>
+
+        <% if (product.salePrice && product.regularPrice && product.salePrice < product.regularPrice) { %>
+          <span style="font-size:20px; text-decoration:line-through; color:#888; margin-left:8px;">
+            ₹<%= product.regularPrice %>
+          </span>
+          <!-- <span style="font-size:14px; color:#fff; background:#ff4d4d; padding:4px 8px; border-radius:4px; margin-left:5px;">
+            <%= Math.round(((product.regularPrice - product.salePrice) / product.regularPrice) * 100) %>% Off
+          </span>
+        <% } %>
+      </div> -->
+      <br>
       
-      
+      Stock : <%= product.quantity %>
+
       <div style="margin:10px 0;">
         <span>⭐⭐⭐⭐⭐</span>
-
         <span style="margin-left:10px;">(5 Reviews)</span>
       </div>
 
  
-      <div style="margin:10px 0;">
+      <!-- <div style="margin:10px 0;">
         <label>Shades:</label>
         <select>
           <% product.shades?.forEach(shade => { %>
             <option><%= shade %></option>
           <% }) %>
         </select>
-      </div>
-
-    
+      </div> -->
     </div>
   </div>
+</div>
+
 
   <h3 style="margin-top:50px;">Related Products</h3>
   <div style="display:flex; gap:20px; overflow-x:auto; padding-bottom:20px;">
@@ -79,16 +99,16 @@
   </div>
 
   
-  <h3>Reviews</h3>
+  <!-- <h3>Reviews</h3>
   <div style="border:1px solid #ddd; padding:15px; border-radius:5px;">
     <% product.reviews?.forEach(review => { %>
       <p style="margin:5px 0;"><strong><%= review.user %>:</strong> <%= review.comment %> ⭐<%= review.rating %></p>
       
-    <% }) %>
+    <% }) %> -->
 
     <form style="margin-top:15px;">
-      <textarea placeholder="Add review..." style="width:100%; height:60px; padding:5px;"></textarea>
-      <button style="margin-top:5px; padding:5px 10px; background:#ff6f61; color:white; border:none;">Submit</button>
+      <!-- <textarea placeholder="Add review..." style="width:100%; height:60px; padding:5px;"></textarea>
+      <button style="margin-top:5px; padding:5px 10px; background:#ff6f61; color:white; border:none;">Submit</button> -->
     </form>
   </div>
 </div>
@@ -109,10 +129,10 @@
   <div style="text-align:center; margin-top:10px;">&copy; 2025 Quora - All Rights Reserved.</div>
 </footer>
 
-</body>
 <script>
-  
+     document.addEventListener("DOMContentLoaded",function(){
      const mainImage = document.querySelector(".main-product-image");
+     const thumbnails = document.querySelectorAll(".thumbnail-image");
 
   mainImage.addEventListener("mousemove", function(e) {
     const rect = mainImage.getBoundingClientRect();
@@ -129,7 +149,15 @@
     mainImage.style.transform = "scale(1)";
     mainImage.style.transformOrigin = "center center";
   });
+
+  thumbnails.forEach(thumbnail=>{
+    thumbnail.addEventListener("click",function(){
+      mainImage.src = this.dataset.src;
+    });
+    });
+  });
 </script>
+</body>
 
 
 

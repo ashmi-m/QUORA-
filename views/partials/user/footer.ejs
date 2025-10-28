@@ -1,35 +1,100 @@
-<head>
-  <link rel="stylesheet" href="/footer.css">
-</head>
 
 <footer>
-  
+  <style>
+    footer {
+      background-color: #fdd9d6;
+      padding: 40px 20px;
+      font-family: sans-serif;
+      color: #333;
+    }
+
+    .footer-top {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .footer-top > div {
+      flex: 1;
+      min-width: 250px;
+    }
+
+    .footer-top h2 {
+      margin-bottom: 10px;
+      font-size: 24px;
+    }
+
+    .footer-top h4 {
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+
+    .footer-top p,
+    .footer-top li {
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .footer-top ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .footer-top a {
+      text-decoration: none;
+      color: #000;
+      transition: color 0.3s;
+    }
+
+    .footer-top a:hover {
+      color: #d44c4c;
+    }
+
+    .footer-bottom {
+      text-align: center;
+      padding-top: 20px;
+      font-size: 14px;
+      border-top: 1px solid #ccc;
+      margin-top: 20px;
+    }
+  </style>
+
   <div class="footer-top">
     <div class="about">
       <h2>QUORA</h2>
-      <p>Welcome to Quora, your ultimate destination for luxurious cosmetics and beauty essentials. We take pride in offering high-quality skincare and makeup collections, exceptional customer service, and a seamless shopping experience. From bold lipsticks to nourishing moisturizers and dazzling eyeshadows, we have everything you need to enhance your natural beauty with confidence and charm.
-everyday routine. ✨</p>
+      <p>
+        Welcome to Quora, your ultimate destination for luxurious cosmetics and beauty essentials. We take pride in offering high-quality skincare and makeup collections, exceptional customer service, and a seamless shopping experience.
+        From bold lipsticks to nourishing moisturizers and dazzling eyeshadows, we have everything you need to enhance your natural beauty with confidence and charm.
+      </p>
     </div>
-    <div class="links"1>
+
+    <div class="links">
       <h4>Get to know us</h4>
       <ul>
         <li><a href="/">About Us</a></li>
         <li><a href="/">Store Locations</a></li>
-        <li><a href="/"> Privacy Policy</a></li>
-         <li><a href="/">Terms & Conditions</a></li>
-           <li><a href="/">Blog & Tech Guides</a></li>
+        <li><a href="/">Privacy Policy</a></li>
+        <li><a href="/">Terms & Conditions</a></li>
+        <li><a href="/">Blog & Tech Guides</a></li>
         <li><a href="/">Support</a></li>
-        <li><a href="/">Privacy</a></li>
       </ul>
     </div>
+
     <div class="contact">
       <h4>Contact Us</h4>
       <p>📍 Kochi, Kerala, India</p>
       <p>📞 +91-456-789-000</p>
-      <p>✉️ quora@cosmetic.com</p>
+      <p>✉️ <a href="mailto:quora@cosmetic.com">quora@cosmetic.com</a></p>
     </div>
   </div>
+
   <div class="footer-bottom">
-    <p>&copy; 2025 Quora – All Rights Reserved.</p>
+    <p>&copy; <span id="year"></span> Quora – All Rights Reserved.</p>
   </div>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
 </footer>
+

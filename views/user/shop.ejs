@@ -1,6 +1,6 @@
 
 
-<%-include("../partials/user/header")%>
+<%- include('../partials/user/header') %>
 <head>
   <meta charset="UTF-8">
   <title>Product Page</title>
@@ -22,7 +22,7 @@
       text-decoration: none;
       color: inherit;
     }
-
+/* 
     header {
       display: flex;
       justify-content: space-between;
@@ -33,9 +33,9 @@
       position: sticky;
       top: 0;
       z-index: 100;
-    }
+    } */
 
-    header h1 {
+    /* header h1 {
       font-size: 24px;
       font-weight: bold;
     }
@@ -44,7 +44,7 @@
       display: flex;
       gap: 20px;
       align-items: center;
-    }
+    } */
 
     .breadcrumb {
       padding: 15px 50px;
@@ -223,12 +223,17 @@
   <aside class="sidebar">
     <h3>Categories</h3>
     <ul>
-      <li>Perfumes</li>
-      <li>Lipstick</li>
-      <li>Moisturizer</li>
-      <li>Nailpolishes</li>
-      <li>Eyeshadow</li>
-      <li>Foundation</li>
+       <li>
+        <a href="/shop" class="<%= !selectedCategory ? 'active' : '' %>">All</a>
+      </li>
+      <% categories.forEach(cat => { %>
+        <li>
+          <a href="/shop?category=<%= cat._id %>" 
+             class="<%= selectedCategory == cat._id.toString() ? 'active' : '' %>">
+             <%= cat.name %>
+          </a>
+        </li>
+      <% }) %>
     </ul>
 
     <h3>Price</h3>
@@ -256,6 +261,7 @@
             <span class="price">₹<%= product.regularPrice %></span>
           </a>
         </div>
+        
       <% }) %>
     <% } else { %>
       <p>No products available</p>
@@ -265,11 +271,19 @@
 </div>
 
 <div class="pagination">
-  <button>1</button>
-  <button class="active">2</button>
-  <button>3</button>
-  <button>4</button>
-  <button>→</button>
+  <% if (currentPage > 1) { %>
+    <a href="?page=<%= currentPage - 1 %>">←</a>
+  <% } %>
+
+  <% for (let i = 1; i <= totalPages; i++) { %>
+    <a href="?page=<%= i %>" class="<%= currentPage === i ? 'active' : '' %>">
+      <%= i %>
+    </a>
+  <% } %>
+
+  <% if (currentPage < totalPages) { %>
+    <a href="?page=<%= currentPage + 1 %>">→</a>
+  <% } %>
 </div>
 
 <footer>

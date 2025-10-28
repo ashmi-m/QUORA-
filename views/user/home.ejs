@@ -1,13 +1,132 @@
 <%- include('../partials/user/header') %>
+
 <head>
-    <link rel="stylesheet" href="../../css/home.css">
-    <title>Home - Quora</title>
+  <link rel="stylesheet" href="../../css/home.css">
+  <title>Home - Quora</title>
+
+  <style>
+   
+    .product-grid {
+      /* display: flex; */
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-top: 20px;
+      justify-content: center;
+    }
+
+    .product-card {
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 15px;
+      width: 220px;
+      background: #fff;
+      text-align: center;
+    }
+
+    .product-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+
+    .product-card h4 {
+      font-size: 16px;
+      margin: 10px 0;
+    }
+
+    .product-card p {
+      font-weight: bold;
+      color: #333;
+      margin: 5px 0;
+    }
+
+    .btn-view-details,
+    .btn-see-more {
+      background: #4f46e5;
+      color: #fff;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+
+    .btn-view-details:hover,
+    .btn-see-more:hover {
+      background: #3730a3;
+    }
+
+   
+    .offers-section {
+      width: 100%;
+      background-color: #fff;
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .offers-container {
+      background-image: url('/images/Flowers brushes cosmetics highlighter Candle Mac.jpeg'); /* Ensure path is correct */
+      background-size: cover;
+      background-position: center;
+      width: 100%;
+      max-width: 1200px;
+      border-radius: 20px;
+      padding: 140px 60px;
+      color: #a15e3f;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .offers-container h2 {
+      font-size: 36px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .offers-container p {
+      font-size: 18px;
+      margin-bottom: 20px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .offers-container .explore-btn {
+      background-color: #a15e3f;
+      color: white;
+      padding: 12px 24px;
+      font-weight: bold;
+      border-radius: 10px;
+      text-decoration: none;
+      display: inline-block;
+      width: fit-content;
+      transition: background-color 0.3s ease;
+    }
+
+    .offers-container .explore-btn:hover {
+      background-color: #8a4b2f;
+    }
+
+    @media (max-width: 768px) {
+      .offers-container {
+        padding: 40px 20px;
+        text-align: center;
+      }
+
+      .offers-container h2 {
+        font-size: 28px;
+      }
+
+      .offers-container p {
+        font-size: 16px;
+      }
+    }
+  </style>
 </head>
 
 <body>
-  <!-- HEADER NAV -->
-
-  <!-- HERO/BANNER -->
   <section class="hero">
     <div class="hero-left">
       <img src="../../images/image 3.png" alt="Perfume collection">
@@ -17,15 +136,15 @@
         <p>Vibrant experiences within curated products, experienced for you</p>
       </div>
     </div>
-    <div class="hero-right">
 
+    <div class="hero-right">
       <div class="right-bottom">
         <div class="banner">
           <img src="../../images/lipsick 2.jpeg" alt="Skincare">
           <span>Skincare routine</span>
         </div>
         <div class="banner">
-          <img src="../../images/bodyloation.jpeg" alt="Eyeshadow">
+          <img src="../../images/bodyloation.jpeg" alt="Eye makeup">
           <span>Eye makeup</span>
         </div>
       </div>
@@ -36,71 +155,52 @@
           <span>Skincare routine</span>
         </div>
         <div class="banner">
-          <img src="../../images/eye1.jpeg" alt="Eyeshadow">
+          <img src="../../images/eye1.jpeg" alt="Eye makeup">
           <span>Eye makeup</span>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- NEW PRODUCTS SECTION -->
+ 
   <section class="products">
     <h2>NEW PRODUCT</h2>
     <div class="product-grid">
-      <div class="product-card">
-        <img src="../../images/💘.jpeg" alt="Dior Perfume">
-        <h4>Perfume</h4>
-        <p>₹1,300</p>
-      </div>
-      <div class="product-card">
-        <img src="../../images/lipstick 3.jpeg" alt="Lipstick">
-        <h4>Lipstick</h4>
-        <p>₹750</p>
-      </div>
-      <div class="product-card">
-        <img src="../../images/Olay mask.jpeg" alt="Cream">
-        <h4>Olay mask</h4>
-        <p>₹900</p>
-      </div>
-      <div class="product-card">
-        <img src="../../images/eyeshadow 111.jpeg">
-        <h4>Eye Shades</h4>
-        <p>₹800</p>
-      </div>
-      <div class="product-card">
-        <img src="../../images/lippiess!!🍓.jpeg" alt="Lipstick">
-        <h4>Lipstick</h4>
-        <p>₹890</p>
-      </div>
-      <div class="product-card">
-        <img src="../../images/foundation111.jpeg" alt="Foundation">
-        <h4>Foundation</h4>
-        <p>₹1200</p>
-      </div>
-      <div class="product-card">
-        <img src="../../images/Nail polish bottle editable mockup _ premium image….jpeg" alt="Nail Polish">
-        <h4>Nail polish</h4>
-        <p>₹180</p>
-      </div>
-      <div class="product-card">
-        <img src="../../images/moisturiser111.jpeg" alt="Moisturiser">
-        <h4>Moisturiser</h4>
-        <p>₹700</p>
-      </div>
+      <% if (products && products.length > 0) { %>
+        <% products.forEach(product => { %>
+          <div class="product-card">
+            <img src="<%= product.productImage && product.productImage.length > 0 ? product.productImage[0] : '/images/default.png' %>" alt="<%= product.productName %>">
+            <h4><%= product.productName %></h4>
+            <p>₹<%= product.salePrice || product.regularPrice %></p>
+            <a href="/product/<%= product._id %>">
+              <button class="btn-view-details">View Details</button>
+            </a>
+          </div>
+        <% }) %>
+      <% } else { %>
+        <p>No products available</p>
+      <% } %>
     </div>
-    <button class="btn-see-more">SEE MORE</button>
+    <a href="/shop"><button class="btn-see-more">SEE MORE</button></a>
   </section>
 
-  <!-- OFFERS SECTION -->
-  <section class="offers">
-    <img src="/images/offers.jpg" alt="Offers Image">
-    <div class="offer-text">
-      <h3>GREAT OFFERS</h3>
-      <p>EXPLORE THE DEALS AND OFFERS</p>
-      <button class="btn-explore">EXPLORE</button>
+ 
+  <section class="offers-section">
+    <div class="offers-container">
+      <h2>GREAT OFFERS</h2>
+      <p>Explore the deals and offers</p>
+      <a href="/offers" class="explore-btn">EXPLORE</a>
     </div>
   </section>
+
+ 
   <%- include('../partials/user/footer') %>
+
 </body>
 
-</html>
+
+
+
+
+
+

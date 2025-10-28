@@ -1,41 +1,33 @@
 const User = require("../../models/userSchema");
+const Product = require("../../models/productSchema");
 const env = require("dotenv").config();
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 
-
-const pageNotFound = async (req, res) => {
-  try {
-    res.render("page-404");
-  } catch (error) {
+const loadHomepage = async(req,res)=>{
+  try{
+    const products = await Product.find()
+    .sort({createdOn:-1})
+    .limit(8)
+    .lean();
+   
+    const user = req.session.user;
+    res.render("home",{products,user});
+  }catch(error){
+    console.error("Error loading homepage:",error);
     res.redirect("/pageNotFound");
   }
 };
 
-
-const loadHomepage = async (req, res) => {
-  try {
-    const user = req.session.user;
-    console.log('==============================', user)
-    if (user) {
-
-      const userData = await User.findOne({ _id: user });
-      console.log('user data from  backend in home page', userData);
-
-      res.render("home", { user: userData })
-    } else {
-      return res.render('home');
-    }
-
-  } catch (error) {
-    console.log("Home page not found", error);
-    res.status(500).send("Server error");
-  }
+const pageNotFound = (req,res)=>{
+  res.status(404).render("page 404");
 };
-
 
 const loadSignup = async (req, res) => {
   try {
+    if(req.session.user){
+      return res.redirect('/');
+    }
     return res.render("signup");
   } catch (error) {
     console.log("Signup page not found", error);
@@ -82,7 +74,7 @@ async function sendVerificationEmail(email, otp) {
 
 const signup = async (req, res) => {
   try {
-    console.log(req.body)
+    // console.log(req.body)
     const { name, email, password, confirmPassword, phone } = req.body;
 
 
@@ -184,9 +176,7 @@ const conformOtp = async (req, res) => {
 }
 const resendOtp = async (req, res) => {
   try {
-    console.log("Ashmi")
-    const { email } = req.session.userData;
-    console.log("email is",email)
+    const { email } = req.session.userData || req.body;
     if (!email) {
       return res.status(400).json({ success: false, message: "Email not found in session" })
     }
@@ -195,6 +185,7 @@ const resendOtp = async (req, res) => {
     req.session.userOtp = otp;
 
     const emailSent = await sendVerificationEmail(email, otp);
+    console.log(emailSent)
     if (emailSent) {
       console.log("Resent OTP", otp);
       res.status(200).json({ success: true, message: "OTP Resend Successfully" })
@@ -209,6 +200,9 @@ const resendOtp = async (req, res) => {
 
 const loadLogin = async (req, res) => {
   try {
+    if(req.session.user){
+      return res.redirect('/');
+    }
     // if(!req.session.user){
     return res.render("login")
     // }else{
@@ -248,9 +242,10 @@ const login = async (req, res) => {
       return res.render("login", { message: "Incorrect Password" })
     }
 
-    req.session.user = findUser._id;
+    req.session.user = findUser;
 
     if (req.session.user) {
+      console.log(req.session.user)
       // console.log("redirect is working")
       return res.redirect("/")//home page
     } else {
@@ -291,7 +286,9 @@ const forgotPassword=async(req,res)=>{
       return res.render("forgotPassword", { message: "Failed to send OTP. Try again." });
     }
 
-    return res.render("resetOtp",{message:""});
+    return res.render("resetOtp",{message:"",
+      email
+    });
   } catch (error) {
     console.error("Error in forgot password", error);
     res.render("forgotPassword", { message: "Something went wrong" });
@@ -369,7 +366,6 @@ module.exports = {
   conformOtp,
   resendOtp,
   loadLogin,
-  pageNotFound,
   login,
   logout,
   loadForgotPassword,

@@ -1,7 +1,4 @@
-<%- include("../../views/partials/admin/header") %>
-
-<head>
-  <meta charset="UTF-8">
+<%- include("../../views/partials/admin/header",{active : 'editproducts' }) %>
   <title>Edit Product</title>
   <style>
     body {
@@ -114,129 +111,162 @@
       background: #5c5c00;
       color: #fff;
     }
-  </style>
-</head>
 
-<body>
-  <div class="sidebar">
-    <h2>QUORA</h2>
-    <ul>
-      <li>Dashboard</li>
-      <li>Order</li>
-      <li>Products</li>
-      <li>Sales report</li>
-      <li>Customer</li>
-      <li>Coupon</li>
-      <li>Category</li>
-      <li>Banner</li>
-      <li>Refund/Return</li>
-      <li>Sign Out</li>
-    </ul>
-  </div>
-
-  <div class="main-content">
-    <div class="card">
-      <h2>Edit Product</h2>
-
-      <form action="/admin/products/edit/<%= product._id %>" method="POST" enctype="multipart/form-data">
-
-        <div class="form-group">
-          <label>Product Name</label>
-          <input type="text" name="productName" value="<%= product.productName %>" required />
-        </div>
-
-        <div class="form-group">
-          <label>Product Description</label>
-          <textarea name="description" required><%= product.description %></textarea>
-        </div>
-
-        <div class="form-group">
-          <label>Edit Photos</label>
-          <div class="image-upload-container">
-            <input type="file" name="productImages" multiple />
-            <% if (product.productImage && product.productImage.length > 0) { %>
-              <% product.productImage.forEach(img => { %>
-                <img src="<%= img %>" width="80" alt="Product Image" />
-              <% }) %>
-            <% } %>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>Base Price</label>
-          <input type="number" name="regularPrice" value="<%= product.regularPrice %>" required />
-        </div>
-
-        <div class="form-group">
-          <label>Discount Price</label>
-          <input type="number" name="salePrice" value="<%= product.salePrice || '' %>" />
-        </div>
-
-        <div class="form-group">
-          <label>Category</label>
-          <select name="category" required>
-            <% categories.forEach(cat => { %>
-              <option value="<%= cat._id %>" <%= product.category && product.category._id.toString() === cat._id.toString() ? "selected" : "" %>>
-                <%= cat.name %>
-              </option>
-            <% }) %>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label>Brand</label>
-          <select name="brand" required>
-            <% brands.forEach(br => { %>
-              <option value="<%= br._id %>" <%= product.brand && product.brand.toString() === br._id.toString() ? "selected" : "" %>>
-                <%= br.brandName %>
-              </option>
-            <% }) %>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label>Stock</label>
-          <input type="number" name="quantity" value="<%= product.quantity %>" required />
-        </div>
-
-        <div class="buttons">
-          <a href="/admin/products">
-            <button type="button" class="cancel-btn">Cancel</button>
-          </a>
-          <button type="submit" class="edit-btn">Save Changes</button>
-
-          <button type="button" class="cancel-btn" onclick="deleteProduct('<%= product._id %>')">
-          Delete Product
-          </button>
-        </div>
-
-      </form>
-    </div>
-  </div>
-</body>
-<script>
-  async function deleteProduct(id) {
-    if (confirm("Are you sure you want to delete this product?")) {
-      try {
-        const res = await fetch(`/admin/products/${id}`, {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" }
-        });
-
-        const data = await res.json();
-
-        if (data.success) {
-          alert("Product deleted successfully!");
-          window.location.href = "/admin/products";
-        } else {
-          alert("Error deleting product: " + data.message);
-        }
-      } catch (err) {
-        console.error("Delete error:", err);
-        alert("Something went wrong while deleting.");
-      }
+    .preview-wrapper {
+      position: relative;
+      display: inline-block;
     }
-  }
-</script>
 
-</html>
+    .preview-wrapper img {
+      border-radius: 6px;
+      border: 1px solid #ddd;
+      padding: 4px;
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+    }
+
+    .btn-delete {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: none;
+      border: none;
+      color: red;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+  </head>
+
+  <body>
+
+    <div class="main-content">
+      <div class="card">
+        <h2>Edit Product</h2>
+
+        <form action="/admin/products/edit/<%= product._id %>" method="POST" enctype="multipart/form-data">
+
+          <div class="form-group">
+            <label>Product Name</label>
+            <input type="text" name="productName" value="<%= product.productName %>" required />
+          </div>
+
+          <div class="form-group">
+            <label>Product Description</label>
+            <textarea name="description" required><%= product.description %></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Edit Photos</label>
+            <div class="image-upload-container">
+              <input type="file" name="productImages" multiple />
+              <% if (product.productImage && product.productImage.length> 0) { %>
+                <% product.productImage.forEach((img, i)=> { %>
+                  <div class="preview-wrapper" id="previewWrapper<%= i %>">
+                    <img src="<%= img %>" width="80" alt="Product Image" />
+                    <button type="button" class="btn-delete"
+                      onclick="removeExistingImage('<%= img %>', '<%= i %>')">❌</button>
+
+
+                    <input type="hidden" name="existingImages[]" value="<%= img %>">
+                  </div>
+
+                  <% }) %>
+                    <% } %>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Base Price</label>
+            <input type="number" name="regularPrice" value="<%= product.regularPrice %>" required />
+          </div>
+
+          <div class="form-group">
+            <label>Discount Price</label>
+            <input type="number" name="salePrice" value="<%= product.salePrice || '' %>" />
+          </div>
+
+          <div class="form-group">
+            <label>Category</label>
+            <select name="category" required>
+              <% categories.forEach(cat=> { %>
+                <option value="<%= cat._id %>" <%=product.category &&
+                  product.category._id.toString()===cat._id.toString() ? "selected" : "" %>>
+                  <%= cat.name %>
+                </option>
+                <% }) %>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Brand</label>
+            <select name="brand" required>
+              <% brands.forEach(br=> { %>
+                <option value="<%= br._id %>" <%=product.brand && product.brand.toString()===br._id.toString()
+                  ? "selected" : "" %>>
+                  <%= br.brandName %>
+                </option>
+                <% }) %>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Stock</label>
+            <input type="number" name="quantity" value="<%= product.quantity %>" required />
+          </div>
+
+          <div class="buttons">
+            <a href="/admin/products">
+              <button type="button" class="cancel-btn">Cancel</button>
+            </a>
+            <button type="submit" class="edit-btn">Save Changes</button>
+
+            <button type="button" class="cancel-btn" onclick="deleteProduct('<%= product._id %>')">
+              Delete Product
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+    <script>
+      async function deleteProduct(id) {
+        if (confirm("Are you sure you want to delete this product?")) {
+          try {
+            const res = await fetch(`/admin/products/${id}`, {
+              method: "DELETE",
+              headers: { "Content-Type": "application/json" }
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+              alert("Product deleted successfully!");
+              window.location.href = "/admin/products";
+            } else {
+              alert("Error deleting product: " + data.message);
+            }
+          } catch (err) {
+            console.error("Delete error:", err);
+            alert("Something went wrong while deleting.");
+          }
+        }
+      }
+      function removeExistingImage(image, index) {
+        const productId = "<%= product._id %>";
+        fetch('/admin/delete-product-image', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ productId, image, index })
+        })
+        
+        const wrapper = document.getElementById(`previewWrapper${index}`);
+        if (wrapper) {
+          wrapper.remove();
+        }
+      }
+
+
+    </script>
+  </body>

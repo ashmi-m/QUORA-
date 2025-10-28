@@ -34,7 +34,7 @@ const productSchema=new Schema({
     },
     quantity:{
         type:Number,
-        default:true
+        default:1
     },
     color:{
         type:String,
@@ -55,7 +55,7 @@ const productSchema=new Schema({
         default:"Available"
     },
 
-},{timeStamps:true});
+},{ timestamps: true});
 
 const Product=mongoose.model("Product",productSchema);
 

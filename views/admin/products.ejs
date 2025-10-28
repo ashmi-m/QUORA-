@@ -1,4 +1,4 @@
-<%- include("../../views/partials/admin/header") %>
+<%- include("../../views/partials/admin/header",{active : 'products'}) %>
 
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -120,14 +120,61 @@
     background: white;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    flex-wrap: wrap;
+    gap: 10px;
   }
 
   .pagination select {
-    padding: 5px 8px;
+    padding: 6px 10px;
     border: 1px solid #ddd;
-    border-radius: 4px;
+    border-radius: 6px;
+  }
+  .pagination-controls button {
+     padding: 6px 12px;
+     border: none;
+     background: #f1f1f1;
+     border-radius: 6px;
+     cursor: pointer;
+     transition: 0.2s;
+  }
+    .pagination-controls button:hover {
+      background: #007bff;
+      color:#fff;
+    }
+    .pagination-controls button.active-page {
+      background: #007bff;
+      color: #fff;
+      font-weight: bold;
+    }
+     .preview-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+  .image-preview {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin: 5px;
+    border: 1px solid #ddd;
+  }
+
+  .btn-delete {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: transparent;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: red;
+    font-weight: bold;
+  }
+  .btn-delete:hover {
+    color: darkred;
   }
 </style>
+</head>
 
 <div class="content-area">
   <div class="header">
@@ -173,21 +220,41 @@
     <div>
       <div id="entriesInfo">Showing 0 entries</div>
     </div>
-    <div id="paginationControls" style="margin-top:10px; display:flex; gap:5px;"></div>
-
+     <div class="pagination-controls" id="paginationControls"></div>
   </div>
+</div>
+ <div class="edit-product mt-5">
+  <h2>Edit Product</h2>
+  <label>Product Name</label>
+  <input type="text" value="<%= product.productName %>" class="form-control" />
+  <label>Product Description</label>
+    <textarea class="form-control"><%= product.description %></textarea>
+        <label>Edit Photos</label>
+    <input type="file" name="photos" multiple class="form-control" />
 
+     <div id="existingImages" class="d-flex gap-2 flex-wrap">
+      <% if (product.images && product.images.length > 0) { %>
+        <% product.images.forEach((img, i) => { %>
+          <div class="preview-wrapper" id="previewWrapper<%= i %>">
+            <img src="/uploads/<%= img %>" class="image-preview" alt="Image <%= i %>">
+            <button type="button" class="btn-delete" onclick="removeImage('<%= img %>','<%= i %>')">❌</button>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+  </div>
+</div> 
 <script>
   let currentPage = 1;
   let totalPages = 1;
   let itemsPerPage = 10;
   let totalItems = 0;
+   let searchQuery = "";
 
   async function loadProducts(page = 1) {
     try {
-       const res = await fetch(`/admin/products/data?page=${page}&limit=${itemsPerPage}`);
+      const res = await fetch(`/admin/products/data?page=${page}&limit=${itemsPerPage}&search=${encodeURIComponent(searchQuery)}`);
       const data = await res.json();
-
       const tbody = document.getElementById("productTableBody");
       tbody.innerHTML = "";
 
@@ -206,7 +273,7 @@
             <td class="actions">
               <span class="edit-icon" onclick="editProduct('${item._id}')">✏️</span>
               <span class="delete-icon" onclick="deleteProduct('${item._id}')">🗑️</span>
-            
+
             </td>
           `;
           tbody.appendChild(tr);
@@ -262,11 +329,6 @@
   container.appendChild(next);
 
 }
-
-  
-
-
-
   async function editProduct(id) {
     const result = await Swal.fire({
       title:"Edit Product?",
@@ -310,11 +372,60 @@
       Swal.fire("Error", "Could not delete product", "error");
     }
   }
+  
+    function searchProducts(e) {
+    searchQuery = e.target.value.trim();
+    loadProducts(1); 
+  }
 
+  
+  async function removeImage(filename, index) {
+    const productId = "<%= product._id %>";
+
+    // fetch('/admin/delete-product-image',{
+    //   method:'POST',
+    //   headers:{'Content-Type': 'application/json'},
+    //    body: JSON.stringify({ productId, image, index })
+    // })
+
+
+    const confirmDelete = await Swal.fire({
+      title: "Remove this image?",
+      text: "It will be deleted from this product.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, remove it"
+    });
+
+     if (!confirmDelete.isConfirmed) return;
+
+    try {
+      const res = await fetch('/admin/delete-image', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename, productId: "<%= product._id %>" })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        document.getElementById(`previewWrapper${index}`).remove();
+        Swal.fire("Removed!", "Image deleted successfully.", "success");
+      } else {
+        Swal.fire("Error", data.message || "Failed to delete image.", "error");
+      }
+    } catch (error) {
+      console.error("Error removing image:", error);
+      Swal.fire("Error", "Something went wrong while deleting image.", "error");
+    }
+  }
 
   document.addEventListener("DOMContentLoaded", () => {
     loadProducts();
     document.getElementById("searchInput").addEventListener("keyup", searchProducts);
+
+  
 
      const urlParams = new URLSearchParams(window.location.search);
      if(urlParams.get("editSuccess")==="true"){
