@@ -181,6 +181,14 @@
     <h1>Products Management</h1>
     <div class="search-box">
       <input type="text"id="searchInput"placeholder="Search products..." />
+      <select id="brandFilter" onchange="filterByBrand()">
+        <option value="">All Brands</option>
+        <% if (brands && brands.length > 0) { %>
+      <% brands.forEach(brand => { %>
+         <option value="<%= brand._id %>"><%= brand.brandName %></option>
+      <% }) %>
+    <% } %>
+      </select>
       <button type="button" onclick="window.location.href='/admin/addproducts'">New Product</button>
     </div>
   </div>
@@ -223,33 +231,14 @@
      <div class="pagination-controls" id="paginationControls"></div>
   </div>
 </div>
- <div class="edit-product mt-5">
-  <h2>Edit Product</h2>
-  <label>Product Name</label>
-  <input type="text" value="<%= product.productName %>" class="form-control" />
-  <label>Product Description</label>
-    <textarea class="form-control"><%= product.description %></textarea>
-        <label>Edit Photos</label>
-    <input type="file" name="photos" multiple class="form-control" />
 
-     <div id="existingImages" class="d-flex gap-2 flex-wrap">
-      <% if (product.images && product.images.length > 0) { %>
-        <% product.images.forEach((img, i) => { %>
-          <div class="preview-wrapper" id="previewWrapper<%= i %>">
-            <img src="/uploads/<%= img %>" class="image-preview" alt="Image <%= i %>">
-            <button type="button" class="btn-delete" onclick="removeImage('<%= img %>','<%= i %>')">❌</button>
-          </div>
-        <% }) %>
-      <% } %>
-    </div>
-  </div>
-</div> 
 <script>
   let currentPage = 1;
   let totalPages = 1;
   let itemsPerPage = 10;
   let totalItems = 0;
    let searchQuery = "";
+     let selectedBrand = "";
 
   async function loadProducts(page = 1) {
     try {
@@ -268,7 +257,8 @@
             <td>${item.category?.name || "No Category"}</td>
             <td>${item.productOffer || "0%"}</td>
             <td>${item.salePrice}</td>
-            <td>${new Date(item.createdOn).toLocaleDateString()}</td>
+           <td><%= new Date(products.createdAt).toLocaleDateString() %></td>
+
 
             <td class="actions">
               <span class="edit-icon" onclick="editProduct('${item._id}')">✏️</span>
@@ -377,70 +367,19 @@
     searchQuery = e.target.value.trim();
     loadProducts(1); 
   }
+ function filterByBrand() {
+    selectedBrand = document.getElementById("brandFilter").value;
+    loadProducts(1);
+  }
+  
 
   
-  async function removeImage(filename, index) {
-    const productId = "<%= product._id %>";
-
-    // fetch('/admin/delete-product-image',{
-    //   method:'POST',
-    //   headers:{'Content-Type': 'application/json'},
-    //    body: JSON.stringify({ productId, image, index })
-    // })
-
-
-    const confirmDelete = await Swal.fire({
-      title: "Remove this image?",
-      text: "It will be deleted from this product.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, remove it"
-    });
-
-     if (!confirmDelete.isConfirmed) return;
-
-    try {
-      const res = await fetch('/admin/delete-image', {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ filename, productId: "<%= product._id %>" })
-      });
-      const data = await res.json();
-
-      if (data.success) {
-        document.getElementById(`previewWrapper${index}`).remove();
-        Swal.fire("Removed!", "Image deleted successfully.", "success");
-      } else {
-        Swal.fire("Error", data.message || "Failed to delete image.", "error");
-      }
-    } catch (error) {
-      console.error("Error removing image:", error);
-      Swal.fire("Error", "Something went wrong while deleting image.", "error");
-    }
-  }
-
+  
+  
   document.addEventListener("DOMContentLoaded", () => {
     loadProducts();
     document.getElementById("searchInput").addEventListener("keyup", searchProducts);
-
-  
-
-     const urlParams = new URLSearchParams(window.location.search);
-     if(urlParams.get("editSuccess")==="true"){
-      Swal.fire({
-         title: "Success!",
-        text: "Product updated successfully.",
-        icon: "success",
-        timer: 2000,
-        showConfirmButton: false
-      });
-       const newUrl = window.location.pathname;
-      window.history.replaceState({}, document.title, newUrl);
-     }
   });
-
 </script>
 
            

@@ -8,6 +8,8 @@
   <link rel="stylesheet" href="/css/signup.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="stylesheet" href="/css/header.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
   <style>
     .error-message {
       color: red;
@@ -141,13 +143,42 @@
     }
     function phoneValidate() {
       const phoneVal = phoneid.value.trim();
-      if (phoneVal.length !== 10 || !/^\d+$/.test(phoneVal)) {
-        error3.textContent = "Enter exactly 10 digits";
-        error3.style.display = "block";
-        return false;
-      }
-      error3.style.display = "none";
-      return true;
+
+  
+  if (!/^\d{10}$/.test(phoneVal)) {
+    Swal.fire({
+      icon: "error",
+      title: "Invalid Phone Number",
+      text: "Phone number must contain exactly 10 digits.",
+    });
+    return false;
+  }
+
+ 
+  const sequentialAsc = "01234567890123456789"; 
+  const sequentialDesc = "98765432109876543210";
+
+  if (sequentialAsc.includes(phoneVal) || sequentialDesc.includes(phoneVal)) {
+    Swal.fire({
+      icon: "error",
+      title: "Invalid Phone Number",
+      text: "Sequential phone numbers are not allowed.",
+    });
+    return false;
+  }
+
+
+  if (/^(\d)\1{9}$/.test(phoneVal)) {
+    Swal.fire({
+      icon: "error",
+      title: "Invalid Phone Number",
+      text: "Repeated digits are not allowed.",
+    });
+    return false;
+  }
+
+  error3.style.display = "none";
+  return true;
     }
 
     function passwordValidate() {
@@ -184,7 +215,14 @@
     function termsValidate() {
       const checkbox = document.getElementById("terms");
       if (!checkbox.checked) {
-        alert("Please check the terms box to proceed.");
+        Swal.fire({
+          icon: "warning",
+      title: "Terms Not Accepted",
+      text: "Please check the terms & policy to proceed.",
+      confirmButtonColor: "#3085d6",
+
+        })
+
         return false;
       }
       return true;

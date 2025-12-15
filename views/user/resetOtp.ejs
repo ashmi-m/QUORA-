@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Confirm With OTP</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -97,6 +98,7 @@
     }
   </style>
 </head>
+
 <body>
   <div class="container">
   
@@ -169,7 +171,7 @@
     }, 1000);
   }
 
-  // Start first countdown
+  
   startCountdown();
 
   resendLink.addEventListener("click", async (e) => {
@@ -182,16 +184,31 @@
         body : JSON.stringify({email})
       });
 
-      if (res.ok) {
-        alert("A new OTP has been sent to your email.");
-        startCountdown();
-      } else {
-        alert("Failed to resend OTP. Try again.");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Error connecting to server.");
+    if (res.ok) {
+      Swal.fire({
+        icon: "success",
+        title: "OTP Sent!",
+        text: "A new OTP has been sent to your email.",
+        confirmButtonColor: "#3085d6",
+      });
+      startCountdown();
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Failed",
+        text: "Failed to resend OTP. Try again.",
+        confirmButtonColor: "#d33",
+      });
     }
+  } catch (err) {
+    console.error(err);
+    Swal.fire({
+      icon: "error",
+      title: "Server Error",
+      text: "Unable to connect to server. Please try again.",
+      confirmButtonColor: "#d33",
+    });
+  }
   });
 </script>
 

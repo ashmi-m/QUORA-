@@ -38,12 +38,14 @@ router.post("/addBrand", upload.single("brandImage"), adminAuth, brandController
 
 //Product Management//
 router.get("/addproducts", adminAuth, productController.getProductAddPage);
-router.post("/addProduct", adminAuth, upload.any(), productController.addProducts);
+router.post("/addProduct", adminAuth, upload.array("images", 4), productController.addProducts);
+// router.post("/addProduct", adminAuth, upload.any(), productController.addProducts);
 router.get("/products",adminAuth, productController.getProductpage);
 router.get("/products/data", adminAuth, productController.getProductsData);
 router.delete("/products/:id", adminAuth, productController.deleteProduct);
 router.get("/editproduct/:id", adminAuth, productController.getEditProductPage);
-router.post("/products/edit/:id", adminAuth, upload.any(), productController.updateProduct);
+// router.post("/products/edit/:id", adminAuth, upload.any(), productController.updateProduct);
+router.post("/products/edit/:id", adminAuth, upload.array("images", 4), productController.updateProduct)
 
 router.post("/delete-product-image",adminAuth,productController.deleteImage);
 

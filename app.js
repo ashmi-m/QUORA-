@@ -44,10 +44,10 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", userRouter);
 app.use("/admin",adminRouter);
 
-app.use((err,req,res,next)=>{
-    console.error('Error:',err);
-    res.status(500).send('Something went wrong!');
-});
+// app.use((err,req,res,next)=>{
+//     console.error('Error:',err);
+//     res.status(500).send('Something went wrongygvuygv hg !');
+// });
 
 app.use((req,res)=>{
     res.status(404).send('Page not found');
@@ -57,6 +57,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
      console.log(`Server running on port ${PORT}`);
     console.log(`Admin panel: http://localhost:${PORT}/admin`);
+    
 })
 
 module.exports = app;

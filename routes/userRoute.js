@@ -4,6 +4,7 @@ const express = require("express");
 const router = express.Router();
 const userController = require("../controller/user/userController");
 const shopController = require("../controller/user/shopController");
+const productController = require("../controller/admin/productController");
 
 
 const passport = require("../config/passport.js");
@@ -41,6 +42,8 @@ router.post("/reset-password", userController.resetPassword);
 // router.post("/shop/addProduct", shopController.addProducts);
 router.get("/shop", shopController.loadShopPage);
 router.get("/product/:id", shopController.loadProductDetails);
+router.get("/shop/brand/:brandId", productController.getProductsByBrand);
+router.get("/brands", productController.getAllBrands);
 
 
 module.exports = router;

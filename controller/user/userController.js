@@ -154,12 +154,19 @@ const conformOtp = async (req, res) => {
         password: passwordHash,
 
       });
+     
 
       await saveUserData.save();
 
       console.log("saveUserData is", saveUserData);
 
-      req.session.user = saveUserData._id;
+      // req.session.user = saveUserData._id;
+      req.session.user = {
+    id: saveUserData._id,
+    name: saveUserData.name,
+    email: saveUserData.email
+};
+
       delete req.session.userOtp;
       delete req.session.userData;
 
