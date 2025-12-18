@@ -96,6 +96,11 @@ const getProductpage = async (req, res) => {
 
 
 
+
+
+
+
+
 const addProducts = async (req, res) => {
   try {
     console.log("req.body is addProducts", req.body);
@@ -172,9 +177,9 @@ if (req.files && req.files.length > 0) {
     }
 
     const regularPrice = parseFloat(products.regularPrice) || 0;
-    const salePrice = products.salePrice
-      ? parseFloat(products.salePrice)
-      : null;
+    // const salePrice = products.salePrice
+    //   ? parseFloat(products.salePrice)
+    //   : null;
     const quantity = parseInt(products.quantity, 10) || 0;
 
 
@@ -184,7 +189,6 @@ if (req.files && req.files.length > 0) {
       brand: products.brand,
       category: categoryDoc._id,
       regularPrice,
-      salePrice,
       createdOn: new Date(),
       quantity,
       size: products.size,

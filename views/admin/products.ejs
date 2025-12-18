@@ -201,7 +201,7 @@
           <th>Product ID</th>
           <th>Price</th>
           <th>Category</th>
-          <th>Discount</th>
+          <!-- <th>Discount</th> -->
           <th>Stock</th>
           <th>Added on</th>
           <th>Actions</th>
@@ -255,8 +255,8 @@
             <td>${item._id}</td>
             <td>${item.regularPrice}</td>
             <td>${item.category?.name || "No Category"}</td>
-            <td>${item.productOffer || "0%"}</td>
-            <td>${item.salePrice}</td>
+           
+           
            <td><%= new Date(products.createdAt).toLocaleDateString() %></td>
 
 

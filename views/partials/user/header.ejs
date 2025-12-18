@@ -87,7 +87,7 @@ navbar {
 
     <!-- Right: User / Auth -->
     <div class="right-section">
-      <% if (locals.user) { %>
+      <% if (user ||locals.user) { %>
         <div class="dropdown">
           <a href="#" class="sign-in-link text-dark">
             <%= user.name || "Username" %>

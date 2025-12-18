@@ -5,14 +5,15 @@ const router = express.Router();
 const userController = require("../controller/user/userController");
 const shopController = require("../controller/user/shopController");
 const productController = require("../controller/admin/productController");
-
+const {userAuth,preventAuthPages}= require("../middlewares/auth.js");
 
 const passport = require("../config/passport.js");
 
 router.get("/pageNotFound",userController.pageNotFound);
 
 
-router.get('/', userController.loadHomepage);
+router.get('/', userController.loadlandingpage);
+router.get('/home',userController.loadHomepage)
 router.get('/signup', userController.loadSignup);  
 router.post('/signup', userController.signup);  
 router.post('/verify-otp', userController.conformOtp);
@@ -26,7 +27,7 @@ router.get('/auth/google/callback',passport.authenticate('google',{failureRedire
     res.redirect('/')
 });
 
-router.get("/login",userController.loadLogin);
+router.get("/login",preventAuthPages,userController.loadLogin);
 router.post("/login",userController.login);
 router.get("/logout",userController.logout);
 router.get("/forgot-password", userController.loadForgotPassword); 

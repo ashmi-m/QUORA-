@@ -11,13 +11,37 @@ const loadHomepage = async(req,res)=>{
     .limit(8)
     .lean();
    
-    const user = req.session.user;
-    res.render("home",{products,user});
+    // const user = req.session.user;
+    res.render("home",
+      {
+        products,
+          // user: req.session.user 
+        
+      });
+
   }catch(error){
     console.error("Error loading homepage:",error);
     res.redirect("/pageNotFound");
   }
 };
+
+
+const loadlandingpage = async(req,res)=>{
+ try {
+  const products = await Product.find()
+  .sort({createdOn:-1})
+  .limit(8)
+  .lean();
+
+  res.render('home',{
+    products 
+  })
+
+ } catch (error) {
+  console.log('error in the landingpage',error)
+ }
+}
+
 
 const pageNotFound = (req,res)=>{
   res.status(404).render("page 404");
@@ -70,8 +94,6 @@ async function sendVerificationEmail(email, otp) {
     return false;
   }
 }
-
-
 const signup = async (req, res) => {
   try {
     // console.log(req.body)
@@ -116,7 +138,13 @@ const signup = async (req, res) => {
     console.error("eerror in post signup", error);
     res.render("signup", { message: "Something went wrong. Please try again." });
   }
-};
+}
+
+
+
+
+
+
 const securePassword = async (password) => {
   try {
     const passwordHash = await bcrypt.hash(password, 10)
@@ -166,6 +194,8 @@ const conformOtp = async (req, res) => {
     name: saveUserData.name,
     email: saveUserData.email
 };
+
+
 
       delete req.session.userOtp;
       delete req.session.userData;
@@ -278,6 +308,7 @@ const loadForgotPassword=async(req,res)=>{
 const forgotPassword=async(req,res)=>{
   try{
     const {email}=req.body;
+    
     const findUser=await User.findOne({email});
     if(!findUser){
       return res.render("forgotPassword",{message:"User not found"});
@@ -365,6 +396,7 @@ const logout = async (req, res) => {
   }
 }
 
+
 module.exports = {
   loadHomepage,
   pageNotFound,
@@ -379,5 +411,5 @@ module.exports = {
   forgotPassword,
   verifyResetOtp,
   resetPassword,
-
+ loadlandingpage
 };

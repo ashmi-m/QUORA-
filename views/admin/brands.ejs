@@ -213,7 +213,7 @@
                         <% } %>
                   </td>
                   <td class="actions">
-                    <button class="btn-delete" onclick="deleteBrand('<%= brand._id %>')">Delete</button>
+                    <!-- <button class="btn-delete" onclick="deleteBrand('<%= brand._id %>')">Delete</button> -->
                     <% if (brand.isBlocked) { %>
                       <button class="btn-unblock" onclick="unblockBrand('<%= brand._id %>')">Unblock</button>
                       <% } else { %>
@@ -274,37 +274,6 @@
       }
     });
 
-    // Delete Brand
-    function deleteBrand(id) {
-      Swal.fire({
-      title: "Are you sure?",
-      text: "This action cannot be undone!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, delete it!"
-    }).then(async (res)=>{
-     if (res.isConfirmed){
-       try {
-      const resp = await fetch(`/admin/deleteBrand/${id}`, { method: "DELETE" });
-      const data = await resp.json();
-      if (data.success) {
-        Swal.fire("Deleted!", "Brand has been deleted.", "success").then(() => {
-          location.reload();
-        });
-      } else {
-        Swal.fire("❌ Error", data.error, "error");
-      }
-    } catch (err) {
-      console.error(err);
-      Swal.fire("❌ Error", "Failed to delete brand", "error");
-    }
-     }else{
-      Swal.fire("Cancelled","Your brand is safe","info");
-     }
-    });
-  }
 
 
     // Block Brand

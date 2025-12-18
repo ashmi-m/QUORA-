@@ -22,7 +22,7 @@ router.get("/categories", adminAuth, categoryController.categoryInfo);
 router.post("/addCategory", adminAuth, categoryController.addCategory);
 
 
-router.delete("/deleteCategory/:id", categoryController.deleteCategory);
+// router.delete("/deleteCategory/:id", categoryController.deleteCategory);
 router.get("/editCategory/:id", categoryController.geteditCategory);
 router.post("/editCategory", categoryController.postEditCategory)
 
@@ -33,7 +33,7 @@ router.get("/brands", brandController.getBrandPage);
 // router.post("/addBrand",adminAuth,brandController.addBrand);
 router.patch("/blockBrand/:id", adminAuth, brandController.blockBrand);
 router.patch("/unblockBrand/:id", adminAuth, brandController.unblockBrand);
-router.delete("/deleteBrand/:id", adminAuth, brandController.deleteBrand);
+// router.delete("/deleteBrand/:id", adminAuth, brandController.deleteBrand);
 router.post("/addBrand", upload.single("brandImage"), adminAuth, brandController.addBrand);
 
 //Product Management//

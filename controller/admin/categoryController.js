@@ -54,15 +54,15 @@ const addCategory = async(req,res)=>{
 
 
 
-const deleteCategory = async (req, res) => {
-  try {
-    const { id } = req.params;
-    await Category.findByIdAndDelete(id);
-    res.json({ message: "Category deleted successfully" });
-  } catch (err) {
-    res.status(500).json({ error: "Server error" });
-  }
-};
+// const deleteCategory = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     await Category.findByIdAndDelete(id);
+//     res.json({ message: "Category deleted successfully" });
+//   } catch (err) {
+//     res.status(500).json({ error: "Server error" });
+//   }
+// };
 
 const geteditCategory = async (req, res) => {
   try {
@@ -122,7 +122,6 @@ const toggleCategoryStatus = async(req,res)=>{
 module.exports = {
   categoryInfo,
   addCategory,
-  deleteCategory,
   geteditCategory,
   postEditCategory,
   getListCategory,

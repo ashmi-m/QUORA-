@@ -52,14 +52,7 @@
             ₹<%= product.salePrice || product.regularPrice %>
           </span>
 
-          <% if (product.salePrice && product.regularPrice && product.salePrice < product.regularPrice) { %>
-            <span style="font-size:20px; text-decoration:line-through; color:#888; margin-left:8px;">
-              ₹<%= product.regularPrice %>
-            </span>
-            <span style="font-size:14px; color:#fff; background:#ff4d4d; padding:4px 8px; border-radius:4px; margin-left:5px;">
-              <%= Math.round(((product.regularPrice - product.salePrice) / product.regularPrice) * 100) %>% Off
-            </span>
-          <% } %>
+         
         </div>
 
         <br>

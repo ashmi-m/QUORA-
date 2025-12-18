@@ -45,7 +45,7 @@
           </div>
           <% } %>
 
-            <form id="signform" action="/signup" method="POST" class="signup-form">
+             <form id="signform" action="/signup" method="POST" class="signup-form">
               <label>Name</label>
               <input type="text" id="name" name="name" placeholder="Enter your Name">
               <div id="error1" class="error-message"></div>
@@ -229,6 +229,7 @@
     }
 
     signform.addEventListener("submit", function (e) {
+     
       const validName = nameValidate();
       const validEmail = emailValidate();
       const validPhone = phoneValidate();
@@ -237,15 +238,19 @@
 
       if (!(validName && validEmail && validPhone && validPassword && validTerms)) {
         e.preventDefault(); 
+        
       }
-    });
+    })
 
+  
    
     nameid.addEventListener("blur", nameValidate);
     emailid.addEventListener("blur", emailValidate);
     phoneid.addEventListener("blur", phoneValidate);
     passid.addEventListener("blur", passwordValidate);
     cpassid.addEventListener("blur", passwordValidate);
+
+
   </script>
 </body>
 

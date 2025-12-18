@@ -34,7 +34,10 @@ const addBrand = async (req, res) => {
   try {
     const { brandName } = req.body;
     if (!brandName || !req.file) {
-      return res.status(400).json({ success: false, error: "Brand name and logo are required" });
+      return res.status(400).json({
+        success:false,
+        error:"Brand name and logo are required"
+      });
     }
 
     const imagePath = req.file.path; // Cloudinary URL or local path
@@ -54,17 +57,17 @@ const addBrand = async (req, res) => {
 };
 
 // 📌 Delete Brand
-const deleteBrand = async (req, res) => {
-  try {
-    console.log("deletebrand",req.params.id)
-    await Brand.findByIdAndDelete(req.params.id);
+// const deleteBrand = async (req, res) => {
+//   try {
+//     console.log("deletebrand",req.params.id)
+//     await Brand.findByIdAndDelete(req.params.id);
 
-    return res.json({ success: true, message: "Brand deleted successfully" });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ success: false, error: "Failed to delete brand" });
-  }
-};
+//     return res.json({ success: true, message: "Brand deleted successfully" });
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).json({ success: false, error: "Failed to delete brand" });
+//   }
+// };
 const unblockBrand = async (req, res) => {
   try {
     console.log('UNBLOCK request received - id:', req.params.id);
@@ -94,7 +97,6 @@ const blockBrand = async (req, res) => {
 module.exports = {
   getBrandPage,
   addBrand,
-  deleteBrand,
   blockBrand,
   unblockBrand,
 };
