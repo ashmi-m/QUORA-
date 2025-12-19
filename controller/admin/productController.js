@@ -338,6 +338,7 @@ const getAllBrands = async (req, res) => {
   }
 };
 
+
 module.exports = {
   getProductAddPage,
   addProducts,
@@ -351,3 +352,4 @@ module.exports = {
     getProductsByBrand,
      getAllBrands,
 };
+ 

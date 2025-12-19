@@ -240,23 +240,13 @@ const loadLogin = async (req, res) => {
     if(req.session.user){
       return res.redirect('/');
     }
-    // if(!req.session.user){
     return res.render("login")
-    // }else{
-    //   res.redirect("/")
-    // }
   } catch (error) {
     res.redirect("pageNotFound")
   }
 }
 
-// const loadLogin = async (req, res) => {
-//   try {
-//     res.render("user/login", { message: "" });   
-//   } catch (error) {
-//     console.log(error.message);
-//   }
-// };
+
 
 
 const login = async (req, res) => {

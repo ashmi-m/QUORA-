@@ -64,3 +64,28 @@ body { margin: 0; font-family: "Segoe UI", Arial, sans-serif; background:#f7f7f7
   .left { max-height:260px; padding:20px; }
   .right { padding:20px; }
 }     
+
+
+
+.password-box {
+  position: relative;
+}
+
+.password-box input {
+  width: 100%;
+  padding-right: 40px; 
+}
+
+.password-box i {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #777;
+  font-size: 14px;
+}
+
+.password-box i:hover {
+  color: #000;
+}

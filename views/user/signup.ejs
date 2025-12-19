@@ -59,11 +59,19 @@
               <div id="error2" class="error-message"></div>
 
               <label>Password</label>
-              <input type="password" id="password" name="password" placeholder="Enter your Password">
+              <!-- <input type="password" id="password" name="password" placeholder="Enter your Password"> -->
+               <input type="password" id="confirm-password" name="confirmPassword" placeholder="Confirm Password">
+               <div class="password-box">
+               <input type="password" id="password" name="password" placeholder="Enter your Password"/>
+               <i class="fa-solid fa-eye" id="togglePassword"></i>
+               </div>
               <div id="error4" class="error-message"></div>
 
               <label>Confirm Password</label>
-              <input type="password" id="confirm-password" name="confirmPassword" placeholder="Confirm Password">
+              <div class="password-box">
+              <input type="password" id="confirm-password" name="confirmPassword" placeholder="Confirm Password"/>
+              <i class="fa-solid fa-eye" id="toggleConfirmPassword"></i>
+              </div>
               <div id="error5" class="error-message"></div>
 
               <div id="error2" class="error-message"></div>
@@ -249,7 +257,20 @@
     phoneid.addEventListener("blur", phoneValidate);
     passid.addEventListener("blur", passwordValidate);
     cpassid.addEventListener("blur", passwordValidate);
+  
 
+
+      document.getElementById("togglePassword").onclick = () => {
+    passid.type = passid.type === "password" ? "text" : "password";
+    togglePassword.classList.toggle("fa-eye");
+    togglePassword.classList.toggle("fa-eye-slash");
+  };
+
+  document.getElementById("toggleConfirmPassword").onclick = () => {
+    cpassid.type = cpassid.type === "password" ? "text" : "password";
+    toggleConfirmPassword.classList.toggle("fa-eye");
+    toggleConfirmPassword.classList.toggle("fa-eye-slash");
+  };
 
   </script>
 </body>

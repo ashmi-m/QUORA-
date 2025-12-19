@@ -282,6 +282,22 @@
         pointer-events: none;
         border-color: #eee;
       }
+
+
+
+
+      .clear-search {
+  margin-right: 8px;
+  font-size: 18px;
+  color: #333;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.clear-search:hover {
+  color: red;
+}
+
     </style>
   </head>
 
@@ -325,9 +341,25 @@
     <div class="container">
       <aside class="sidebar">
         <form id="filterForm" action="/shop" method="GET">
+
+
             <h3>Search</h3>
-    <input type="text" name="search" value="<%= searchQuery || '' %>" placeholder="Search products">
-    <button type="submit" class="btn btn-success">Search</button>
+            <div class="search-bar">
+              <input type="text" name="search" value="<%= searchQuery || '' %>" placeholder="Search products"
+            >
+             <% if (searchQuery) { %>
+    <!-- Clear search -->
+    <a href="/shop" class="clear-search">✕</a>
+  <% } %>
+
+  <button type="submit">Search</button>
+</div>
+
+
+
+            
+    <!-- <input type="text" name="search" value="<%= searchQuery || '' %>" placeholder="Search products">
+    <button type="submit" class="btn btn-success">Search</button> -->
 
     <% if (sortOption) { %>
       <input type="hidden" name="sort" value="<%= sortOption %>">
@@ -400,7 +432,7 @@
                   <%=priceRange==='1000-5000' ?'checked':'' %>> ₹1000 - ₹5000</label></li>
             <label>
               <input type="radio" name="priceRange" value="5000-15000" onchange="this.form.submit()"
-                <%=priceRange==='10000-15000' ? 'checked' : '' %>> ₹5000 - ₹15000
+                <%=priceRange==='5000-15000' ? 'checked' : '' %>> ₹5000 - ₹15000
             </label>
             </li>
             <li><label><input type="radio" name="priceRange" value="above15000" onchange="this.form.submit()"

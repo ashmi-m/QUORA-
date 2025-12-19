@@ -1,7 +1,7 @@
 const Brand = require("../../models/brandSchema");
 const Product = require("../../models/productSchema");
 
-// 📌 List Brands
+
 const getBrandPage = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -29,7 +29,6 @@ const getBrandPage = async (req, res) => {
   }
 };
 
-// 📌 Add Brand
 const addBrand = async (req, res) => {
   try {
     const { brandName } = req.body;
@@ -56,7 +55,6 @@ const addBrand = async (req, res) => {
   }
 };
 
-// 📌 Delete Brand
 // const deleteBrand = async (req, res) => {
 //   try {
 //     console.log("deletebrand",req.params.id)
