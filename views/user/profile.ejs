@@ -1,0 +1,186 @@
+
+<%- include("../partials/user/header") %>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Profile | Quora</title>
+  <link rel="stylesheet" href="/css/profile.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+
+<div class="breadcrumb">
+  Home / My Account
+</div>
+
+<div class="profile-container">
+
+  <!-- LEFT SIDEBAR -->
+  <div class="profile-sidebar">
+    <h3>Hello 👋 <%= user?.name %></h3>
+
+    <div class="profile-menu">
+      <button class="active" data-target="profileSection">Profile Information</button>
+      <button data-target="ordersSection">My Orders</button>
+      <button data-target="addressSection">Manage Addresses</button>
+      <a href="/forgot-password"><button type="button">Forgot Password</button></a>
+      <a href="/logout"><button type="button">Logout</button></a>
+      <a href="/add-address" class="btn">Add New Address</a>
+
+
+    </div>
+  </div>
+
+  <!-- RIGHT CONTENT -->
+  <div class="profile-content">
+
+    <!-- PROFILE INFO -->
+    <div id="profileSection" class="profile-section">
+
+      <form id="profileForm">
+        <div class="profile-actions">
+          <button type="button" id="editProfileBtn">Edit Profile</button>
+          <button type="button" id="saveProfileBtn" class="hidden">Save Changes</button>
+        </div>
+
+        <h2>Personal Information</h2>
+
+        <label>Name</label>
+        <input type="text" name="name" value="<%= user.name %>" disabled>
+
+        <div class="row">
+          <div>
+            <label>Email</label>
+            <input type="email" value="<%= user.email %>" disabled>
+          </div>
+
+          <div>
+            <label>Mobile Number</label>
+            <input type="text" name="phone" value="<%= user.phone %>" disabled>
+          </div>
+        </div>
+
+        <label>Gender</label>
+        <div class="gender">
+          <label>
+            <input type="radio" name="gender" value="Male" disabled
+              <%= user.gender === "Male" ? "checked" : "" %>>
+            Male
+          </label>
+
+          <label>
+            <input type="radio" name="gender" value="Female" disabled
+              <%= user.gender === "Female" ? "checked" : "" %>>
+            Female
+          </label>
+        </div>
+      </form>
+    </div>
+
+    <!-- ORDERS -->
+    <div id="ordersSection" class="profile-section hidden">
+      <h2>My Orders</h2>
+
+      <% if (!orders.length) { %>
+        <p>No orders found.</p>
+      <% } else { %>
+        <% orders.forEach(order => { %>
+          <div class="card">
+            <p><b>Order ID:</b> <%= order._id %></p>
+            <p><b>Total:</b> ₹<%= order.totalAmount %></p>
+            <p><b>Status:</b> <%= order.status %></p>
+
+            <% if (order.status !== "Cancelled") { %>
+              <button class="cancel-order-btn" data-id="<%= order._id %>">
+                Cancel Order
+              </button>
+            <% } %>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+
+    <!-- ADDRESSES -->
+    <div id="addressSection" class="profile-section hidden">
+      <h2>Manage Addresses</h2>
+
+      <% if (!user.addresses?.length) { %>
+        <p>No address found.</p>
+      <% } else { %>
+        <% user.addresses.forEach(addr => { %>
+          <div class="card">
+            <p><%= addr.house %>, <%= addr.city %>, <%= addr.state %></p>
+            <p>Pincode: <%= addr.pincode %></p>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+
+  </div>
+</div>
+
+<footer>© 2025 Quora - All Rights Reserved</footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  /* SECTION SWITCH */
+  const menuButtons = document.querySelectorAll(".profile-menu button[data-target]");
+  const sections = document.querySelectorAll(".profile-section");
+
+  menuButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      sections.forEach(sec => sec.classList.add("hidden"));
+      document.getElementById(btn.dataset.target).classList.remove("hidden");
+
+      menuButtons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+    });
+  });
+
+  /* EDIT PROFILE */
+  const editBtn = document.getElementById("editProfileBtn");
+  const saveBtn = document.getElementById("saveProfileBtn");
+  const inputs = document.querySelectorAll(
+    "#profileSection input[name='name'], #profileSection input[name='phone'], #profileSection input[name='gender']"
+  );
+
+  editBtn.addEventListener("click", () => {
+    inputs.forEach(i => i.disabled = false);
+    editBtn.classList.add("hidden");
+    saveBtn.classList.remove("hidden");
+  });
+
+  saveBtn.addEventListener("click", async () => {
+    const gender = document.querySelector("input[name='gender']:checked")?.value;
+
+    const data = {
+      name: document.querySelector("input[name='name']").value,
+      phone: document.querySelector("input[name='phone']").value,
+      gender
+    };
+
+    const res = await fetch("/profile/update", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+
+    const result = await res.json();
+
+    if (result.success) {
+      Swal.fire("Success", "Profile updated", "success")
+        .then(() => location.reload());
+    } else {
+      Swal.fire("Error", "Update failed", "error");
+    }
+  });
+
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,57 @@
+
+<%- include("../partials/user/header") %>
+
+<div class="address-container">
+
+  <div class="address-card">
+    <h3>Add a new address</h3>
+
+    <form id="addressForm">
+      <div class="row">
+        <input type="text" name="name" placeholder="Enter your name" required>
+        <input type="text" name="mobile" placeholder="Enter your Mobile number" required>
+      </div>
+
+      <div class="row">
+        <input type="text" name="pincode" placeholder="Enter your Pincode" required>
+        <input type="text" name="locality" placeholder="Enter your locality" required>
+      </div>
+
+      <textarea name="address" placeholder="Address (area, street, city)" required></textarea>
+
+      <div class="row">
+        <input type="text" name="city" placeholder="City/District/Town" required>
+
+        <select name="state" required>
+          <option value="">--- select state ---</option>
+          <option value="Kerala">Kerala</option>
+          <option value="Tamil Nadu">Tamil Nadu</option>
+          <option value="Karnataka">Karnataka</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <input type="text" name="landmark" placeholder="Landmark (optional)">
+      </div>
+
+      <div class="address-type">
+        <label>
+          <input type="radio" name="type" value="Home" checked> Home
+        </label>
+        <label>
+          <input type="radio" name="type" value="Work"> Work
+        </label>
+      </div>
+
+      <div class="btn-row">
+        <button type="submit" class="save-btn">Save</button>
+        <a href="/userprofile" class="cancel-btn">Cancel</a>
+      </div>
+
+    </form>
+  </div>
+
+</div>
+
+<script src="/js/address.js"></script>
+

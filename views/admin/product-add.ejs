@@ -188,7 +188,8 @@
                     <div class="card-body">
                         <div id="message-container"></div>
 
-                        <form id="productForm" enctype="multipart/form-data" action="/admin/addProduct" method="post" novalidate>
+                      
+<form id="productForm" enctype="multipart/form-data" novalidate>
 
 
                             <div class="mb-4">
@@ -377,127 +378,169 @@
     <!-- <script src="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.js"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
     <script>
-        function removeImage(index) {
-            const fileInput = document.getElementById(`input${index}`);
-            const previewImg = document.getElementById(`imgView${index}`);
 
-            fileInput.value = '';
+const croppedImages = {};
+let cropper = null;
+let currentIndex = null;
 
-            previewImg.src = '';
-            previewImg.style.display = 'none';
+function showError(id, msg) {
+  document.getElementById(id).innerText = msg;
+}
 
-            Swal.fire({
-                icon:'info',
-                title:'Image Removed',
-                text:`Image ${index} has been cleared.`,
-                timer:1000,
-                showConfirmButton:false
-            });
-        }
-        let cropper;
-        let currentInputIndex;
-
-        function openCropper(event, index) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-            if (!validTypes.includes(file.type)) {
-                alert('Please upload a valid image file (JPEG, JPG, PNG, WEBP)');
-                event.target.value = '';
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const cropperImage = document.getElementById('cropperImage');
-                cropperImage.src = e.target.result;
-                document.getElementById('cropperModal').style.display = 'flex';
-                currentInputIndex = index;
-                cropperImage.onload = function () {
-                    if (cropper) cropper.destroy();
-                    cropper = new Cropper(cropperImage, {
-                        aspectRatio: 1,
-                        viewMode: 1,
-                        autoCropArea: 1,
-                        responsive: true,
-                        background: false,
-                    });
-                };
-            };
-
-            reader.readAsDataURL(file);
+function clearErrors() {
+  document.querySelectorAll('.error-message').forEach(e => e.innerText = '');
+}
 
 
-        };
+function validateForm() {
+  clearErrors();
+  let valid = true;
+
+  const name = document.getElementById('product_name').value.trim();
+  const brand = document.getElementById('brand').value;
+  const category = document.getElementById('category').value;
+  const desc = document.querySelector('[name=description]').value.trim();
+  const price = document.querySelector('[name=regularPrice]').value;
+  const qty = document.querySelector('[name=quantity]').value;
+
+  if (name.length < 3) {
+    showError('productName-error', 'Product name must be at least 3 characters');
+    valid = false;
+  }
+
+  if (!brand) {
+    showError('brand-error', 'Please select a brand');
+    valid = false;
+  }
+
+  if (!category) {
+    showError('category-error', 'Please select a category');
+    valid = false;
+  }
+
+  if (desc.length < 10) {
+    showError('description-error', 'Description must be at least 10 characters');
+    valid = false;
+  }
+
+  if (!price || price <= 0) {
+    showError('regularPrice-error', 'Enter a valid price');
+    valid = false;
+  }
+
+  if (qty < 0) {
+    showError('quantity-error', 'Quantity cannot be negative');
+    valid = false;
+  }
+
+  if (Object.keys(croppedImages).length === 0) {
+    showError('images-error', 'At least one image is required');
+    valid = false;
+  }
+
+  return valid;
+}
 
 
-        function closeCropper() {
-            document.getElementById('cropperModal').style.display = 'none';
-            if (cropper) cropper.destroy();
-            cropper = null;
-        }
+function openCropper(event, index) {
+  currentIndex = index;
 
-        function cropImage() {
-            if (!cropper) return;
-            cropper.getCroppedCanvas().toBlob((blob) => {
-                const preview = document.getElementById(`imgView${currentInputIndex}`);
-                const fileInput = document.getElementById(`input${currentInputIndex}`);
-                preview.src = URL.createObjectURL(blob);
-                preview.style.display = 'block';
+  if (cropper) {
+    cropper.destroy();
+    cropper = null;
+  }
 
+  const reader = new FileReader();
+  reader.onload = e => {
+    cropperImage.src = e.target.result;
+    cropperModal.style.display = 'flex';
+    cropper = new Cropper(cropperImage, { aspectRatio: 1 });
+  };
+  reader.readAsDataURL(event.target.files[0]);
+}
 
-                const file = new File([blob], fileInput.files[0].name, { type: blob.type });
-                const dataTransfer = new DataTransfer();
-                dataTransfer.items.add(file);
-                fileInput.files = dataTransfer.files;
+function cropImage() {
+  cropper.getCroppedCanvas().toBlob(blob => {
+    croppedImages[currentIndex] = blob;
 
+    const img = document.getElementById(`imgView${currentIndex}`);
+    img.src = URL.createObjectURL(blob);
+    img.style.display = 'block';
 
-                closeCropper();
-            });
-        }
+    closeCropper();
+  }, 'image/jpeg');
+}
 
-        const form = document.getElementById("productForm");
-        form.addEventListener("submit", async function (e) {
-            e.preventDefault();
-
-            const formData = new FormData(form);
-            try {
-                const response = await fetch("/admin/addProduct", {
-                    method: "Post",
-                    body: formData
-                });
-
-                const result = await response.json();
-
-                if (result.ok) {
-                    Swal.fire({
-                        icon: "success",
-                        title: "Success!",
-                        text: result.message,
-                        confirmButtonText: "OK"
-                    }).then(() => {
-                        form.reset();
-                        document.getElementById("productPreview").innerHTML =
-                            '<p class="text-muted">Fill the form to see live preview</p>';
-                    });
-
-                } else {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Error",
-                        text: result.error || "Something Went Wrong"
-                    });
-                }
-            } catch (err) {
-                console.log("Request failed:", err);
-                Swal.fire({
-                    icon: "error",
-                    title: "Error",
-                    text: "Server error,please try again"
-                });
-            }
-        });
+function closeCropper() {
+  if (cropper) {
+    cropper.destroy();
+    cropper = null;
+  }
+  cropperModal.style.display = 'none';
+}
 
 
-    </script>
+document.getElementById('productForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  if (!validateForm()) return;
+
+  const formData = new FormData();
+
+  
+  formData.append('productName', document.getElementById('product_name').value);
+  formData.append('brand', document.getElementById('brand').value);
+  formData.append('category', document.getElementById('category').value);
+  formData.append('description', document.querySelector('[name=description]').value);
+  formData.append('regularPrice', document.querySelector('[name=regularPrice]').value);
+  formData.append('quantity', document.querySelector('[name=quantity]').value);
+  formData.append('color', document.querySelector('[name=color]').value);
+
+  
+  Object.keys(croppedImages).forEach(index => {
+    formData.append('images', croppedImages[index], `image${index}.jpg`);
+  });
+
+  try {
+    const res = await fetch('/admin/addProduct', {
+      method: 'POST',
+      body: formData
+    });
+
+    const data = await res.json();
+
+    if (data.ok) {
+      Swal.fire('Success', data.message, 'success').then(() => {
+        resetProductForm();
+      });
+    } else {
+      Swal.fire('Error', data.error, 'error');
+    }
+  } catch (err) {
+    Swal.fire('Error', 'Server error', 'error');
+  }
+});
+
+
+function resetProductForm() {
+  
+  document.getElementById('productForm').reset();
+
+  Object.keys(croppedImages).forEach(k => delete croppedImages[k]);
+  for (let i = 1; i <= 4; i++) {
+    const input = document.getElementById(`input${i}`);
+    if (input) input.value = "";
+  }
+  document.querySelectorAll('.image-preview').forEach(img => {
+    img.src = "";
+    img.style.display = "none";
+  });
+
+  const container = document.getElementById('addedImagesContainer');
+  if (container) {
+    container.innerHTML = `<span class="text-muted">Selected images will appear here</span>`;
+  }
+
+  clearErrors();
+}
+
+</script>

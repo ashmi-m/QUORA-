@@ -4,6 +4,8 @@ const env = require("dotenv").config();
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 
+
+const Order = require("../../models/orderSchema");
 const loadHomepage = async(req,res)=>{
   try{
     const products = await Product.find()
@@ -269,15 +271,24 @@ const login = async (req, res) => {
       return res.render("login", { message: "Incorrect Password" })
     }
 
-    req.session.user = findUser;
+    // req.session.user = findUser;
 
-    if (req.session.user) {
-      console.log(req.session.user)
-      // console.log("redirect is working")
-      return res.redirect("/")//home page
-    } else {
-      res.redirect('/login')
-    }
+    // if (req.session.user) {
+    //   console.log(req.session.user)
+    //   // console.log("redirect is working")
+    //   return res.redirect("/")//home page
+    // } else {
+    //   res.redirect('/login')
+    // }
+
+       req.session.user = {
+      _id: findUser._id,
+      name: findUser.name,
+      email: findUser.email
+    };
+
+        return res.redirect("/userprofile");
+
 
   } catch (error) {
     console.error("login error", error);
@@ -384,7 +395,65 @@ const logout = async (req, res) => {
     res.redirect("/pageNotFound")
 
   }
-}
+};
+
+
+
+const loadProfilePage = async (req, res) => {
+  try {
+    // ✅ check session
+    if (!req.session.user) {
+      return res.redirect("/login");
+    }
+
+    const userId = req.session.user._id;
+
+    const user = await User.findById(userId).lean();
+    const orders = await Order.find({ user: userId })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    res.render("profile", { user, orders });
+  } catch (error) {
+    console.log("Error loading profile:", error);
+    res.redirect("/pageNotFound");
+  }
+};
+
+
+
+const updateProfile = async (req, res) => {
+  try {
+    if (!req.session.user) {
+      return res.status(401).json({ success: false });
+    }
+
+    const { name, phone, gender } = req.body;
+
+    await User.findByIdAndUpdate(req.session.user._id, {
+      name,
+      phone,
+      gender
+    });
+
+    // keep session updated
+    req.session.user.name = name;
+
+    res.json({ success: true });
+  } catch (error) {
+    res.json({ success: false, error: "Update failed" });
+  }
+};
+
+
+
+
+
+
+
+
+
+
 
 
 module.exports = {
@@ -401,5 +470,8 @@ module.exports = {
   forgotPassword,
   verifyResetOtp,
   resetPassword,
- loadlandingpage
+ loadlandingpage,
+ loadProfilePage,
+  updateProfile,
+  
 };

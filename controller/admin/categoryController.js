@@ -35,22 +35,30 @@ const categoryInfo = async (req, res) => {
   }
 };
 
-const addCategory = async(req,res)=>{
-  try{
+const addCategory = async (req, res) => {
+  try {
     const { name, description } = req.body;
-    if(!name || !description) return res.status(400).json({success:false,error:"All fields required"});
 
-    const existing = await Category.findOne({ name: name.trim() });
-    if(existing) return res.status(400).json({success:false,error:"Category name already exists"});
+    if (!name || !description) {
+      return res.status(400).json({ success: false, error: "All fields required" });
+    }
 
-    const newCat = new Category({ name, description, status:true, isListed:true });
+    // Check if category already exists (case-insensitive)
+    const existing = await Category.findOne({ name: { $regex: `^${name.trim()}$`, $options: "i" } });
+    if (existing) {
+      return res.status(400).json({ success: false, error: "Category name already exists" });
+    }
+
+    const newCat = new Category({ name: name.trim(), description, status: true, isListed: true });
     await newCat.save();
-    res.status(200).json({success:true,message:"Category added successfully"});
-  }catch(err){
+
+    res.status(200).json({ success: true, message: "Category added successfully" });
+  } catch (err) {
     console.error(err);
-    res.status(500).json({success:false,error:"Internal server error"});
+    res.status(500).json({ success: false, error: "Internal server error" });
   }
-}
+};
+
 
 
 

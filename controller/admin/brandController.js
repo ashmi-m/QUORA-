@@ -38,7 +38,20 @@ const addBrand = async (req, res) => {
         error:"Brand name and logo are required"
       });
     }
+    
+//strt//
+    brandName = brandName.trim();
+       const existingBrand = await Brand.findOne({
+      brandName: { $regex: `^${brandName}$`, $options: "i" },
+    });
 
+     if (existingBrand) {
+      return res.status(409).json({
+        success: false,
+        error: "Brand already exists",
+      });
+    }
+    //
     const imagePath = req.file.path; // Cloudinary URL or local path
 
     const newBrand = new Brand({
@@ -54,6 +67,19 @@ const addBrand = async (req, res) => {
     return res.status(500).json({ success: false, error: "Internal server error" });
   }
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // const deleteBrand = async (req, res) => {
 //   try {

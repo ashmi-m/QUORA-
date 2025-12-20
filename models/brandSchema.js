@@ -21,5 +21,10 @@ const brandSchema = new Schema({
   },
 });
 
+brandSchema.index(
+  { brandName: 1 },
+  { unique: true, collation: { locale: "en", strength: 2 } }
+);
+
 const Brand = mongoose.model("Brand", brandSchema);
 module.exports = Brand;

@@ -96,10 +96,7 @@ const getProductpage = async (req, res) => {
 
 
 
-
-
-
-
+const mongoose = require("mongoose");
 
 const addProducts = async (req, res) => {
   try {
@@ -207,11 +204,6 @@ if (req.files && req.files.length > 0) {
     return res.status(500).json({ ok: false, error: "Server error" });
   }
 };
-
-
-
-
-
 
 
    const getEditProductPage = async(req,res)=>{

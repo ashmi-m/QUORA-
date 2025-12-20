@@ -6,6 +6,11 @@ const userController = require("../controller/user/userController");
 const shopController = require("../controller/user/shopController");
 const productController = require("../controller/admin/productController");
 const {userAuth,preventAuthPages}= require("../middlewares/auth.js");
+const orderController = require('../controller/user/orderController');
+const addressController = require("../controller/user/addressController");
+
+
+
 
 const passport = require("../config/passport.js");
 
@@ -45,6 +50,23 @@ router.get("/shop", shopController.loadShopPage);
 router.get("/product/:id", shopController.loadProductDetails);
 router.get("/shop/brand/:brandId", productController.getProductsByBrand);
 router.get("/brands", productController.getAllBrands);
+
+
+//
+// PROFILE
+
+
+router.get("/userprofile", userAuth, userController.loadProfilePage);
+router.put("/profile/update", userAuth, userController.updateProfile);
+
+// ===== ORDERS =====
+router.get("/place-order", userAuth, orderController.placeOrder);
+router.put("/user/cancel/:id", userAuth, orderController.cancelOrder);
+
+// ===== ADDRESS =====
+router.post("/address/add", userAuth, addressController.addAddress);
+router.get("/address/list", userAuth, addressController.getAddresses);
+router.get("/add-address", userAuth, userController.loadAddAddressPage);
 
 
 module.exports = router;
