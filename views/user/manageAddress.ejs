@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Manage Addresses</title>
+  <link rel="stylesheet" href="/css/manage-address.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+<div class="profile-container">
+  <main class="profile-content">
+
+    <!-- HEADER -->
+    <div class="address-header">
+      <h3>Manage Addresses</h3>
+      <a href="/add-address" class="add-address-btn">Add new Address</a>
+    </div>
+
+    <!-- ADDRESS LIST -->
+    <% if (!user.addresses || user.addresses.length === 0) { %>
+      <p>No address found.</p>
+    <% } else { %>
+
+      <% user.addresses.forEach((addr, index) => { %>
+
+        <div class="address-card">
+
+          <!-- NAME -->
+          <p class="address-name"><%= addr.name %></p>
+
+          <!-- PHONE -->
+          <p class="address-phone"><%= addr.mobile %></p>
+
+          <!-- FULL ADDRESS -->
+          <p class="address-text">
+            <%= addr.address %>, <%= addr.city %><% if (addr.state) { %>, <%= addr.state %><% } %> - <%= addr.pincode %>
+          </p>
+
+          <!-- ACTIONS -->
+          <% if (index === 0) { %>
+            <!-- FIRST CARD: Edit and Delete as links -->
+            <div class="address-actions-inline">
+              <a href="/edit-address/<%= addr._id %>" class="action-link">Edit</a>
+              <span class="separator">|</span>
+              <button type="button" class="action-link delete-btn" data-id="<%= addr._id %>">Delete</button>
+            </div>
+          <% } else { %>
+            <!-- OTHER CARDS: 3-dot menu -->
+            <div class="address-actions-menu">
+              <button type="button" class="dots-btn">⋮</button>
+              <div class="dropdown-menu">
+                <a href="/edit-address/<%= addr._id %>">Edit</a>
+                <button type="button" class="delete-btn" data-id="<%= addr._id %>">Delete</button>
+              </div>
+            </div>
+          <% } %>
+
+          <!-- TYPE TAG (Home/Work) -->
+          <% if (addr.type) { %>
+            <span class="address-type-tag"><%= addr.type %></span>
+          <% } %>
+
+        </div>
+
+      <% }) %>
+
+    <% } %>
+
+  </main>
+</div>
+
+<script>
+document.addEventListener("click", (e) => {
+
+  // Toggle dropdown menu
+  if (e.target.classList.contains("dots-btn")) {
+    e.stopPropagation();
+
+    // Close all other dropdowns
+    document.querySelectorAll(".dropdown-menu").forEach(menu => {
+      if (menu !== e.target.nextElementSibling) {
+        menu.classList.remove("show");
+      }
+    });
+
+    // Toggle current dropdown
+    const dropdown = e.target.nextElementSibling;
+    dropdown.classList.toggle("show");
+    return;
+  }
+
+  // Delete address
+  if (e.target.classList.contains("delete-btn")) {
+    e.stopPropagation();
+    const id = e.target.dataset.id;
+
+    Swal.fire({
+      title: "Delete address?",
+      text: "This action cannot be undone",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#666",
+      confirmButtonText: "Delete",
+      cancelButtonText: "Cancel"
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await fetch(`/delete-address/${id}`, { method: "DELETE" });
+        location.reload();
+      }
+    });
+    return;
+  }
+
+  // Close all dropdowns when clicking outside
+  document.querySelectorAll(".dropdown-menu").forEach(menu => {
+    menu.classList.remove("show");
+  });
+});
+</script>
+
+</body>
+</html>

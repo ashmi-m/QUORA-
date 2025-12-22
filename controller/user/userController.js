@@ -401,7 +401,7 @@ const logout = async (req, res) => {
 
 const loadProfilePage = async (req, res) => {
   try {
-    // ✅ check session
+   
     if (!req.session.user) {
       return res.redirect("/login");
     }
@@ -436,7 +436,6 @@ const updateProfile = async (req, res) => {
       gender
     });
 
-    // keep session updated
     req.session.user.name = name;
 
     res.json({ success: true });
@@ -445,7 +444,59 @@ const updateProfile = async (req, res) => {
   }
 };
 
+const loadAddAddressPage = async (req, res) => {
+  try {
+    if (!req.session.user) {
+      return res.redirect("/login");
+    }
 
+    res.render("addAddress"); 
+  } catch (error) {
+    console.error("Load add address error:", error);
+    res.redirect("/pageNotFound");
+  }
+};
+
+const loadManageAddressPage = async (req, res) => {
+  try {
+    const user = await User.findById(req.session.user._id).lean();
+    console.log(user.addresses)
+    res.render("user/manageAddress", { user });
+  } catch (error) {
+    console.error(error);
+    res.redirect("/pageNotFound");
+  }
+};
+
+
+const addAddress = async (req, res) => {
+  try {
+    if (!req.session.user) return res.redirect("/login");
+     console.log("REQ BODY",req.body);
+    const userId = req.session.user._id;
+
+    const newAddress = {
+      name: req.body.name,
+      mobile: req.body.mobile,
+      pincode: req.body.pincode,
+      locality: req.body.locality,
+      address: req.body.address,
+      city: req.body.city,
+      state: req.body.state,
+      landmark: req.body.landmark,
+      type: req.body.type
+    };
+
+    console.log("Adding Address:", newAddress); // debug log
+
+    await User.findByIdAndUpdate(userId, { $push: { addresses: newAddress } });
+
+    res.redirect("/userprofile"); // redirect to profile after saving
+  } catch (error) {
+    console.error("Add address error:", error);
+    res.redirect("/pageNotFound");
+  }
+};
 
 
 
@@ -473,5 +524,7 @@ module.exports = {
  loadlandingpage,
  loadProfilePage,
   updateProfile,
-  
+ loadAddAddressPage,
+ addAddress,
+  loadManageAddressPage,
 };

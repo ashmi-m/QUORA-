@@ -1,0 +1,203 @@
+/* ========== RESET ========== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Inter", Arial, sans-serif;
+}
+
+body {
+  background: #f9f9f9;
+  color: #333;
+}
+
+/* ========== PAGE LAYOUT ========== */
+.profile-container {
+  padding: 40px 60px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.profile-content {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 40px;
+}
+
+/* ========== HEADER ========== */
+.address-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.address-header h3 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+/* ========== ADD BUTTON ========== */
+.add-address-btn {
+  background: #000000;
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.add-address-btn:hover {
+  background: #333333;
+}
+
+/* ========== ADDRESS CARD ========== */
+.address-card {
+  background: #ffffff;
+  padding: 0;
+  margin-bottom: 20px;
+  position: relative;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 20px;
+}
+
+.address-card:last-child {
+  border-bottom: none;
+}
+
+/* ========== ADDRESS CONTENT ========== */
+.address-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 6px;
+}
+
+.address-phone {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.address-text {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+  max-width: 90%;
+}
+
+/* ========== FIRST CARD: INLINE ACTIONS (Edit | Delete) ========== */
+.address-actions-inline {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.action-link {
+  font-size: 14px;
+  color: #1a73e8;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.action-link:hover {
+  color: #0d5bb5;
+  text-decoration: underline;
+}
+
+.separator {
+  color: #999;
+  font-size: 14px;
+}
+
+/* ========== 3 DOT MENU (OTHER CARDS) ========== */
+.address-actions-menu {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.dots-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #666;
+  padding: 4px 8px;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.dots-btn:hover {
+  color: #333;
+}
+
+/* ========== DROPDOWN MENU ========== */
+.dropdown-menu {
+  position: absolute;
+  top: 30px;
+  right: 0;
+  background: #ffffff;
+  border-radius: 4px;
+  min-width: 120px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+  z-index: 100;
+  border: 1px solid #e0e0e0;
+  overflow: hidden;
+}
+
+.dropdown-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-menu a,
+.dropdown-menu button {
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  font-size: 14px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s;
+  color: #333;
+  text-decoration: none;
+}
+
+.dropdown-menu button {
+  color: #d32f2f;
+}
+
+.dropdown-menu a:hover,
+.dropdown-menu button:hover {
+  background: #f5f5f5;
+}
+
+/* ========== TYPE TAG (Home/Work) ========== */
+.address-type-tag {
+  position: absolute;
+  bottom: 20px;
+  right: 0;
+  background: #f0f0f0;
+  color: #666;
+  padding: 4px 12px;
+  font-size: 12px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+

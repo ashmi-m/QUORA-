@@ -64,8 +64,9 @@ router.get("/place-order", userAuth, orderController.placeOrder);
 router.put("/user/cancel/:id", userAuth, orderController.cancelOrder);
 
 // ===== ADDRESS =====
-router.post("/address/add", userAuth, addressController.addAddress);
-router.get("/address/list", userAuth, addressController.getAddresses);
+router.post("/address/add", userAuth, userController.addAddress);
+router.get("/manage-address", userAuth, userController.loadManageAddressPage);
+
 router.get("/add-address", userAuth, userController.loadAddAddressPage);
 
 

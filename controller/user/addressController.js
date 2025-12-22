@@ -1,4 +1,4 @@
-const User = require("../../models/userSchema"); // fixed path
+const User = require("../../models/userSchema"); 
 
 exports.addAddress = async (req, res) => {
   try {
