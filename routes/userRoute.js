@@ -8,8 +8,8 @@ const productController = require("../controller/admin/productController");
 const {userAuth,preventAuthPages}= require("../middlewares/auth.js");
 const orderController = require('../controller/user/orderController');
 const addressController = require("../controller/user/addressController");
-
-
+const cartController =require("../controller/user/cartController")
+const wishlistController = require('../controller/user/wishlistController'); 
 
 
 const passport = require("../config/passport.js");
@@ -70,7 +70,22 @@ router.get("/manage-address", userAuth, userController.loadManageAddressPage);
 router.get("/add-address", userAuth, userController.loadAddAddressPage);
 
 
+// EDIT ADDRESS
+router.get("/edit-address/:id", userAuth, userController.loadEditAddressPage);
+router.post("/address/edit/:id", userAuth, userController.updateAddress);
+
+router.delete("/address/delete/:id", userAuth, userController.deleteAddress);
+
+router.get("/cart", userAuth, cartController.loadCartPage);
+router.post("/cart/add", userAuth, cartController.addToCart);
+
+router.post("/cart/update", userAuth, cartController.updateCartItem);   
+router.post("/cart/remove", userAuth, cartController.removeCartItem);   
+router.get('/wishlist', userAuth, wishlistController.getWishlist);
+router.post('/wishlist/add', userAuth, wishlistController.addToWishlist);
+
 module.exports = router;
 
 
   
+

@@ -1,0 +1,92 @@
+
+
+
+<%- include("../partials/user/header") %>
+
+<link rel="stylesheet" href="/css/address.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="account-page">
+
+  <main class="account-content">
+    <div class="address-card">
+      <h3 class="card-title">Edit Address</h3>
+
+      <% if (typeof error !== "undefined") { %>
+        <script>
+          Swal.fire("Error", "<%= error %>", "error");
+        </script>
+      <% } %>
+
+      <form action="/address/edit/<%= address._id %>" method="POST">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Name</label>
+            <input name="name" value="<%= address.name %>" required>
+          </div>
+
+          <div class="form-group">
+            <label>Mobile</label>
+            <input name="mobile" value="<%= address.mobile %>" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Address</label>
+          <textarea name="address" required><%= address.address %></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>City</label>
+            <input name="city" value="<%= address.city %>" required>
+          </div>
+
+          <div class="form-group">
+            <label>Pincode</label>
+            <input name="pincode" value="<%= address.pincode %>" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>State</label>
+            <input name="state" value="<%= address.state %>" required>
+          </div>
+
+          <div class="form-group">
+            <label>Type</label>
+            <select name="type">
+              <option value="Home" <%= address.type==="Home"?"selected":"" %>>Home</option>
+              <option value="Work" <%= address.type==="Work"?"selected":"" %>>Work</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="save-btn">Update</button>
+          <a href="/manage-address" class="cancel-btn">Cancel</a>
+        </div>
+
+      </form>
+    </div>
+  </main>
+</div>
+
+<script>
+document.querySelector("form").addEventListener("submit", e => {
+  const mobile = document.querySelector("[name='mobile']").value;
+  const pincode = document.querySelector("[name='pincode']").value;
+
+  if (!/^\d{10}$/.test(mobile)) {
+    e.preventDefault();
+    Swal.fire("Invalid Mobile", "Enter 10 digit number", "error");
+  }
+
+  if (!/^\d{6}$/.test(pincode)) {
+    e.preventDefault();
+    Swal.fire("Invalid Pincode", "Enter 6 digit pincode", "error");
+  }
+});
+</script>

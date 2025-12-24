@@ -9,113 +9,84 @@
 <body>
 
 <div class="profile-container">
-  <main class="profile-content">
+  <div class="address-wrapper">
 
-    <!-- HEADER -->
     <div class="address-header">
-      <h3>Manage Addresses</h3>
-      <a href="/add-address" class="add-address-btn">Add new Address</a>
+      <h2>Manage Addresses</h2>
+      <a href="/add-address" class="add-address-btn">+ Add New Address</a>
     </div>
-
-    <!-- ADDRESS LIST -->
-    <% if (!user.addresses || user.addresses.length === 0) { %>
-      <p>No address found.</p>
-    <% } else { %>
-
-      <% user.addresses.forEach((addr, index) => { %>
-
-        <div class="address-card">
-
-          <!-- NAME -->
-          <p class="address-name"><%= addr.name %></p>
-
-          <!-- PHONE -->
-          <p class="address-phone"><%= addr.mobile %></p>
-
-          <!-- FULL ADDRESS -->
-          <p class="address-text">
-            <%= addr.address %>, <%= addr.city %><% if (addr.state) { %>, <%= addr.state %><% } %> - <%= addr.pincode %>
-          </p>
-
-          <!-- ACTIONS -->
-          <% if (index === 0) { %>
-            <!-- FIRST CARD: Edit and Delete as links -->
-            <div class="address-actions-inline">
-              <a href="/edit-address/<%= addr._id %>" class="action-link">Edit</a>
-              <span class="separator">|</span>
-              <button type="button" class="action-link delete-btn" data-id="<%= addr._id %>">Delete</button>
-            </div>
-          <% } else { %>
-            <!-- OTHER CARDS: 3-dot menu -->
-            <div class="address-actions-menu">
-              <button type="button" class="dots-btn">⋮</button>
-              <div class="dropdown-menu">
-                <a href="/edit-address/<%= addr._id %>">Edit</a>
-                <button type="button" class="delete-btn" data-id="<%= addr._id %>">Delete</button>
-              </div>
-            </div>
-          <% } %>
-
-          <!-- TYPE TAG (Home/Work) -->
-          <% if (addr.type) { %>
-            <span class="address-type-tag"><%= addr.type %></span>
-          <% } %>
-
-        </div>
-
-      <% }) %>
-
+     <% if (!user.addresses || user.addresses.length === 0) { %>
+      <p>No address found</p>
     <% } %>
 
-  </main>
+    <% user.addresses.forEach(addr => { %>
+       <div class="address-card" id="address-<%= addr._id %>">
+
+        <div class="address-info">
+          <div>
+            <span class="address-name"><%= addr.name.toUpperCase() %></span>
+            <span class="address-phone"><%= addr.mobile %></span>
+          </div>
+
+          <div class="address-actions">
+            <button class="dots-btn">⋮</button>
+            <div class="dropdown-menu">
+              <a href="/edit-address/<%= addr._id %>" class="edit-btn">Edit</a>
+              <button class="delete-btn" data-id="<%= addr._id %>">Delete</button>
+            </div>
+          </div>
+        </div>
+
+        <p class="address-text">
+          <%= addr.address %>, <%= addr.city %>, <%= addr.state %> - <%= addr.pincode %>
+        </p>
+
+        <span class="address-type"><%= addr.type %></span>
+
+      </div>
+    <% }) %>
+
+  </div>
 </div>
 
-<script>
-document.addEventListener("click", (e) => {
 
-  // Toggle dropdown menu
+<script>
+document.addEventListener("click", e => {
   if (e.target.classList.contains("dots-btn")) {
     e.stopPropagation();
-
-    // Close all other dropdowns
-    document.querySelectorAll(".dropdown-menu").forEach(menu => {
-      if (menu !== e.target.nextElementSibling) {
-        menu.classList.remove("show");
-      }
-    });
-
-    // Toggle current dropdown
-    const dropdown = e.target.nextElementSibling;
-    dropdown.classList.toggle("show");
-    return;
+    document.querySelectorAll(".dropdown-menu").forEach(d => d.classList.remove("show"));
+    e.target.nextElementSibling.classList.toggle("show");
+  } else {
+    document.querySelectorAll(".dropdown-menu").forEach(d => d.classList.remove("show"));
   }
+});
 
-  // Delete address
-  if (e.target.classList.contains("delete-btn")) {
-    e.stopPropagation();
-    const id = e.target.dataset.id;
-
-    Swal.fire({
-      title: "Delete address?",
-      text: "This action cannot be undone",
+document.querySelectorAll(".delete-btn").forEach(btn => {
+  btn.addEventListener("click", async () => {
+    const id = btn.dataset.id;
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",
-      cancelButtonColor: "#666",
-      confirmButtonText: "Delete",
-      cancelButtonText: "Cancel"
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        await fetch(`/delete-address/${id}`, { method: "DELETE" });
-        location.reload();
-      }
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!"
     });
-    return;
-  }
-
-  // Close all dropdowns when clicking outside
-  document.querySelectorAll(".dropdown-menu").forEach(menu => {
-    menu.classList.remove("show");
+    
+    if (result.isConfirmed) {
+      try {
+        const res = await fetch(`/address/delete/${id}`, { method: "DELETE", headers: { "Content-Type": "application/json" } });
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById(`address-${id}`).remove();
+          Swal.fire({ icon: "success", title: "Deleted!", text: "Address deleted successfully", timer: 2000, showConfirmButton: false });
+        } else Swal.fire("Error", "Failed to delete address", "error");
+      } catch (err) {
+        console.error(err);
+        Swal.fire("Error", "Something went wrong", "error");
+      }
+    }
   });
 });
 </script>

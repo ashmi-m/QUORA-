@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <title>Product Page</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
       * {
         box-sizing: border-box;
@@ -298,186 +299,142 @@
   color: red;
 }
 
+
+
+.add-to-cart-btn {
+  margin-top: 8px;
+  padding: 8px;
+  border: none;
+  background-color: #e63946;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.add-to-cart-btn:hover {
+  background-color: #d62828;
+}
+
+
+
     </style>
   </head>
+<body>
 
-  <body>
+<div class="breadcrumb">
+  <span>Home > Products</span>
+  <div class="sort">
+    <form action="/shop" method="GET" id="filterForm">
+      <% if (searchQuery) { %>
+        <input type="hidden" name="search" value="<%= searchQuery %>">
+      <% } %>
 
-
-    <div class="breadcrumb">
-      <span>Home > Products</span>
-      <div class="sort">
-        <form action="/shop" method="GET" id="filterForm">
-
-  <% if (searchQuery) { %>
-    <input type="hidden" name="search" value="<%= searchQuery %>">
-  <% } %>
-
-   <% selectedCategory.forEach(id => { %>
-      <input type="hidden" name="category[]" value="<%= id %>">
-    <% }) %>
-
-
-<% selectedBrand.forEach(id => { %>
-      <input type="hidden" name="brand[]" value="<%= id %>">
-    <% }) %>
-
-                 
-    <% if (priceRange) { %>
-      <input type="hidden" name="priceRange" value="<%= priceRange %>">
-    <% } %>
-    
-  <label>Sort:</label>
-      <select name="sort" onchange="this.form.submit()">
-    <option value="">Default</option>
-    <option value="low-high" <%= sortOption==='low-high'?'selected':'' %>>Low → High</option>
-    <option value="high-low" <%= sortOption==='high-low'?'selected':'' %>>High → Low</option>
-    <option value="a-z" <%= sortOption==='a-z'?'selected':'' %>>A → Z</option>
-    <option value="z-a" <%= sortOption==='z-a'?'selected':'' %>>Z → A</option>
-  </select>
-</form>
-      </div>
-    </div>
-    <div class="container">
-      <aside class="sidebar">
-        <form id="filterForm" action="/shop" method="GET">
-
-
-            <h3>Search</h3>
-            <div class="search-bar">
-              <input type="text" name="search" value="<%= searchQuery || '' %>" placeholder="Search products"
-            >
-             <% if (searchQuery) { %>
-    <!-- Clear search -->
-    <a href="/shop" class="clear-search">✕</a>
-  <% } %>
-
-  <button type="submit">Search</button>
-</div>
-
-
-
-            
-    <!-- <input type="text" name="search" value="<%= searchQuery || '' %>" placeholder="Search products">
-    <button type="submit" class="btn btn-success">Search</button> -->
-
-    <% if (sortOption) { %>
-      <input type="hidden" name="sort" value="<%= sortOption %>">
-    <% } %>
-
-    <!-- <% if (selectedCategory && selectedCategory.length > 0) { %>
-      <% selectedCategory.forEach(function(id) { %>
+      <% selectedCategory.forEach(id => { %>
         <input type="hidden" name="category[]" value="<%= id %>">
       <% }) %>
-    <% } %>
 
-    <% if (selectedBrand && selectedBrand.length > 0) { %>
-      <% selectedBrand.forEach(function(id) { %>
+      <% selectedBrand.forEach(id => { %>
         <input type="hidden" name="brand[]" value="<%= id %>">
       <% }) %>
-    <% } %> -->
-           <h3>Categories</h3>
-    <ul>
-      <% categories.forEach(cat => { %>
-        <li>
-          <label>
-            <input
-              type="checkbox"
-              name="category"
-              value="<%= cat._id %>"
-              onchange="this.form.submit()"
-              <%= selectedCategory.includes(cat._id.toString()) ? 'checked' : '' %>
-            >
-            <%= cat.name %>
-          </label>
-        </li>
-      <% }) %>
-    </ul>
 
-          <!-- 
-        <h3>Price</h3>
-        <ul>
-          <li>₹99 - ₹2999</li>
-        </ul> -->
+      <% if (priceRange) { %>
+        <input type="hidden" name="priceRange" value="<%= priceRange %>">
+      <% } %>
 
-          <h3>Brands</h3>
-    <ul>
-      <% brands.forEach(b => { %>
-        <li>
-          <label>
-            <input
-              type="checkbox"
-              name="brand"
-              value="<%= b._id %>"
-              onchange="this.form.submit()"
-              <%= selectedBrand.includes(b._id.toString()) ? 'checked' : '' %>
-            >
-            <%= b.brandName %>
-          </label>
-        </li>
-      <% }) %>
-    </ul>
+      <label>Sort:</label>
+      <select name="sort" onchange="this.form.submit()">
+        <option value="">Default</option>
+        <option value="low-high" <%= sortOption==='low-high'?'selected':'' %>>Low → High</option>
+        <option value="high-low" <%= sortOption==='high-low'?'selected':'' %>>High → Low</option>
+        <option value="a-z" <%= sortOption==='a-z'?'selected':'' %>>A → Z</option>
+        <option value="z-a" <%= sortOption==='z-a'?'selected':'' %>>Z → A</option>
+      </select>
+    </form>
+  </div>
+</div>
 
+<div class="container">
+  <aside class="sidebar">
+    <form id="filterForm" action="/shop" method="GET">
+      <h3>Search</h3>
+      <div class="search-bar">
+        <input type="text" name="search" value="<%= searchQuery || '' %>" placeholder="Search products">
+        <% if (searchQuery) { %>
+          <a href="/shop" class="clear-search">✕</a>
+        <% } %>
+        <button type="submit">Search</button>
+      </div>
 
-          <h3>Filter by Price</h3>
-          <ul>
-            <li><label><input type="radio" name="priceRange" value="" onchange="this.form.submit()" <%=!priceRange
-                  ? 'checked' :'' %>> All</label></li>
-            <li><label><input type="radio" name="priceRange" value="under500" onchange="this.form.submit()"
-                  <%=priceRange==='under500' ?'checked':'' %>> Under ₹500</label></li>
-            <li><label><input type="radio" name="priceRange" value="500-1000" onchange="this.form.submit()"
-                  <%=priceRange==='500-1000' ?'checked':'' %>> ₹500 - ₹1000</label></li>
+      <% if (sortOption) { %>
+        <input type="hidden" name="sort" value="<%= sortOption %>">
+      <% } %>
 
-            <li><label><input type="radio" name="priceRange" value="1000-5000" onchange="this.form.submit()"
-                  <%=priceRange==='1000-5000' ?'checked':'' %>> ₹1000 - ₹5000</label></li>
+      <h3>Categories</h3>
+      <ul>
+        <% categories.forEach(cat => { %>
+          <li>
             <label>
-              <input type="radio" name="priceRange" value="5000-15000" onchange="this.form.submit()"
-                <%=priceRange==='5000-15000' ? 'checked' : '' %>> ₹5000 - ₹15000
+              <input type="checkbox" name="category" value="<%= cat._id %>" onchange="this.form.submit()"
+                <%= selectedCategory.includes(cat._id.toString()) ? 'checked' : '' %>>
+              <%= cat.name %>
             </label>
-            </li>
-            <li><label><input type="radio" name="priceRange" value="above15000" onchange="this.form.submit()"
-                  <%=priceRange==='above15000' ?'checked':'' %>> Above ₹15000</label></li>
-          </ul>
-          <!-- <h3>Sort By</h3>
-        <select name="sort" id="sort" onchange="this.form.submit()">
-          <option value="">Default</option>
-          <option value="low-high" <%= sortOption==='low-high' ? 'selected' : '' %>>Price: Low to High</option>
-          <option value="high-low" <%= sortOption==='high-low' ? 'selected' : '' %>>Price: High to Low</option>
-        </select> -->
+          </li>
+        <% }) %>
+      </ul>
 
-        </form>
-      </aside>
+      <h3>Brands</h3>
+      <ul>
+        <% brands.forEach(b => { %>
+          <li>
+            <label>
+              <input type="checkbox" name="brand" value="<%= b._id %>" onchange="this.form.submit()"
+                <%= selectedBrand.includes(b._id.toString()) ? 'checked' : '' %>>
+              <%= b.brandName %>
+            </label>
+          </li>
+        <% }) %>
+      </ul>
 
-      <section class="products">
-  <% if (products.length > 0) { %>
-    <% products.forEach(function(product) { %>
+      <h3>Filter by Price</h3>
+      <ul>
+        <li><label><input type="radio" name="priceRange" value="" onchange="this.form.submit()" <%= !priceRange ? 'checked' : '' %>> All</label></li>
+        <li><label><input type="radio" name="priceRange" value="under500" onchange="this.form.submit()" <%= priceRange==='under500' ? 'checked' : '' %>> Under ₹500</label></li>
+        <li><label><input type="radio" name="priceRange" value="500-1000" onchange="this.form.submit()" <%= priceRange==='500-1000' ? 'checked' : '' %>> ₹500 - ₹1000</label></li>
+        <li><label><input type="radio" name="priceRange" value="1000-5000" onchange="this.form.submit()" <%= priceRange==='1000-5000' ? 'checked' : '' %>> ₹1000 - ₹5000</label></li>
+        <li><label><input type="radio" name="priceRange" value="5000-15000" onchange="this.form.submit()" <%= priceRange==='5000-15000' ? 'checked' : '' %>> ₹5000 - ₹15000</label></li>
+        <li><label><input type="radio" name="priceRange" value="above15000" onchange="this.form.submit()" <%= priceRange==='above15000' ? 'checked' : '' %>> Above ₹15000</label></li>
+      </ul>
+    </form>
+  </aside>
+
+  <section class="products">
+    <% products.forEach(product => { %>
       <div class="product-card">
         <a href="/product/<%= product._id %>">
-          <img src="<%= product.productImage && product.productImage[0] ? product.productImage[0] : '/images/default.jpg' %>">
+          <img src="<%= product.productImage?.[0] || '/images/default.jpg' %>">
           <p><%= product.productName %></p>
           <span>₹<%= product.regularPrice %></span>
         </a>
+
+<button class="add-to-cart-btn" data-id="<%= product._id %>">
+  Add to Cart
+</button>
+
+
       </div>
     <% }) %>
-  <% } else { %>
-    <p>No products found</p>
-  <% } %>
-</section>
-
+  </section>
 </div>
 
 <div class="pagination">
-
   <% const buildQuery = (page) => { %>
     <% let q = `?page=${page}`; %>
-
     <% selectedCategory.forEach(id => { q += `&category[]=${id}` }) %>
     <% selectedBrand.forEach(id => { q += `&brand[]=${id}` }) %>
-
     <% if (priceRange) q += `&priceRange=${priceRange}` %>
     <% if (sortOption) q += `&sort=${sortOption}` %>
     <% if (searchQuery) q += `&search=${searchQuery}` %>
-
     <%= q %>
   <% } %>
 
@@ -486,37 +443,179 @@
   <% } %>
 
   <% for (let i = 1; i <= totalPages; i++) { %>
-    <a class="page-btn <%= currentPage === i ? 'active' : '' %>"
-       href="<%= buildQuery(i) %>">
-      <%= i %>
-    </a>
+    <a class="page-btn <%= currentPage === i ? 'active' : '' %>" href="<%= buildQuery(i) %>"><%= i %></a>
   <% } %>
 
   <% if (currentPage < totalPages) { %>
     <a class="page-btn" href="<%= buildQuery(currentPage + 1) %>">Next</a>
   <% } %>
-
 </div>
 
-   
+<footer>
+  <div class="footer-container">
+    <div>
+      <h4>About</h4>
+      <p>Welcome to Quora, your ultimate destination for beauty products...</p>
+    </div>
+    <div>
+      <h4>Contact Us</h4>
+      <p>Email: support@quora.com</p>
+      <p>Phone: +91-123-456-7890</p>
+    </div>
+  </div>
+  <div class="bottom">
+    &copy; 2025 Quora - All Rights Reserved.
+  </div>
+</footer>
+
+<!-- Include SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  // Select all Add to Cart buttons
+  const addToCartButtons = document.querySelectorAll(".add-to-cart-btn");
+
+  addToCartButtons.forEach(button => {
+    button.addEventListener("click", async (e) => {
+      e.preventDefault();
+
+      // Get product ID from button's data attribute
+      const productId = button.dataset.id || button.dataset.productId;
+
+      if (!productId) {
+        Swal.fire({
+          icon: "error",
+          title: "Oops!",
+          text: "Product ID is missing!"
+        });
+        return;
+      }
+
+      try {
+        // Send request to add product to cart
+        const res = await fetch("/cart/add", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productId })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          // Update cart count dynamically
+          const countElem = document.getElementById("cart-count");
+          if (countElem) {
+            countElem.innerText = parseInt(countElem.innerText || "0") + 1;
+          }
+
+          // Show SweetAlert success modal
+          Swal.fire({
+            title: "Added to Cart!",
+            text: `${data.productName || "Product"} has been added to your cart.`,
+            icon: "success",
+            showCancelButton: true,
+            confirmButtonText: "View Cart",
+            cancelButtonText: "Continue Shopping"
+          }).then((result) => {
+            if (result.isConfirmed) {
+              window.location.href = "/cart";
+            }
+          });
+
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: data.message || "Something went wrong!"
+          });
+        }
+
+      } catch (err) {
+        console.error(err);
+        Swal.fire({
+          icon: "error",
+          title: "Server Error",
+          text: "Unable to add product to cart."
+        });
+      }
+
+    });
+  });
+
+});
+
+document.querySelector(".add-to-cart").addEventListener("click", async () => {
+  const productId = document.querySelector(".add-to-cart").dataset.id;
+
+  const res = await fetch("/cart/add", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ productId })
+  });
+
+  const data = await res.json();
+
+  if (res.ok) {
+    Swal.fire("Added!", data.message, "success");
+  } else {
+    Swal.fire("Unavailable", data.message, "error");
+  }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  const btn = document.querySelector(".add-to-cart-btn");
+
+  if (!btn) {
+    console.error("Add to Cart button not found");
+    return;
+  }
+  btn.addEventListener("click", async (e) => {
+    const productId = e.target.dataset.id;
+
+    if (!productId) {
+      Swal.fire("Error", "Product ID missing", "error");
+      return;
+    }
+
+    try {
+      const res = await fetch("/cart/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId })
+      });
+      
+      const data = await res.json();
+
+      // 🚫 BLOCKED / UNLISTED PRODUCT OR CATEGORY
+      if (!res.ok) {
+        Swal.fire({
+          icon: "warning",
+          title: "Unavailable",
+          text: data.message
+        });
+        return;
+      }
+
+      // ✅ SUCCESS
+      Swal.fire({
+        icon: "success",
+        title: "Added to Cart",
+        timer: 1200,
+        showConfirmButton: false
+      });
+
+    } catch (err) {
+      Swal.fire("Error", "Something went wrong", "error");
+    }
+  });
+
+});
 
 
+</script>
 
-    <footer>
-      <div class="footer-container">
-        <div>
-          <h4>About</h4>
-          <p>Welcome to Quora, your ultimate destination for beauty products...</p>
-        </div>
-        <div>
-          <h4>Contact Us</h4>
-          <p>Email: support@quora.com</p>
-          <p>Phone: +91-123-456-7890</p>
-        </div>
-      </div>
-      <div class="bottom">
-        &copy; 2025 Quora - All Rights Reserved.
-      </div>
-    </footer>
 
-  </body>
+</body>

@@ -197,6 +197,68 @@
     </div>
   </section>
 
+
+
+  <div class="cart-model" id="cartModal">
+    <div class="cart-box">
+
+      <div class="cart-header">
+        <h3>My Cart</h3>
+        <span class="close-cart" id="closeCart">&items;</span>
+      </div>
+          <% if (cart && cart.items.length > 0) { %>
+      <% cart.items.forEach(item => { %>
+        <div class="cart-item">
+          <img src="<%= item.productId.productImage[0] %>">
+          <div class="cart-info">
+            <p><%= item.productId.productName %></p>
+            <span>Qty: <%= item.quantity %></span>
+            <strong>₹<%= item.productId.salePrice %></strong>
+    </div>
+  </div>
+       </div>
+        </div>
+      <% }) %>
+        <div class="cart-footer">
+        <a href="/cart" class="view-cart-btn">View Cart</a>
+        <a href="/checkout" class="checkout-btn">Checkout</a>
+      </div>
+    <% } else { %>
+      <p class="empty-cart">Your cart is empty</p>
+    <% } %>
+</div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+
+    const openCart = document.getElementById("openCart");
+    const closeCart = document.getElementById("closeCart");
+    const cartModal = document.getElementById("cartModal");
+
+    if (!openCart || !cartModal) {
+      console.log("Cart elements not found");
+      return;
+    }
+
+    openCart.addEventListener("click", () => {
+      cartModal.style.display = "flex";
+    });
+
+    if (closeCart) {
+      closeCart.addEventListener("click", () => {
+        cartModal.style.display = "none";
+      });
+    }
+    
+    cartModal.addEventListener("click", (e) => {
+      if (e.target === cartModal) {
+        cartModal.style.display = "none";
+      }
+    });
+
+  });
+</script>
  
   <%- include('../partials/user/footer') %>
 

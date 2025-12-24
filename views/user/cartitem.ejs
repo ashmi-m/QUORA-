@@ -1,0 +1,143 @@
+
+<%- include("../partials/user/header") %>
+<link rel="stylesheet" href="/css/cart.css">
+
+<section class="container cart-main">
+
+  <% if (!cart || cart.items.length === 0) { %>
+    <div class="empty-cart">Your cart is empty 😢</div>
+  <% } else { %>
+
+    <div class="cart-products">
+      <% let subtotal = 0; %>
+      <% cart.items.forEach(item => { %>
+        <% 
+          const price = item.productId.salePrice || item.productId.regularPrice || 0;
+          const qty = item.quantity;
+          const total = price * qty;
+          subtotal += total;
+        %>
+
+        <div class="cart-item" data-id="<%= item._id %>">
+          <img src="<%= item.productId.productImage?.[0] || '/images/default.png' %>">
+          <div class="item-details">
+            <div class="item-name"><%= item.productId.productName %></div>
+            <div class="item-price">₹ <%= price %></div>
+
+            <div class="quantity">
+              <button class="decrease-qty">-</button>
+              <input type="text" value="<%= qty %>" readonly>
+              <button class="increase-qty">+</button>
+            </div>
+
+            <div class="item-total">₹ <%= total %></div>
+          </div>
+          <button class="delete">✕</button>
+        </div>
+      <% }) %>
+
+      <a href="/shop" class="continue-shopping">Continue Shopping</a>
+    </div>
+
+    <div class="cart-summary">
+      <h2>Cart Summary</h2>
+      <p>Subtotal: <span id="cart-subtotal">₹ <%= subtotal %></span></p>
+      <p>Total: <span id="cart-total">₹ <%= subtotal %></span></p>
+      <a href="/checkout" class="checkout-btn">Checkout</a>
+    </div>
+
+  <% } %>
+
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  // 🔹 Update totals
+  function updateSummary() {
+    let subtotal = 0;
+    document.querySelectorAll(".cart-item").forEach(item => {
+      subtotal += parseFloat(
+        item.querySelector(".item-total").textContent.replace("₹", "")
+      );
+    });
+    document.getElementById("cart-subtotal").textContent = `₹ ${subtotal}`;
+    document.getElementById("cart-total").textContent = `₹ ${subtotal}`;
+  }
+
+  // 🔹 REMOVE ITEM
+  document.querySelectorAll(".delete").forEach(btn => {
+    btn.addEventListener("click", async (e) => {
+      const itemEl = e.target.closest(".cart-item");
+      const itemId = itemEl.dataset.id;
+
+      try {
+        const res = await fetch("/cart/remove", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ itemId })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          itemEl.remove();
+          updateSummary();
+
+          Swal.fire({
+            icon: "success",
+            title: "Removed!",
+            text: "Item removed from cart",
+            timer: 1200,
+            showConfirmButton: false
+          });
+
+          if (document.querySelectorAll(".cart-item").length === 0) {
+            document.querySelector(".cart-main").innerHTML =
+              '<div class="empty-cart">Your cart is empty 😢</div>';
+          }
+        } else {
+          Swal.fire("Error", data.message || "Remove failed", "error");
+        }
+
+      } catch (err) {
+        console.error(err);
+        Swal.fire("Error", "Something went wrong", "error");
+      }
+    });
+  });
+
+  // 🔹 UPDATE QUANTITY
+  document.querySelectorAll(".increase-qty, .decrease-qty").forEach(btn => {
+    btn.addEventListener("click", async (e) => {
+      const itemEl = e.target.closest(".cart-item");
+      const itemId = itemEl.dataset.id;
+      const action = e.target.classList.contains("increase-qty") ? "inc" : "dec";
+
+      const res = await fetch("/cart/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ itemId, action })
+      });
+
+      if (res.ok) {
+        let qtyInput = itemEl.querySelector("input");
+        let qty = parseInt(qtyInput.value);
+        qty = action === "inc" ? qty + 1 : Math.max(1, qty - 1);
+        qtyInput.value = qty;
+
+        const price = parseFloat(itemEl.querySelector(".item-price").textContent.replace("₹", ""));
+        itemEl.querySelector(".item-total").textContent = `₹ ${price * qty}`;
+        updateSummary();
+      }
+    });
+  });
+
+});
+
+
+</script>
+
+<%- include("../partials/user/footer") %>

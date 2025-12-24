@@ -35,8 +35,23 @@ const loadlandingpage = async(req,res)=>{
   .limit(8)
   .lean();
 
+  let cart =null;
+  let cartCount=0;
+  if(req.session.user){
+    cart = await Cart.findOne({userId:req.session.user})
+    .populate("items.productId")
+    .lean();
+    if(cart&&cart.items){
+      cartCount=cart.items.length;
+    }
+  }
+
   res.render('home',{
-    products 
+    products ,
+    user:req.session.user,
+    cart,
+    cartCount
+   
   })
 
  } catch (error) {
@@ -461,7 +476,7 @@ const loadManageAddressPage = async (req, res) => {
   try {
     const user = await User.findById(req.session.user._id).lean();
     console.log(user.addresses)
-    res.render("user/manageAddress", { user });
+    res.render("manageAddress", { user });
   } catch (error) {
     console.error(error);
     res.redirect("/pageNotFound");
@@ -471,30 +486,94 @@ const loadManageAddressPage = async (req, res) => {
 
 const addAddress = async (req, res) => {
   try {
-    if (!req.session.user) return res.redirect("/login");
-     console.log("REQ BODY",req.body);
-    const userId = req.session.user._id;
+    const { name, mobile, pincode, locality, address, city, state, type } = req.body;
 
-    const newAddress = {
-      name: req.body.name,
-      mobile: req.body.mobile,
-      pincode: req.body.pincode,
-      locality: req.body.locality,
-      address: req.body.address,
-      city: req.body.city,
-      state: req.body.state,
-      landmark: req.body.landmark,
-      type: req.body.type
-    };
+   
+    if (!name || !mobile || !pincode || !locality || !address || !city || !state) {
+      return res.redirect("/add-address");
+    }
 
-    console.log("Adding Address:", newAddress); // debug log
+    if (!/^\d{10}$/.test(mobile) || !/^\d{6}$/.test(pincode)) {
+      return res.redirect("/add-address");
+    }
 
-    await User.findByIdAndUpdate(userId, { $push: { addresses: newAddress } });
+    await User.updateOne(
+      { _id: req.session.user },
+      {
+        $push: {
+          addresses: {
+            name,
+            mobile,
+            pincode,
+            locality,
+            address,
+            city,
+            state,
+            type
+          }
+        }
+      }
+    );
 
-    res.redirect("/userprofile"); // redirect to profile after saving
+   
+    res.redirect("/add-address?saved=true");
+
   } catch (error) {
-    console.error("Add address error:", error);
-    res.redirect("/pageNotFound");
+    console.log(error);
+    res.redirect("/add-address");
+  }
+};
+
+
+const loadEditAddressPage = async (req, res) => {
+  try {
+    if (!req.session.user) return res.redirect("/login");
+
+    const user = await User.findById(req.session.user._id);
+    const address = user.addresses.id(req.params.id);
+
+    if (!address) {
+      return res.redirect("/manage-address");
+    }
+
+    res.render("editAddress", {
+      user,
+      address
+    });
+
+  } catch (error) {
+    console.error("Load edit address error:", error);
+    res.redirect("/manage-address");
+  }
+};
+
+const updateAddress = async (req, res) => {
+  try {
+    await User.updateOne(
+      {
+        _id: req.session.user,
+        "addresses._id": req.params.id
+      },
+      {
+        $set: {
+          "addresses.$.name": req.body.name,
+          "addresses.$.mobile": req.body.mobile,
+          "addresses.$.pincode": req.body.pincode,
+          "addresses.$.locality": req.body.locality,
+          "addresses.$.address": req.body.address,
+          "addresses.$.city": req.body.city,
+          "addresses.$.state": req.body.state,
+          "addresses.$.landmark": req.body.landmark,
+          "addresses.$.type": req.body.type
+        }
+      }
+    );
+
+    return res.redirect("/manage-address?updated=true");
+
+  } catch (err) {
+    console.error(err);
+    return res.redirect("/manage-address");
   }
 };
 
@@ -502,7 +581,22 @@ const addAddress = async (req, res) => {
 
 
 
+const deleteAddress = async (req, res) => {
+  try {
+    if (!req.session.user) return res.status(401).json({ success: false });
 
+    await User.findByIdAndUpdate(
+      req.session.user._id,
+      { $pull: { addresses: { _id: req.params.id } } }
+    );
+
+    res.json({ success: true });
+
+  } catch (error) {
+    console.error("Delete address error:", error);
+    res.status(500).json({ success: false });
+  }
+};
 
 
 
@@ -527,4 +621,8 @@ module.exports = {
  loadAddAddressPage,
  addAddress,
   loadManageAddressPage,
+ 
+  loadEditAddressPage,
+  updateAddress,
+  deleteAddress
 };
