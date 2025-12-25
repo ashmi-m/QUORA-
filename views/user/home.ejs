@@ -19,12 +19,28 @@
     }
 
     .product-card {
+        position: relative;
       border: 1px solid #ddd;
       border-radius: 10px;
       padding: 15px;
       width: 220px;
       background: #fff;
       text-align: center;
+    }
+    
+    .wishlist-icon {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 22px;
+      cursor: pointer;
+      color: #ccc;
+      transition: 0.3s;
+      z-index: 10;
+    }
+    
+    .wishlist-icon.active {
+      color: red;
     }
 
     .product-card img {
@@ -108,6 +124,21 @@
       width: fit-content;
       transition: background-color 0.3s ease;
     }
+    .cart-icon {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 20px;
+  cursor: pointer;
+  color: #555;
+  transition: 0.3s;
+  z-index: 10;
+}
+
+.cart-icon:hover {
+  color: #4f46e5;
+}
+
 
     .offers-container .explore-btn:hover {
       background-color: #8a4b2f;
@@ -173,12 +204,22 @@
       <% if (products && products.length > 0) { %>
         <% products.forEach(product => { %>
           <div class="product-card">
+             <span
+              class="wishlist-icon <%= wishlistIds && wishlistIds.includes(product._id.toString()) ? 'active' : '' %>"
+              data-id="<%= product._id %>">
+              ❤
+            </span>
+           
+  
             <img src="<%= product.productImage && product.productImage.length > 0 ? product.productImage[0] : '/images/default.png' %>" alt="<%= product.productName %>">
             <h4><%= product.productName %></h4>
+
             <p>₹<%= product.salePrice || product.regularPrice %></p>
-            <a href="/product/<%= product._id %>">
-              <button class="btn-view-details">View Details</button>
-            </a>
+
+           <button class="btn-add-cart" data-id="<%= product._id %>">
+  <i class="fa fa-shopping-cart"></i> Add to Cart
+</button>
+
           </div>
         <% }) %>
       <% } else { %>
@@ -198,66 +239,96 @@
   </section>
 
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-  <div class="cart-model" id="cartModal">
-    <div class="cart-box">
+   <script>
+    document.addEventListener("DOMContentLoaded", () => {
 
-      <div class="cart-header">
-        <h3>My Cart</h3>
-        <span class="close-cart" id="closeCart">&items;</span>
-      </div>
-          <% if (cart && cart.items.length > 0) { %>
-      <% cart.items.forEach(item => { %>
-        <div class="cart-item">
-          <img src="<%= item.productId.productImage[0] %>">
-          <div class="cart-info">
-            <p><%= item.productId.productName %></p>
-            <span>Qty: <%= item.quantity %></span>
-            <strong>₹<%= item.productId.salePrice %></strong>
-    </div>
-  </div>
-       </div>
-        </div>
-      <% }) %>
-        <div class="cart-footer">
-        <a href="/cart" class="view-cart-btn">View Cart</a>
-        <a href="/checkout" class="checkout-btn">Checkout</a>
-      </div>
-    <% } else { %>
-      <p class="empty-cart">Your cart is empty</p>
-    <% } %>
-</div>
-</div>
+      document.querySelectorAll(".wishlist-icon").forEach(icon => {
+        icon.addEventListener("click", async () => {
 
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
+          const productId = icon.dataset.id;
+          const isActive = icon.classList.contains("active");
 
-    const openCart = document.getElementById("openCart");
-    const closeCart = document.getElementById("closeCart");
-    const cartModal = document.getElementById("cartModal");
+          try {
+            const res = await fetch(
+              isActive ? "/wishlist/remove" : "/wishlist/add",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ productId })
+              }
+            );
 
-    if (!openCart || !cartModal) {
-      console.log("Cart elements not found");
-      return;
-    }
+            const data = await res.json();
 
-    openCart.addEventListener("click", () => {
-      cartModal.style.display = "flex";
+            if (data.success || data.added) {
+              icon.classList.toggle("active");
+
+              Swal.fire({
+                icon: "success",
+                title: isActive
+                  ? "Removed from Wishlist"
+                  : "Added to Wishlist",
+                timer: 1000,
+                showConfirmButton: false
+              });
+            }
+
+          } catch (err) {
+            Swal.fire("Login Required", "Please login to use wishlist", "warning");
+          }
+        });
+      });
+
     });
 
-    if (closeCart) {
-      closeCart.addEventListener("click", () => {
-        cartModal.style.display = "none";
-      });
-    }
-    
-    cartModal.addEventListener("click", (e) => {
-      if (e.target === cartModal) {
-        cartModal.style.display = "none";
+const MAX_QTY = 5; // Same as backend limit
+  document.querySelectorAll(".btn-add-cart").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const productId = btn.dataset.id;
+
+      try {
+        const res = await fetch("/cart/add", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productId })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          Swal.fire({
+            icon: "success",
+            title: data.message,
+            timer: 1000,
+            showConfirmButton: false
+          });
+
+          const badge = document.querySelector('a[href="/cart"] .badge');
+          if (badge) badge.textContent = parseInt(badge.textContent || "0") + 1;
+ } else {
+          Swal.fire({
+            icon: "warning",
+            title: data.message,
+            timer: 1500,
+            showConfirmButton: false
+          });
+        }
+
+      } catch {
+        Swal.fire({
+          icon: "error",
+          title: "Login Required",
+          text: "Please login to add products to cart",
+        });
       }
     });
-
   });
+
+
+
+
 </script>
  
   <%- include('../partials/user/footer') %>

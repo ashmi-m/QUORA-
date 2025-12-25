@@ -5,6 +5,7 @@ const fs = require("fs").promises;
 const path = require("path");
 const sharp = require("sharp");
 const cloudinary = require("../../config/cloudinary"); 
+const Wishlist = require("../../models/wishlistSchema");
 
 const getProductAddPage = async (req, res) => {
   try {
@@ -130,7 +131,6 @@ const productImages = [];
 
 if (req.files && req.files.length > 0) {
   for (const file of req.files) {
-    // If the file path is a Cloudinary URL, skip sharp
     if (file.path && file.path.startsWith("http")) {
       productImages.push(file.path);
       continue;
@@ -330,6 +330,38 @@ const getAllBrands = async (req, res) => {
   }
 };
 
+const getProductDetails = async (req, res) => {
+  try {
+    const productId = req.params.id;
+    const product = await Product.findById(productId).lean();
+    if (!product) return res.redirect("/shop");
+
+    const relatedProducts = await Product.find({
+      category: product.category,
+      _id: { $ne: product._id }
+    }).limit(5).lean();
+
+    let isWishlisted = false;
+    if (req.user) {
+      const wishlist = await Wishlist.findOne({
+        userId: req.user._id,
+        "items.productId": productId
+      });
+      isWishlisted = !!wishlist;
+    }
+    
+    res.render("user/productDetails", {
+      product,
+      relatedProducts,
+      isWishlisted
+    });
+
+  } catch (error) {
+    console.error("Error loading product details:", error);
+    res.redirect("/pageerror");
+  }
+};
+
 
 module.exports = {
   getProductAddPage,
@@ -343,5 +375,6 @@ module.exports = {
     deleteImage,
     getProductsByBrand,
      getAllBrands,
+     getProductDetails
 };
  

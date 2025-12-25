@@ -83,6 +83,7 @@ router.post("/cart/update", userAuth, cartController.updateCartItem);
 router.post("/cart/remove", userAuth, cartController.removeCartItem);   
 router.get('/wishlist', userAuth, wishlistController.getWishlist);
 router.post('/wishlist/add', userAuth, wishlistController.addToWishlist);
+router.post('/wishlist/remove', userAuth, wishlistController.removeFromWishlist);
 
 module.exports = router;
 

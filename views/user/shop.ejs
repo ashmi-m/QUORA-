@@ -116,6 +116,7 @@
       }
 
       .product-card {
+        position: relative;
         border: 1px solid #ddd;
         border-radius: 8px;
         padding: 10px;
@@ -317,6 +318,18 @@
 }
 
 
+.product-img-wrapper {
+  position: absolute;
+  width: 100%;
+}
+
+.product-img-wrapper img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 6px;
+} */
+
 
     </style>
   </head>
@@ -420,7 +433,9 @@
 <button class="add-to-cart-btn" data-id="<%= product._id %>">
   Add to Cart
 </button>
-
+   <div class="wishlist-overlay" data-id="<%= product._id %>">
+      ❤
+    </div>
 
       </div>
     <% }) %>
@@ -471,30 +486,25 @@
 <!-- Include SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
-  // Select all Add to Cart buttons
-  const addToCartButtons = document.querySelectorAll(".add-to-cart-btn");
-
-  addToCartButtons.forEach(button => {
-    button.addEventListener("click", async (e) => {
+  /* ========================
+     ADD TO CART (ALL ITEMS)
+     ======================== */
+  document.querySelectorAll(".add-to-cart-btn").forEach(btn => {
+    btn.addEventListener("click", async (e) => {
       e.preventDefault();
+      e.stopPropagation();
 
-      // Get product ID from button's data attribute
-      const productId = button.dataset.id || button.dataset.productId;
-
+      const productId = btn.dataset.id;
       if (!productId) {
-        Swal.fire({
-          icon: "error",
-          title: "Oops!",
-          text: "Product ID is missing!"
-        });
+        Swal.fire("Error", "Product ID missing", "error");
         return;
       }
 
       try {
-        // Send request to add product to cart
         const res = await fetch("/cart/add", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -503,119 +513,64 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const data = await res.json();
 
-        if (res.ok) {
-          // Update cart count dynamically
-          const countElem = document.getElementById("cart-count");
-          if (countElem) {
-            countElem.innerText = parseInt(countElem.innerText || "0") + 1;
-          }
-
-          // Show SweetAlert success modal
-          Swal.fire({
-            title: "Added to Cart!",
-            text: `${data.productName || "Product"} has been added to your cart.`,
-            icon: "success",
-            showCancelButton: true,
-            confirmButtonText: "View Cart",
-            cancelButtonText: "Continue Shopping"
-          }).then((result) => {
-            if (result.isConfirmed) {
-              window.location.href = "/cart";
-            }
-          });
-
-        } else {
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: data.message || "Something went wrong!"
-          });
+        if (!res.ok) {
+          Swal.fire("Unavailable", data.message || "Error", "warning");
+          return;
         }
 
-      } catch (err) {
-        console.error(err);
         Swal.fire({
-          icon: "error",
-          title: "Server Error",
-          text: "Unable to add product to cart."
+          icon: "success",
+          title: "Added to Cart",
+          timer: 1200,
+          showConfirmButton: false
         });
-      }
 
+      } catch (err) {
+        Swal.fire("Error", "Server error", "error");
+      }
+    });
+  });
+
+  /* ========================
+     ADD TO WISHLIST
+     ======================== */
+  document.querySelectorAll(".wishlist-overlay").forEach(btn => {
+    btn.addEventListener("click", async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const productId = btn.dataset.id;
+      if (!productId) return;
+
+      try {
+        const res = await fetch("/wishlist/add", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productId })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          btn.classList.add("active");
+
+          Swal.fire({
+            icon: "success",
+            title: "Added to Wishlist ❤️",
+            timer: 1200,
+            showConfirmButton: false
+          });
+        } else {
+          Swal.fire("Error", data.message || "Failed", "error");
+        }
+      } catch (err) {
+        Swal.fire("Error", "Server error", "error");
+      }
     });
   });
 
 });
-
-document.querySelector(".add-to-cart").addEventListener("click", async () => {
-  const productId = document.querySelector(".add-to-cart").dataset.id;
-
-  const res = await fetch("/cart/add", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ productId })
-  });
-
-  const data = await res.json();
-
-  if (res.ok) {
-    Swal.fire("Added!", data.message, "success");
-  } else {
-    Swal.fire("Unavailable", data.message, "error");
-  }
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-
-  const btn = document.querySelector(".add-to-cart-btn");
-
-  if (!btn) {
-    console.error("Add to Cart button not found");
-    return;
-  }
-  btn.addEventListener("click", async (e) => {
-    const productId = e.target.dataset.id;
-
-    if (!productId) {
-      Swal.fire("Error", "Product ID missing", "error");
-      return;
-    }
-
-    try {
-      const res = await fetch("/cart/add", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId })
-      });
-      
-      const data = await res.json();
-
-      // 🚫 BLOCKED / UNLISTED PRODUCT OR CATEGORY
-      if (!res.ok) {
-        Swal.fire({
-          icon: "warning",
-          title: "Unavailable",
-          text: data.message
-        });
-        return;
-      }
-
-      // ✅ SUCCESS
-      Swal.fire({
-        icon: "success",
-        title: "Added to Cart",
-        timer: 1200,
-        showConfirmButton: false
-      });
-
-    } catch (err) {
-      Swal.fire("Error", "Something went wrong", "error");
-    }
-  });
-
-});
-
-
 </script>
 
 
-</body>
+</body> 

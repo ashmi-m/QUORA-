@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Product = require("../../models/productSchema");
 const Category = require("../../models/categorySchema");
 const Brand = require("../../models/brandSchema");
-
+const Wishlist = require("../../models/wishlistSchema");
 
 
 const loadShopPage = async (req, res) => {
@@ -143,8 +143,15 @@ const loadProductDetails = async (req, res) => {
        isBlocked: false,
     }).limit(4).lean();
      console.log("Related Products Found:", relatedProducts.length);
-
-    res.render("productDetails", { product, relatedProducts });
+    let isWishlisted = false;
+    if (req.user) {
+      const wishlist = await Wishlist.findOne({
+        userId: req.user._id,
+        "items.productId": productId,
+      });
+      isWishlisted = !!wishlist;
+    }
+    res.render("productDetails", { product, relatedProducts,isWishlisted });
   } catch (error) {
     console.error(error);
     res.redirect("/pageNotFound");

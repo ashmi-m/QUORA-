@@ -6,6 +6,7 @@
 <head>
   <meta charset="UTF-8">
   <title><%= product.productName %> - Quora</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body style="margin:0; font-family: Arial, sans-serif; background:#fff; color:#333;">
@@ -39,6 +40,13 @@
 
       <div style="flex:2;">
         <h2 style="margin-top:0;"><%= product.productName %></h2>
+        <span 
+          id="wishlistBtn"
+          data-id="<%= product._id %>"
+          style="color:<%= isWishlisted ? 'red' : '#bbb' %>; cursor:pointer; font-size:26px; margin-left:10px;">
+          ❤
+        </span>
+
 
         <div style="margin:15px 0; padding:15px; border:1px solid #eee; border-radius:8px; background:#fafafa;">
           <h4 style="margin:0 0 10px; font-size:18px; color:#ff6f61;">Product Description</h4>
@@ -97,6 +105,7 @@
   </footer>
 
   <script>
+    
     document.addEventListener("DOMContentLoaded", function () {
       const mainImage = document.querySelector(".main-product-image");
       const thumbnails = document.querySelectorAll(".thumbnail-image");
@@ -122,7 +131,48 @@
           mainImage.src = this.dataset.src;
         });
       });
+
+    
+    
+ const wishlistBtn = document.getElementById("wishlistBtn");
+      if (wishlistBtn) {
+        wishlistBtn.addEventListener("click", async () => {
+          const productId = wishlistBtn.dataset.id;
+          const isActive = wishlistBtn.style.color === "red";
+
+          try {
+            const url = isActive ? "/wishlist/remove" : "/wishlist/add";
+
+            const res = await fetch(url, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ productId })
+            });
+            
+            const data = await res.json();
+
+            if (data.success) {
+              wishlistBtn.style.color = isActive ? "#bbb" : "red";
+              wishlistBtn.dataset.active = (!isActive).toString();
+              Swal.fire({
+                icon: "success",
+                title: isActive ? "Removed from Wishlist" : "Added to Wishlist",
+                timer: 1000,
+                showConfirmButton: false
+              });
+            } else {
+              Swal.fire("Error", data.message || "Something went wrong", "error");
+            }
+            
+          } catch (err) {
+            console.error(err);
+            Swal.fire("Error", "Please login to use wishlist", "error");
+          }
+        });
+      }
     });
+
+
   </script>
 
 </body>

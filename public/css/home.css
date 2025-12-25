@@ -394,5 +394,21 @@ body {
   top: -8px;
   left: -4px;
 }
+.btn-add-cart {
+  width: 100%;
+  margin-top: 10px;
+  background: #d2182a;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.btn-add-cart:hover {
+  background: #15803d;
+}
 
 

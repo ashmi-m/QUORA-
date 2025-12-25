@@ -87,35 +87,21 @@
 
     <div class="right-section">
 
-      <span class="wishlist-icon">
-        <a href="/wishlist">
-          <i class="fa fa-heart"></i>
-          <% if (typeof wishlistCount !== "undefined" && wishlistCount > 0) { %>
-            <small class="wishlist-count"><%= wishlistCount %></small>
-          <% } %>
-        </a>
-      </span>
+       <a href="/wishlist" class="header-icon">
+    <i class="fa fa-heart"></i>
+    <% if (typeof wishlistCount !== "undefined" && wishlistCount > 0) { %>
+      <small class="badge"><%= wishlistCount %></small>
+    <% } %>
+  </a>
 
-      
-      <span class="cart-icon" id="openCart">
-
-        <a href="/cart" id="openCart">
-          <i class="fa fa-shopping-cart"></i>
-        </a>
+    <a href="/cart" class="header-icon">
+    <i class="fa fa-shopping-cart"></i>
+    <% if (typeof cartCount !== "undefined" && cartCount > 0) { %>
+      <small class="badge"><%= cartCount %></small>
+    <% } %>
+  </a>
 
 
-        <% if (typeof cartCount !=="undefined" && cartCount> 0) { %>
-          <small class="cart-count">
-            <%= cartCount %>
-          </small>
-          <% } %>
-      </span>
-
-
-
-
-      <!-- Right: User / Auth -->
-      <div class="right-section">
         <% if (user ||locals.user) { %>
           <div class="dropdown">
             <a href="#" class="sign-in-link text-dark">

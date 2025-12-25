@@ -1,72 +1,110 @@
 const User = require("../../models/userSchema");
 const Product = require("../../models/productSchema");
+const Cart = require("../../models/cartSchema");
+const Wishlist = require("../../models/wishlistSchema");
+
 const env = require("dotenv").config();
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 
 
 const Order = require("../../models/orderSchema");
-const loadHomepage = async(req,res)=>{
-  try{
-    const products = await Product.find()
-    .sort({createdOn:-1})
-    .limit(8)
-    .lean();
-   
-    // const user = req.session.user;
-    res.render("home",
-      {
-        products,
-          // user: req.session.user 
-        
-      });
 
-  }catch(error){
-    console.error("Error loading homepage:",error);
+
+const loadHomepage = async (req, res) => {
+  try {
+    const products = await Product.find()
+      .sort({ createdOn: -1 })
+      .limit(8)
+      .lean();
+
+    let wishlistIds = [];
+    let cartCount = 0;
+
+    if (req.session.user) {
+      // Wishlist
+      const wishlist = await Wishlist.findOne({ userId: req.session.user._id }).lean();
+      if (wishlist && wishlist.items) {
+        wishlistIds = wishlist.items.map(item => item.productId.toString());
+      }
+
+      // Cart
+      const cart = await Cart.findOne({ userId: req.session.user._id }).lean();
+      if (cart && cart.items) {
+        cartCount = cart.items.length;
+      }
+    }
+
+    res.render("home", {
+      products,
+      user: req.session.user || null,
+      wishlistIds,
+      cartCount
+    });
+
+  } catch (error) {
+    console.error("Error loading homepage:", error);
+    res.redirect("/pageNotFound");
+  }
+};
+
+const loadlandingpage = async (req, res) => {
+  try {
+    const products = await Product.find()
+      .sort({ createdOn: -1 })
+      .limit(8)
+      .lean();
+
+    let cart = null;
+    let cartCount = 0;
+    let wishlistIds = [];
+
+    if (req.session.user) {
+
+      // CART
+      cart = await Cart.findOne({ userId: req.session.user._id })
+        .populate("items.productId")
+        .lean();
+
+      if (cart && cart.items) {
+        cartCount = cart.items.length;
+      }
+
+      // WISHLIST
+      const wishlist = await Wishlist.findOne({
+        userId: req.session.user._id
+      }).lean();
+
+      if (wishlist && wishlist.items) {
+        wishlistIds = wishlist.items.map(item =>
+          item.productId.toString()
+        );
+      }
+    }
+
+    res.render("home", {
+      products,
+      user: req.session.user || null,
+      cart,
+      cartCount,
+      wishlistIds
+    });
+
+  } catch (error) {
+    console.log("Error in landing page:", error);
     res.redirect("/pageNotFound");
   }
 };
 
 
-const loadlandingpage = async(req,res)=>{
- try {
-  const products = await Product.find()
-  .sort({createdOn:-1})
-  .limit(8)
-  .lean();
 
-  let cart =null;
-  let cartCount=0;
-  if(req.session.user){
-    cart = await Cart.findOne({userId:req.session.user})
-    .populate("items.productId")
-    .lean();
-    if(cart&&cart.items){
-      cartCount=cart.items.length;
-    }
-  }
-
-  res.render('home',{
-    products ,
-    user:req.session.user,
-    cart,
-    cartCount
-   
-  })
-
- } catch (error) {
-  console.log('error in the landingpage',error)
- }
-}
-
-
-const pageNotFound = (req,res)=>{
+const pageNotFound = (req, res) => {
   res.status(404).render("page 404");
 };
 
 const loadSignup = async (req, res) => {
   try {
-    if(req.session.user){
+    if (req.session.user) {
       return res.redirect('/');
     }
     return res.render("signup");
@@ -199,7 +237,7 @@ const conformOtp = async (req, res) => {
         password: passwordHash,
 
       });
-     
+
 
       await saveUserData.save();
 
@@ -207,10 +245,10 @@ const conformOtp = async (req, res) => {
 
       // req.session.user = saveUserData._id;
       req.session.user = {
-    id: saveUserData._id,
-    name: saveUserData.name,
-    email: saveUserData.email
-};
+        _id: saveUserData._id,
+        name: saveUserData.name,
+        email: saveUserData.email
+      };
 
 
 
@@ -254,7 +292,7 @@ const resendOtp = async (req, res) => {
 
 const loadLogin = async (req, res) => {
   try {
-    if(req.session.user){
+    if (req.session.user) {
       return res.redirect('/');
     }
     return res.render("login")
@@ -296,13 +334,13 @@ const login = async (req, res) => {
     //   res.redirect('/login')
     // }
 
-       req.session.user = {
+    req.session.user = {
       _id: findUser._id,
       name: findUser.name,
       email: findUser.email
     };
 
-        return res.redirect("/userprofile");
+    return res.redirect("/userprofile");
 
 
   } catch (error) {
@@ -311,36 +349,37 @@ const login = async (req, res) => {
   }
 };
 
-const loadForgotPassword=async(req,res)=>{
-  try{
+const loadForgotPassword = async (req, res) => {
+  try {
     res.render("forgotPassword");
-  }catch(error){
-    console.log("Error loading forgot password",error);
+  } catch (error) {
+    console.log("Error loading forgot password", error);
     res.redirect("/pageNotFound");
   }
 };
 
 
-const forgotPassword=async(req,res)=>{
-  try{
-    const {email}=req.body;
-    
-    const findUser=await User.findOne({email});
-    if(!findUser){
-      return res.render("forgotPassword",{message:"User not found"});
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const findUser = await User.findOne({ email });
+    if (!findUser) {
+      return res.render("forgotPassword", { message: "User not found" });
     }
-      const otp = generateOtp();
+    const otp = generateOtp();
     req.session.resetOtp = otp;
     req.session.resetEmail = email;
 
-    console.log("Generated Otp:",otp);
+    console.log("Generated Otp:", otp);
 
     const emailSent = await sendVerificationEmail(email, otp);
     if (!emailSent) {
       return res.render("forgotPassword", { message: "Failed to send OTP. Try again." });
     }
 
-    return res.render("resetOtp",{message:"",
+    return res.render("resetOtp", {
+      message: "",
       email
     });
   } catch (error) {
@@ -354,7 +393,7 @@ const verifyResetOtp = async (req, res) => {
     const { otp } = req.body;
 
     if (otp === req.session.resetOtp) {
-      return res.render("resetPassword",{message:""}); 
+      return res.render("resetPassword", { message: "" });
     }
 
     res.render("resetOtp", { message: "Invalid OTP. Try again." });
@@ -367,7 +406,7 @@ const verifyResetOtp = async (req, res) => {
 const resetPassword = async (req, res) => {
   try {
     const { newPassword, confirmPassword } = req.body;
-    console.log("req.body:",req.body);
+    console.log("req.body:", req.body);
 
     if (newPassword !== confirmPassword) {
       return res.render("resetPassword", { message: "Passwords do not match" });
@@ -378,7 +417,7 @@ const resetPassword = async (req, res) => {
       return res.redirect("/forgot-password");
     }
 
-    const passwordHash = await bcrypt.hash(newPassword,10);
+    const passwordHash = await bcrypt.hash(newPassword, 10);
     await User.findOneAndUpdate({ email }, { $set: { password: passwordHash } });
 
     delete req.session.resetOtp;
@@ -390,7 +429,7 @@ const resetPassword = async (req, res) => {
     res.render("resetPassword", { message: "Something went wrong" });
   }
 };
-  
+
 
 
 
@@ -416,7 +455,7 @@ const logout = async (req, res) => {
 
 const loadProfilePage = async (req, res) => {
   try {
-   
+
     if (!req.session.user) {
       return res.redirect("/login");
     }
@@ -465,7 +504,7 @@ const loadAddAddressPage = async (req, res) => {
       return res.redirect("/login");
     }
 
-    res.render("addAddress"); 
+    res.render("addAddress");
   } catch (error) {
     console.error("Load add address error:", error);
     res.redirect("/pageNotFound");
@@ -488,7 +527,7 @@ const addAddress = async (req, res) => {
   try {
     const { name, mobile, pincode, locality, address, city, state, type } = req.body;
 
-   
+
     if (!name || !mobile || !pincode || !locality || !address || !city || !state) {
       return res.redirect("/add-address");
     }
@@ -515,7 +554,7 @@ const addAddress = async (req, res) => {
       }
     );
 
-   
+
     res.redirect("/add-address?saved=true");
 
   } catch (error) {
@@ -615,13 +654,13 @@ module.exports = {
   forgotPassword,
   verifyResetOtp,
   resetPassword,
- loadlandingpage,
- loadProfilePage,
+  loadlandingpage,
+  loadProfilePage,
   updateProfile,
- loadAddAddressPage,
- addAddress,
+  loadAddAddressPage,
+  addAddress,
   loadManageAddressPage,
- 
+
   loadEditAddressPage,
   updateAddress,
   deleteAddress

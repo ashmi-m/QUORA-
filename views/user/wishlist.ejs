@@ -1,83 +1,133 @@
 
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wishlist Page</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
+<%- include("../partials/user/header") %>
 
-  <!-- Header -->
-  <header>
-    <h1>QUORA</h1>
-    <nav>
-      <a href="#">Home</a>
-      <a href="#">About</a>
-      <a href="#">Shop</a>
-      <a href="#">Login/Register</a>
-    </nav>
-  </header>
+<link rel="stylesheet" href="/css/wishlist.css">
 
-  <!-- Breadcrumb -->
-  <div class="breadcrumbs">
-    Home &gt; <strong>Products</strong>
-  </div>
+<div class="breadcrumbs">
+  Home &gt; <strong>Wishlist</strong>
+</div>
 
-  <!-- Wishlist -->
-  <div class="wishlist-container">
-    <div class="wishlist-item">
-      <span class="heart">&#10084;</span>
-      <img src="https://via.placeholder.com/200x200.png?text=Product+1" alt="Product 1">
-      <div class="details">
-        <h3>Quora Velvet Matte</h3>
-        <div class="rating">★★★★☆ (4.5)</div>
-        <div class="price">₹850</div>
-        <button>Add to Cart</button>
-      </div>
+<section class="wishlist-wrapper">
+  <h2 class="wishlist-title">My Wishlist</h2>
+
+  <% if (!wishlist || wishlist.length === 0) { %>
+    <p class="empty">Your wishlist is empty ❤️</p>
+  <% } else { %>
+    <div class="wishlist-container">
+      <% wishlist.forEach(item => { %>
+        <% if (!item.productId) return; %>
+        <% const product = item.productId; %>
+
+        <div class="wishlist-item">
+          <!-- Heart icon to remove from wishlist -->
+          <span class="heart wishlist-remove" data-id="<%= product._id %>">❤</span>
+
+          <!-- Product Image -->
+          <img src="<%= product.productImage?.[0] || '/images/default.jpg' %>" alt="<%= product.productName %>">
+
+          <div class="details">
+            <!-- Product Name -->
+            <h3><%= product.productName %></h3>
+
+            <!-- Product Rating -->
+            <div class="rating">
+              ★★★★☆ (<%= product.rating || 4.0 %>)
+            </div>
+
+            <!-- Product Price -->
+            <div class="price">₹<%= product.regularPrice %></div>
+
+            <!-- Add to Cart Button -->
+            <button class="add-to-cart-btn" data-id="<%= product._id %>">
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      <% }) %>
     </div>
+  <% } %>
+</section>
 
-    <div class="wishlist-item">
-      <span class="heart">&#10084;</span>
-      <img src="https://via.placeholder.com/200x200.png?text=Product+2" alt="Product 2">
-      <div class="details">
-        <h3>Quora Perfume - Rose</h3>
-        <div class="rating">★★★★★ (5.0)</div>
-        <div class="price">₹2000</div>
-        <button>Add to Cart</button>
-      </div>
-    </div>
+<%- include("../partials/user/footer") %>
 
-    <div class="wishlist-item">
-      <span class="heart">&#10084;</span>
-      <img src="https://via.placeholder.com/200x200.png?text=Product+3" alt="Product 3">
-      <div class="details">
-        <h3>Quora Nail - Holiday</h3>
-        <div class="rating">★★★☆☆ (3.5)</div>
-        <div class="price">₹150</div>
-        <button>Add to Cart</button>
-      </div>
-    </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <div class="wishlist-item">
-      <span class="heart">&#10084;</span>
-      <img src="https://via.placeholder.com/200x200.png?text=Product+4" alt="Product 4">
-      <div class="details">
-        <h3>Eyeshadow - Smoky Nights</h3>
-        <div class="rating">★★★★☆ (4.0)</div>
-        <div class="price">₹1200</div>
-        <button>Add to Cart</button>
-      </div>
-    </div>
-  </div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
 
-  <!-- Footer -->
-  <footer>
-    &copy; 2025 Quora – All Rights Reserved.
-  </footer>
+  // ========================
+  // Add to Cart from Wishlist
+  // ========================
+  document.querySelectorAll(".add-to-cart-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const productId = btn.dataset.id;
+      if (!productId) return;
 
-</body>
-</html>
+      try {
+        const res = await fetch("/cart/add", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productId })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          Swal.fire({
+            icon: "success",
+            title: "Added to Cart",
+            text: `${data.productName || "Product"} added successfully!`,
+            timer: 1200,
+            showConfirmButton: false
+          });
+        } else {
+          Swal.fire("Error", data.message || "Unable to add to cart", "error");
+        }
+
+      } catch (err) {
+        console.error(err);
+        Swal.fire("Error", "Server error", "error");
+      }
+    });
+  });
+
+  // ========================
+  // Remove from Wishlist
+  // ========================
+  document.querySelectorAll(".wishlist-remove").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const productId = btn.dataset.id;
+      if (!productId) return;
+
+      try {
+        const res = await fetch("/wishlist/remove", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productId })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          Swal.fire({
+            icon: "success",
+            title: "Removed from Wishlist",
+            timer: 1000,
+            showConfirmButton: false
+          });
+          // Remove the item from DOM
+          btn.closest(".wishlist-item").remove();
+        } else {
+          Swal.fire("Error", data.message || "Unable to remove", "error");
+        }
+      } catch (err) {
+        console.error(err);
+        Swal.fire("Error", "Server error", "error");
+      }
+    });
+  });
+
+});
+</script>
+
