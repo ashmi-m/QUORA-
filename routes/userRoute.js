@@ -10,7 +10,7 @@ const orderController = require('../controller/user/orderController');
 const addressController = require("../controller/user/addressController");
 const cartController =require("../controller/user/cartController")
 const wishlistController = require('../controller/user/wishlistController'); 
-
+const checkoutController = require("../controller/user/checkoutController");
 
 const passport = require("../config/passport.js");
 
@@ -84,6 +84,9 @@ router.post("/cart/remove", userAuth, cartController.removeCartItem);
 router.get('/wishlist', userAuth, wishlistController.getWishlist);
 router.post('/wishlist/add', userAuth, wishlistController.addToWishlist);
 router.post('/wishlist/remove', userAuth, wishlistController.removeFromWishlist);
+router.get("/checkout", userAuth, checkoutController.loadCheckoutPage);
+
+
 
 module.exports = router;
 

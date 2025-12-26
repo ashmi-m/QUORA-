@@ -209,11 +209,12 @@
               data-id="<%= product._id %>">
               ❤
             </span>
+            <a href="/product/<%= product._id %>" class="product-link">
            
   
             <img src="<%= product.productImage && product.productImage.length > 0 ? product.productImage[0] : '/images/default.png' %>" alt="<%= product.productName %>">
             <h4><%= product.productName %></h4>
-
+            </a>
             <p>₹<%= product.salePrice || product.regularPrice %></p>
 
            <button class="btn-add-cart" data-id="<%= product._id %>">

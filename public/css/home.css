@@ -410,5 +410,9 @@ body {
 .btn-add-cart:hover {
   background: #15803d;
 }
+.product-link {
+  text-decoration: none;
+  color: inherit;
+}
 
 

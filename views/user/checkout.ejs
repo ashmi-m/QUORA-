@@ -1,0 +1,79 @@
+<%- include("../partials/user/header") %>
+<link rel="stylesheet" href="/css/checkout.css">
+
+<form action="/checkout/place-order" method="POST">
+  <section class="checkout-container">
+
+   
+    <div class="address-section">
+      <h3>Select Delivery Address</h3>
+
+   <% if (addresses.length === 0) { %>
+  <p>No address found</p>
+<a href="/add-address?from=checkout" class="add-btn">
+  + Add new address
+</a>
+
+<% } %>
+     <% addresses.forEach((addr, index) => { %>
+  <label class="address-card">
+    <input type="radio" name="address" value="<%= index %>" <%= index === 0 ? "checked" : "" %>>
+
+         <div>
+      <strong><%= addr.name %></strong>
+      <p><%= addr.phone %></p>
+      <p>
+        <%= addr.landMark %>, <%= addr.city %>, <%= addr.state %> - <%= addr.pincode %>
+      </p>
+    </div>
+  </label>
+<% }) %>
+
+    </div>
+
+    <!-- RIGHT : ORDER SUMMARY -->
+    <div class="summary-section">
+      <h3>Order Summary</h3>
+
+      <% cart.items.forEach(item => { %>
+        <div class="summary-item">
+          <span><%= item.productId.productName %> × <%= item.quantity %></span>
+          <span>₹ <%= item.totalPrice %></span>
+        </div>
+      <% }) %>
+
+      <hr>
+
+      <div class="summary-row">
+        <span>Subtotal</span>
+        <span>₹ <%= subtotal %></span>
+      </div>
+
+      <div class="summary-row">
+        <span>Delivery</span>
+        <span>₹ <%= deliveryCharge %></span>
+      </div>
+
+      <div class="summary-row total">
+        <span>Total</span>
+        <span>₹ <%= total %></span>
+      </div>
+
+      <button type="submit" class="pay-btn">Proceed to Pay</button>
+    </div>
+
+  </section>
+</form>
+
+<script>
+document.querySelector("form").addEventListener("submit", (e) => {
+  const selected = document.querySelector('input[name="address"]:checked');
+  if (!selected) {
+    e.preventDefault(); // stop form from submitting
+    alert("Please select an address!");
+    return false;
+  }
+});
+</script>
+
+<%- include("../partials/user/footer") %>

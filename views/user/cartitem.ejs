@@ -4,31 +4,41 @@
 <section class="container cart-main">
 
   <% if (!cart || cart.items.length === 0) { %>
+
     <div class="empty-cart">Your cart is empty 😢</div>
+
   <% } else { %>
 
     <div class="cart-products">
       <% let subtotal = 0; %>
 
       <% cart.items.forEach(item => { %>
-        <% 
+        <%
           const price = item.productId.salePrice || item.productId.regularPrice || 0;
           const qty = item.quantity;
           const total = price * qty;
           subtotal += total;
+
+          const outOfStock = item.productId.stock <= 0;
         %>
 
-        <div class="cart-item" data-id="<%= item._id %>">
+        <div class="cart-item <%= outOfStock ? 'out-stock' : '' %>" data-id="<%= item._id %>">
+
           <img src="<%= item.productId.productImage?.[0] || '/images/default.png' %>" alt="product">
 
           <div class="item-details">
             <div class="item-name"><%= item.productId.productName %></div>
+
+            <% if (outOfStock) { %>
+              <div class="stock-label">Out of Stock</div>
+            <% } %>
+
             <div class="item-price">₹ <%= price %></div>
 
             <div class="quantity">
-              <button class="decrease-qty">-</button>
+              <button class="decrease-qty" <%= outOfStock ? "disabled" : "" %>>-</button>
               <input type="text" value="<%= qty %>" readonly>
-              <button class="increase-qty">+</button>
+              <button class="increase-qty" <%= outOfStock ? "disabled" : "" %>>+</button>
             </div>
 
             <div class="item-total">₹ <%= total %></div>
@@ -45,12 +55,35 @@
       <h2>Cart Summary</h2>
       <p>Subtotal: <span id="cart-subtotal">₹ <%= subtotal %></span></p>
       <p>Total: <span id="cart-total">₹ <%= subtotal %></span></p>
-      <a href="/checkout" class="checkout-btn">Checkout</a>
+
+      <% 
+        let hasOutOfStock = false;
+        for (let i = 0; i < cart.items.length; i++) {
+          if (cart.items[i].productId.stock <= 0) {
+            hasOutOfStock = true;
+            break;
+          }
+        }
+      %>
+
+      <a href="<%= hasOutOfStock ? 'javascript:void(0)' : '/checkout' %>"
+         class="checkout-btn <%= hasOutOfStock ? 'disabled-checkout' : '' %>">
+        Checkout
+      </a>
+
+      <% if (hasOutOfStock) { %>
+        <p class="checkout-warning">
+          Remove out-of-stock items to proceed
+        </p>
+      <% } %>
+
     </div>
 
   <% } %>
 
 </section>
+
+
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -113,8 +146,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
-
-  // 🔹 UPDATE QUANTITY (+ / -)
   document.querySelectorAll(".increase-qty, .decrease-qty").forEach(btn => {
     btn.addEventListener("click", async (e) => {
       const itemEl = e.target.closest(".cart-item");
@@ -129,8 +160,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         const data = await res.json();
-
-        // 🚫 LIMIT / ERROR
         if (!res.ok) {
           Swal.fire({
             icon: "warning",

@@ -66,6 +66,15 @@
         <br>
         <p>Stock: <%= product.quantity %></p>
 
+        <div style="display:flex; gap:15px; margin-top:20px;">
+        <button
+          id="addToCartBtn"
+          data-id="<%= product._id %>"
+          style="padding:12px 20px; background:black; color:white; border:none; cursor:pointer;">
+          🛒 Add to Cart
+        </button>
+      </div>
+
         <div style="margin:10px 0;">
           <span>⭐⭐⭐⭐⭐</span>
           <span style="margin-left:10px;">(5 Reviews)</span>
@@ -105,6 +114,42 @@
   </footer>
 
   <script>
+
+
+  const addToCartBtn = document.getElementById("addToCartBtn");
+
+  addToCartBtn.addEventListener("click", async () => {
+    const productId = addToCartBtn.dataset.id;
+
+    try {
+      const res = await fetch("/cart/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId })
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Added to Cart",
+          timer: 1200,
+          showConfirmButton: false
+        });
+
+        const badge = document.querySelector('a[href="/cart"] .badge');
+        if (badge) badge.textContent = Number(badge.textContent || 0) + 1;
+
+      } else {
+        Swal.fire("Warning", data.message, "warning");
+      }
+
+    } catch (err) {
+      Swal.fire("Login Required", "Please login first", "warning");
+    }
+  });
+  
     
     document.addEventListener("DOMContentLoaded", function () {
       const mainImage = document.querySelector(".main-product-image");
