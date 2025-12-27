@@ -2,6 +2,8 @@ const User = require("../../models/userSchema");
 const Product = require("../../models/productSchema");
 const Cart = require("../../models/cartSchema");
 const Wishlist = require("../../models/wishlistSchema");
+const Address = require("../../models/addressSchema"); // import Address model
+const mongoose = require("mongoose");
 
 const env = require("dotenv").config();
 const nodemailer = require("nodemailer");
@@ -462,12 +464,15 @@ const loadProfilePage = async (req, res) => {
 
     const userId = req.session.user._id;
 
+    const addressDoc = await Address.findOne({ userId }).lean();
+    const addresses = addressDoc?.addresses || [];
+
     const user = await User.findById(userId).lean();
     const orders = await Order.find({ user: userId })
       .sort({ createdAt: -1 })
       .lean();
 
-    res.render("profile", { user, orders });
+    res.render("profile", { user, orders, addresses });
   } catch (error) {
     console.log("Error loading profile:", error);
     res.redirect("/pageNotFound");
@@ -511,11 +516,18 @@ const loadAddAddressPage = async (req, res) => {
   }
 };
 
+
+
 const loadManageAddressPage = async (req, res) => {
   try {
-    const user = await User.findById(req.session.user._id).lean();
-    console.log(user.addresses)
-    res.render("manageAddress", { user });
+    const userId =req.session.user._id;
+
+    // fetch address document for this user
+    const addressDoc = await Address.findOne({ userId }).lean();
+    const addresses = addressDoc?.addresses || [];
+
+    // pass addresses to your EJS page
+    res.render("manageAddress", { addresses });
   } catch (error) {
     console.error(error);
     res.redirect("/pageNotFound");
@@ -525,8 +537,8 @@ const loadManageAddressPage = async (req, res) => {
 
 const addAddress = async (req, res) => {
   try {
-    const { name, mobile, pincode, locality, address, city, state, type } = req.body;
-
+    const { name, mobile, pincode, locality, address, city, state, type, landmark } = req.body;
+    const userId = req.session.user._id;
 
     if (!name || !mobile || !pincode || !locality || !address || !city || !state) {
       return res.redirect("/add-address");
@@ -536,29 +548,29 @@ const addAddress = async (req, res) => {
       return res.redirect("/add-address");
     }
 
-    await User.updateOne(
-      { _id: req.session.user },
-      {
-        $push: {
-          addresses: {
-            name,
-            mobile,
-            pincode,
-            locality,
-            address,
-            city,
-            state,
-            type
-          }
-        }
-      }
-    );
+    const newAddress = {
+      addressType: type,
+      name,
+      phone: mobile,
+      altPhone: mobile,
+      city,
+      state,
+      landMark: landmark,
+      pincode
+    };
 
+    let addressDoc = await Address.findOne({ userId });
+    if (addressDoc) {
+      addressDoc.addresses.push(newAddress);
+      await addressDoc.save();
+    } else {
+      await Address.create({ userId, addresses: [newAddress] });
+    }
 
-    res.redirect("/add-address?saved=true");
+    res.redirect("/checkout?saved=true");
 
   } catch (error) {
-    console.log(error);
+    console.error("Add address error:", error);
     res.redirect("/add-address");
   }
 };
@@ -566,76 +578,102 @@ const addAddress = async (req, res) => {
 
 const loadEditAddressPage = async (req, res) => {
   try {
-    if (!req.session.user) return res.redirect("/login");
+    const userId = req.session.user._id;
+    const addressId = req.params.id;
 
-    const user = await User.findById(req.session.user._id);
-    const address = user.addresses.id(req.params.id);
+    const addressDoc = await Address.findOne(
+      { userId, "addresses._id": addressId },
+      { "addresses.$": 1 }
+    );
 
-    if (!address) {
+    if (!addressDoc || !addressDoc.addresses.length) {
       return res.redirect("/manage-address");
     }
 
-    res.render("editAddress", {
-      user,
-      address
-    });
+    const address = addressDoc.addresses[0];
+
+    res.render("editAddress", { address });
 
   } catch (error) {
-    console.error("Load edit address error:", error);
+    console.error("Edit address load error:", error);
     res.redirect("/manage-address");
   }
 };
-
 const updateAddress = async (req, res) => {
   try {
-    await User.updateOne(
-      {
-        _id: req.session.user,
-        "addresses._id": req.params.id
-      },
+    const userId = req.session.user._id;
+    const addressId = req.params.id;
+
+    const {
+      name,
+      phone,
+      address,
+      city,
+      state,
+      pincode,
+      type
+    } = req.body;
+
+    const result = await Address.updateOne(
+      { userId, "addresses._id": addressId },
       {
         $set: {
-          "addresses.$.name": req.body.name,
-          "addresses.$.mobile": req.body.mobile,
-          "addresses.$.pincode": req.body.pincode,
-          "addresses.$.locality": req.body.locality,
-          "addresses.$.address": req.body.address,
-          "addresses.$.city": req.body.city,
-          "addresses.$.state": req.body.state,
-          "addresses.$.landmark": req.body.landmark,
-          "addresses.$.type": req.body.type
+          "addresses.$.name": name,
+          "addresses.$.phone": phone,
+          "addresses.$.address": address,
+          "addresses.$.city": city,
+          "addresses.$.state": state,
+          "addresses.$.pincode": pincode,
+          "addresses.$.type": type
         }
       }
     );
 
-    return res.redirect("/manage-address?updated=true");
+    if (result.modifiedCount === 0) {
+      return res.status(404).send("Address not found");
+    }
 
-  } catch (err) {
-    console.error(err);
-    return res.redirect("/manage-address");
+    res.redirect("/manage-address");
+
+  } catch (error) {
+    console.error("Update address error:", error);
+    res.status(500).send("Server error");
   }
 };
-
-
-
 
 
 const deleteAddress = async (req, res) => {
   try {
-    if (!req.session.user) return res.status(401).json({ success: false });
+    const userId = req.session.user._id;
+    const addressId = req.params.id;
 
-    await User.findByIdAndUpdate(
-      req.session.user._id,
-      { $pull: { addresses: { _id: req.params.id } } }
+    const result = await Address.updateOne(
+      { userId },
+      { $pull: { addresses: { _id: addressId } } }
     );
 
-    res.json({ success: true });
+    if (result.modifiedCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Address not found"
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Address deleted successfully"
+    });
 
   } catch (error) {
     console.error("Delete address error:", error);
-    res.status(500).json({ success: false });
+    res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
   }
 };
+
+
 
 
 

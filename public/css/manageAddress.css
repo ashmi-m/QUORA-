@@ -1,4 +1,4 @@
-
+/* 
 
 * {
   box-sizing: border-box;
@@ -116,6 +116,151 @@ body {
 .edit-btn:hover,
 .delete-btn:hover {
   background: #f5f5f5;
+}
+
+.delete-btn {
+  color: #d32f2f;
+} */
+ 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Inter, Arial, sans-serif;
+}
+
+body {
+  background: #f7f7f7;
+}
+
+.profile-container {
+  padding: 10px 20px;
+  background-color: #dedcdc;
+}
+
+.address-wrapper {
+  max-width: 800px;
+  min-width: 800px;
+  /* margin: auto; */
+  background: #fff;
+  border-radius: 14px;
+  padding: 32px;
+}
+
+/* HEADER */
+.address-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.address-header h2 {
+  font-size: 26px;
+  font-weight: 500;
+}
+
+.add-address-btn {
+  background: #556b2f;
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+/* CARD */
+.address-card {
+  padding: 22px 0;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.address-card:last-child {
+  border-bottom: none;
+}
+
+.address-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+/* LEFT */
+.address-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.address-name {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.address-phone {
+  font-size: 13px;
+  color: #6f6f6f;
+}
+
+/* ADDRESS TEXT */
+.address-text {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #444;
+  line-height: 1.6;
+}
+
+/* TYPE */
+.address-type {
+  margin-top: 14px;
+  display: inline-block;
+  padding: 4px 14px;
+  border: 1px solid #bdbdbd;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+/* MENU */
+.address-actions {
+  position: relative;
+}
+
+.dots-btn {
+  background: #f1f1f1;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: 36px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.12);
+  min-width: 120px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: .2s;
+}
+
+.dropdown-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.edit-btn,
+.delete-btn {
+  all: unset;
+  display: block;
+  padding: 12px 16px;
+  cursor: pointer;
+  font-size: 14px;
 }
 
 .delete-btn {

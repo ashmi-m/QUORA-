@@ -34,9 +34,10 @@
 }
 
 .add-btn {
-  display: inline-block;
+  /* display: inline-block; */
   margin-top: 10px;
-  color: #ff5722;
+  color: #6f3fb4;
+  margin-right: 0cap;
 }
 
 .summary-item,

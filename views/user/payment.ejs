@@ -1,0 +1,45 @@
+<!-- <%- include("../partials/user/header") %>
+<link rel="stylesheet" href="/css/payment.css">
+
+<h2>Payment</h2>
+
+<form action="/checkout/payment" method="POST">
+  <div class="address-summary">
+    <h3>Deliver To</h3>
+    <p><strong><%= address.name %></strong></p>
+    <p><%= address.phone %></p>
+    <p><%= address.landMark %>, <%= address.city %>, <%= address.state %> - <%= address.pincode %></p>
+  </div>
+
+  <div class="payment-methods">
+    <h3>Select Payment Method</h3>
+    <label>
+      <input type="radio" name="paymentMethod" value="COD" checked> Cash on Delivery
+    </label>
+    <label>
+      <input type="radio" name="paymentMethod" value="Razorpay"> Razorpay
+    </label>
+    <label>
+      <input type="radio" name="paymentMethod" value="Card"> Card
+    </label>
+    <label>
+      <input type="radio" name="paymentMethod" value="UPI"> UPI
+    </label>
+    <label>
+      <input type="radio" name="paymentMethod" value="Wallet"> Wallet
+    </label>
+  </div>
+
+  <div class="order-summary">
+    <h3>Order Summary</h3>
+    <% cartItems.forEach(item => { %>
+      <div><%= item.productId.productName %> × <%= item.quantity %> → ₹ <%= item.productId.price * item.quantity %></div>
+    <% }) %>
+    <hr>
+    <div>Total: ₹ <%= total %></div>
+  </div>
+
+  <button type="submit">Place Order</button>
+</form>
+
+<%- include("../partials/user/footer") %> -->

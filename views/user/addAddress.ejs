@@ -95,7 +95,7 @@
 </div>
 
 <script>
-/* CLIENT SIDE VALIDATION */
+
 document.getElementById("addressForm").addEventListener("submit", e => {
   const mobile = document.querySelector("[name='mobile']").value.trim();
   const pincode = document.querySelector("[name='pincode']").value.trim();
@@ -113,7 +113,7 @@ document.getElementById("addressForm").addEventListener("submit", e => {
   }
 });
 
-/* SUCCESS MESSAGE */
+
 const params = new URLSearchParams(window.location.search);
 if (params.get("saved") === "true") {
   Swal.fire({

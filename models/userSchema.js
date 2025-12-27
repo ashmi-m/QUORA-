@@ -77,17 +77,17 @@ const userSchema=new Schema({
             default:Date.now
         }
     }],
-     addresses: [{
-        name: { type: String, required: true },
-        mobile: { type: String, required: true },
-        address: { type: String, required: true },
-        locality: { type: String, required: true },
-        city: { type: String, required: true },
-        state: { type: String, required: true },
-        pincode: { type: String, required: true },
-        landmark: { type: String },
-        type: { type: String, enum: ["Home", "Work", "Other"], default: "Home" }
-    }]
+    //  addresses: [{
+    //     name: { type: String, required: true },
+    //     mobile: { type: String, required: true },
+    //     address: { type: String, required: true },
+    //     locality: { type: String, required: true },
+    //     city: { type: String, required: true },
+    //     state: { type: String, required: true },
+    //     pincode: { type: String, required: true },
+    //     landmark: { type: String },
+    //     type: { type: String, enum: ["Home", "Work", "Other"], default: "Home" }
+    // }]
 })
 
 const User=mongoose.model("User",userSchema);

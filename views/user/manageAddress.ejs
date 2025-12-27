@@ -1,9 +1,11 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Manage Addresses</title>
-  <link rel="stylesheet" href="/css/manage-address.css">
+  <link rel="stylesheet" href="/css/manageAddress.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
@@ -15,19 +17,25 @@
       <h2>Manage Addresses</h2>
       <a href="/add-address" class="add-address-btn">+ Add New Address</a>
     </div>
-     <% if (!user.addresses || user.addresses.length === 0) { %>
+
+    <% if (!addresses || addresses.length === 0) { %>
       <p>No address found</p>
     <% } %>
 
-    <% user.addresses.forEach(addr => { %>
-       <div class="address-card" id="address-<%= addr._id %>">
+    <% addresses.forEach(addr => { %>
+      <div class="address-card" id="address-<%= addr._id %>">
 
         <div class="address-info">
-          <div>
-            <span class="address-name"><%= addr.name.toUpperCase() %></span>
-            <span class="address-phone"><%= addr.mobile %></span>
-          </div>
+          <div class="address-left">
+            <div class="address-name">
+              <%= addr.name ? addr.name.toUpperCase() : "NAME" %>
+            </div>
 
+            <div class="address-phone">
+              <%= addr.phone || addr.mobile || addr.phoneNumber || "NO NUMBER" %>
+            </div>
+
+          </div>
           <div class="address-actions">
             <button class="dots-btn">⋮</button>
             <div class="dropdown-menu">
@@ -35,13 +43,16 @@
               <button class="delete-btn" data-id="<%= addr._id %>">Delete</button>
             </div>
           </div>
+
         </div>
 
         <p class="address-text">
           <%= addr.address %>, <%= addr.city %>, <%= addr.state %> - <%= addr.pincode %>
         </p>
 
-        <span class="address-type"><%= addr.type %></span>
+ <span class="address-type">
+      <%= addr.addressType %>  
+    </span>
 
       </div>
     <% }) %>
@@ -49,42 +60,42 @@
   </div>
 </div>
 
-
 <script>
 document.addEventListener("click", e => {
   if (e.target.classList.contains("dots-btn")) {
     e.stopPropagation();
-    document.querySelectorAll(".dropdown-menu").forEach(d => d.classList.remove("show"));
+    document.querySelectorAll(".dropdown-menu")
+      .forEach(menu => menu.classList.remove("show"));
     e.target.nextElementSibling.classList.toggle("show");
   } else {
-    document.querySelectorAll(".dropdown-menu").forEach(d => d.classList.remove("show"));
+    document.querySelectorAll(".dropdown-menu")
+      .forEach(menu => menu.classList.remove("show"));
   }
 });
 
 document.querySelectorAll(".delete-btn").forEach(btn => {
   btn.addEventListener("click", async () => {
     const id = btn.dataset.id;
-    const result = await Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
+
+    const confirm = await Swal.fire({
+      title: "Delete address?",
+      text: "This action cannot be undone",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, delete it!"
+      confirmButtonText: "Delete"
     });
-    
-    if (result.isConfirmed) {
-      try {
-        const res = await fetch(`/address/delete/${id}`, { method: "DELETE", headers: { "Content-Type": "application/json" } });
-        const data = await res.json();
-        if (data.success) {
-          document.getElementById(`address-${id}`).remove();
-          Swal.fire({ icon: "success", title: "Deleted!", text: "Address deleted successfully", timer: 2000, showConfirmButton: false });
-        } else Swal.fire("Error", "Failed to delete address", "error");
-      } catch (err) {
-        console.error(err);
-        Swal.fire("Error", "Something went wrong", "error");
+
+    if (confirm.isConfirmed) {
+      const res = await fetch(`/address/delete/${id}`, { method: "DELETE" });
+      const data = await res.json();
+
+      if (data.success) {
+        document.getElementById(`address-${id}`).remove();
+        Swal.fire("Deleted!", "Address removed", "success");
+      } else {
+        Swal.fire("Error", "Delete failed", "error");
       }
     }
   });
@@ -93,3 +104,4 @@ document.querySelectorAll(".delete-btn").forEach(btn => {
 
 </body>
 </html>
+

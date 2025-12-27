@@ -11,6 +11,7 @@ const addressController = require("../controller/user/addressController");
 const cartController =require("../controller/user/cartController")
 const wishlistController = require('../controller/user/wishlistController'); 
 const checkoutController = require("../controller/user/checkoutController");
+const paymentController = require("../controller/user/paymentController");
 
 const passport = require("../config/passport.js");
 
@@ -60,8 +61,8 @@ router.get("/userprofile", userAuth, userController.loadProfilePage);
 router.put("/profile/update", userAuth, userController.updateProfile);
 
 // ===== ORDERS =====
-router.get("/place-order", userAuth, orderController.placeOrder);
-router.put("/user/cancel/:id", userAuth, orderController.cancelOrder);
+// router.get("/place-order", userAuth, orderController.placeOrder);
+// router.put("/user/cancel/:id", userAuth, orderController.cancelOrder);
 
 // ===== ADDRESS =====
 router.post("/address/add", userAuth, userController.addAddress);
@@ -86,8 +87,12 @@ router.post('/wishlist/add', userAuth, wishlistController.addToWishlist);
 router.post('/wishlist/remove', userAuth, wishlistController.removeFromWishlist);
 router.get("/checkout", userAuth, checkoutController.loadCheckoutPage);
 
+// router.get("/payment", paymentController.loadPayment);
+// router.post("/payment/place", paymentController.placeOrder);
+// router.post("/select-address", checkoutController.selectAddress);
 
-
+// router.get("/payment", paymentController.loadPayment);
+// router.post("/payment", paymentController.placeOrder);
 module.exports = router;
 
 
