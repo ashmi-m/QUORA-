@@ -1,7 +1,7 @@
 <%- include("../partials/user/header") %>
   <link rel="stylesheet" href="/css/checkout.css">
 
-  <form action="/checkout/payment" method="POST">
+  <form action="/checkout/select-address" method="POST">
     <section class="checkout-container">
 
 
@@ -19,7 +19,8 @@
           <% } %>
             <% addresses.forEach((addr, index)=> { %>
               <label class="address-card">
-                <input type="radio" name="address" value="<%= index %>" <%=index===0 ? "checked" : "" %>>
+
+               <input type="radio" name="addressId" value="<%= addr._id %>" <%= index===0 ? "checked" : "" %>>
 
                 <div>
                   <strong>
@@ -72,14 +73,19 @@
   </form>
 
   <script>
-    document.querySelector("form").addEventListener("submit", (e) => {
-      const selected = document.querySelector('input[name="address"]:checked');
-      if (!selected) {
-        e.preventDefault(); // stop form from submitting
-        alert("Please select an address!");
-        return false;
-      }
-    });
-  </script>
+  const form = document.querySelector("form");
+
+  form.addEventListener("submit", function (e) {
+    const selectedAddress = document.querySelector(
+      'input[name="addressId"]:checked'
+    );
+
+    if (!selectedAddress) {
+      e.preventDefault();
+      alert("Please select an address!");
+    }
+  });
+</script>
+
 
   <%- include("../partials/user/footer") %>

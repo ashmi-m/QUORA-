@@ -1,45 +1,74 @@
-<!-- <%- include("../partials/user/header") %>
+
+
+<%- include("../partials/user/header") %>
 <link rel="stylesheet" href="/css/payment.css">
 
-<h2>Payment</h2>
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  Home / <strong>Products</strong>
+</div>
 
-<form action="/checkout/payment" method="POST">
-  <div class="address-summary">
-    <h3>Deliver To</h3>
-    <p><strong><%= address.name %></strong></p>
-    <p><%= address.phone %></p>
-    <p><%= address.landMark %>, <%= address.city %>, <%= address.state %> - <%= address.pincode %></p>
+<form action="/checkout/payment/place" method="POST">
+  <div class="payment-container">
+
+    <!-- LEFT SECTION -->
+    <div class="payment-methods">
+      <h3>Select payment method</h3>
+
+      <label class="payment-option">
+        <input type="radio" name="paymentMethod" value="Razorpay" checked>
+        <span>Razorpay - <%= address.name %></span>
+      </label>
+
+      <label class="payment-option">
+        <input type="radio" name="paymentMethod" value="UPI">
+        <span>UPI Payment</span>
+      </label>
+
+      <label class="payment-option">
+        <input type="radio" name="paymentMethod" value="Card">
+        <span>Credit / Debit Card</span>
+      </label>
+
+      <label class="payment-option">
+        <input type="radio" name="paymentMethod" value="Wallet">
+        <span>Wallets</span>
+      </label>
+
+      <label class="payment-option">
+        <input type="radio" name="paymentMethod" value="COD">
+        <span>Cash on Delivery</span>
+      </label>
+    </div>
+
+    <!-- RIGHT SECTION -->
+    <div class="order-summary">
+      <h3>Order summary</h3>
+
+      <% cartItems.forEach(item => { %>
+        <div class="summary-row">
+          <span><%= item.productId.productName %> × <%= item.quantity %></span>
+          <span>₹ <%= item.productId.price * item.quantity %></span>
+        </div>
+      <% }) %>
+
+      <hr>
+
+      <div class="summary-row total">
+        <strong>Total</strong>
+        <strong>₹ <%= total %></strong>
+      </div>
+
+      <button type="submit" class="place-order-btn">
+        Place Order
+      </button>
+
+      <p class="secure-text">
+        🔒 Safe and secure payments. 100% Authentic products
+      </p>
+    </div>
+
   </div>
-
-  <div class="payment-methods">
-    <h3>Select Payment Method</h3>
-    <label>
-      <input type="radio" name="paymentMethod" value="COD" checked> Cash on Delivery
-    </label>
-    <label>
-      <input type="radio" name="paymentMethod" value="Razorpay"> Razorpay
-    </label>
-    <label>
-      <input type="radio" name="paymentMethod" value="Card"> Card
-    </label>
-    <label>
-      <input type="radio" name="paymentMethod" value="UPI"> UPI
-    </label>
-    <label>
-      <input type="radio" name="paymentMethod" value="Wallet"> Wallet
-    </label>
-  </div>
-
-  <div class="order-summary">
-    <h3>Order Summary</h3>
-    <% cartItems.forEach(item => { %>
-      <div><%= item.productId.productName %> × <%= item.quantity %> → ₹ <%= item.productId.price * item.quantity %></div>
-    <% }) %>
-    <hr>
-    <div>Total: ₹ <%= total %></div>
-  </div>
-
-  <button type="submit">Place Order</button>
 </form>
 
-<%- include("../partials/user/footer") %> -->
+<%- include("../partials/user/footer") %>

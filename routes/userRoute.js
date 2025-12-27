@@ -87,12 +87,12 @@ router.post('/wishlist/add', userAuth, wishlistController.addToWishlist);
 router.post('/wishlist/remove', userAuth, wishlistController.removeFromWishlist);
 router.get("/checkout", userAuth, checkoutController.loadCheckoutPage);
 
-// router.get("/payment", paymentController.loadPayment);
-// router.post("/payment/place", paymentController.placeOrder);
-// router.post("/select-address", checkoutController.selectAddress);
+router.post("/checkout/select-address", checkoutController.selectAddress);
 
-// router.get("/payment", paymentController.loadPayment);
-// router.post("/payment", paymentController.placeOrder);
+// Payment page
+router.get("/checkout/payment", paymentController.loadPayment);
+router.post("/checkout/payment", paymentController.placeOrder);
+
 module.exports = router;
 
 
