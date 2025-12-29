@@ -1,0 +1,135 @@
+<%- include("../partials/user/header") %>
+<link rel="stylesheet" href="/css/orderDetails.css">
+
+<div class="order-details-wrapper">
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="/">Home</a> / <a href="/orders">My Orders</a> / <span>Order Details</span>
+  </div>
+
+  <div class="order-container">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar">
+      <div class="user-info">
+        <img src="<%= user.profilePic || '/images/default-avatar.png' %>" alt="user">
+        <p>Hello, <strong><%= user.name %></strong></p>
+      </div>
+
+      <nav class="sidebar-menu">
+        <a href="/orders" class="menu-item active">My Orders</a>
+        <a href="/account" class="menu-item">Account Settings</a>
+        <a href="/account/addresses" class="menu-item">Manage Addresses</a>
+        <a href="/wallet" class="menu-item">My Wallet</a>
+        <a href="/logout" class="menu-item logout">Log out</a>
+      </nav>
+    </aside>
+
+    <!-- ===== MAIN ===== -->
+    <main class="order-main">
+
+      <h2 class="page-title">Order Details</h2>
+
+      <!-- ORDER SUMMARY -->
+      <div class="order-summary">
+        <div>
+          <p><strong>Order ID:</strong> <%= order._id %></p>
+          <p><strong>Ordered On:</strong>
+            <%= new Date(order.createdAt).toLocaleDateString("en-IN", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric"
+            }) %>
+          </p>
+        </div>
+
+        <div>
+          <p>
+            <strong>Status:</strong>
+            <span class="status <%= order.status.toLowerCase() %>">
+              <%= order.status %>
+            </span>
+          </p>
+          <p><strong>Payment:</strong> <%= order.paymentMethod %></p>
+        </div>
+      </div>
+
+      <!-- PRODUCTS -->
+      <section class="products-section">
+        <h3>Items in this Order</h3>
+
+        <% order.products.forEach(item => { %>
+          <div class="product-card">
+            <img src="<%= item.productId?.productImage?.[0] || '/images/no-image.png' %>">
+
+            <div class="product-details">
+              <h4><%= item.productId?.productName %></h4>
+              <p>Price: ₹ <%= item.price %></p>
+              <p>Quantity: <%= item.quantity %></p>
+              <p class="subtotal">
+                Subtotal: ₹ <%= item.price * item.quantity %>
+              </p>
+            </div>
+          </div>
+        <% }) %>
+      </section>
+
+      <!-- SHIPPING + PRICE -->
+      <section class="details-grid">
+
+        <div class="details-box">
+          <h3>Shipping Details</h3>
+          <p><%= order.shipping?.name %></p>
+          <p><%= order.shipping?.address %></p>
+          <p><%= order.shipping?.city %> - <%= order.shipping?.pincode %></p>
+          <p>Phone: <%= order.shipping?.phone %></p>
+        </div>
+
+        <div class="details-box">
+          <h3>Price Details</h3>
+          <p>Items Total: ₹ <%= order.itemsTotal || order.totalAmount %></p>
+          <p>Delivery Charges: ₹ <%= order.deliveryCharges || 0 %></p>
+          <p>Platform Fee: ₹ <%= order.platformFee || 0 %></p>
+          <hr>
+          <p class="grand-total">
+            Total Amount: ₹ <%= order.totalAmount %>
+          </p>
+        </div>
+
+      </section>
+
+      <!-- ACTIONS -->
+      <div class="order-actions">
+        <% if (order.status === "Placed") { %>
+          <button class="cancel-btn"
+            onclick="confirmCancel('<%= order._id %>')">
+            Cancel Order
+          </button>
+        <% } %>
+
+        <button class="invoice-btn">Download Invoice</button>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  function confirmCancel(orderId) {
+    Swal.fire({
+      title: 'Cancel this order?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      confirmButtonText: 'Yes, cancel it'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch(`/user/cancel/${orderId}`, { method: "PUT" })
+          .then(res => res.json())
+          .then(() => location.reload());
+      }
+    });
+  }
+</script>

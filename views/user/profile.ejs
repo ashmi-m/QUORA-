@@ -17,9 +17,12 @@
     </div>
 
     <div class="profile-container">
-
-      <!-- LEFT SIDEBAR -->
       <div class="profile-sidebar">
+        <div class="profile-image-box">
+        <img src="<%= user.profileImage %>" alt="Profile Image" id="profilePreview">
+        <input type="file" id="profileImageInput" hidden>
+        <button type="button" id="changeImageBtn">Change Photo</button>
+      </div>
         <h3>Hello 👋 <%= user?.name %>
         </h3>
 
@@ -29,15 +32,14 @@
           <button data-target="addressSection">Manage Addresses</button>
           <a href="/forgot-password"><button type="button">Forgot Password</button></a>
           <a href="/logout"><button type="button">Logout</button></a>
-          <!-- <a href="/add-address" class="btn">Add New Address</a> -->
+
 
         </div>
       </div>
 
-      <!-- RIGHT CONTENT -->
+    
       <div class="profile-content">
 
-        <!-- PROFILE INFO -->
         <div id="profileSection" class="profile-section">
 
           <form id="profileForm">
@@ -77,14 +79,10 @@
             </div>
           </form>
         </div>
-
-        <!-- ORDERS -->
         <div id="ordersSection" class="profile-section hidden">
           <%- include("./orders", { orders: orders }) %>
 
         </div>
-
-        <!-- ADDRESSES -->
         <div id="addressSection" class="profile-section hidden">
 
           <%- include("./manageAddress", { addresses: addresses }) %>
@@ -97,8 +95,6 @@
 
     <script>
       document.addEventListener("DOMContentLoaded", () => {
-
-        /* SECTION SWITCH */
         const menuButtons = document.querySelectorAll(".profile-menu button[data-target]");
         const sections = document.querySelectorAll(".profile-section");
 
@@ -111,8 +107,6 @@
             btn.classList.add("active");
           });
         });
-
-        /* EDIT PROFILE */
         const editBtn = document.getElementById("editProfileBtn");
         const saveBtn = document.getElementById("saveProfileBtn");
         const inputs = document.querySelectorAll(
@@ -149,6 +143,34 @@
             Swal.fire("Error", "Update failed", "error");
           }
         });
+        const changeBtn = document.getElementById("changeImageBtn");
+      const imageInput = document.getElementById("profileImageInput");
+      const preview = document.getElementById("profilePreview");
+     
+      changeBtn.addEventListener("click", () => imageInput.click());
+
+      imageInput.addEventListener("change", async () => {
+        const file = imageInput.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append("profileImage", file);
+
+        const res = await fetch("/profile/upload-image", {
+          method: "PUT",
+          body: formData
+        });
+        
+        const result = await res.json();
+
+        if (result.success) {
+          preview.src = result.image;
+          Swal.fire("Success", "Profile image updated", "success");
+        } else {
+          Swal.fire("Error", "Upload failed", "error");
+        }
+      });
+
 
       });
     </script>

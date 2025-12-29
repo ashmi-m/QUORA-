@@ -1,7 +1,6 @@
 const Order = require("../../models/orderSchema");
 const Cart = require("../../models/cartSchema");
 
-/* LOAD ORDERS */
 const loadOrders = async (req, res) => {
   try {
     if (!req.session.user) return res.redirect("/login");
@@ -23,7 +22,38 @@ const loadOrders = async (req, res) => {
   }
 };
 
-/* PLACE ORDER */
+
+const loadOrderDetails = async (req, res) => {
+  try {
+    console.log("ORDER DETAILS ID:", req.params.id);
+    console.log("USER ID:", req.session.user?._id);
+
+    const order = await Order.findOne({
+      _id: req.params.id,
+      userId: req.session.user._id,
+    })
+      .populate("products.productId");
+
+    console.log("ORDER FOUND:", order);
+
+    if (!order) {
+      return res.status(404).send("Order not found");
+    }
+
+    res.render("orderDetails", {
+      order,
+      user: req.session.user,
+    });
+
+  } catch (error) {
+    console.error("ORDER DETAILS ERROR ❌", error);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
+  
+
+
 const placeOrder = async (req, res) => {
   try {
     const { addressId, paymentMethod } = req.body;
@@ -103,5 +133,6 @@ const cancelOrder = async (req, res) => {
 module.exports = {
   loadOrders,
   placeOrder,
-  cancelOrder
+  cancelOrder,
+  loadOrderDetails
 };

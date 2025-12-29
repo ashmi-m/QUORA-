@@ -17,7 +17,6 @@ body {
   gap: 30px;
 }
 
-/* SIDEBAR */
 .profile-sidebar {
   width: 260px;
   background: #fff;
@@ -41,7 +40,6 @@ body {
   color: #fff;
 }
 
-/* CONTENT */
 .profile-content {
   flex: 1;
   background: #fff;
@@ -82,7 +80,7 @@ body {
   margin-top: 10px;
 }
 
-/* CARD */
+
 .card {
   border: 1px solid #ddd;
   padding: 15px;
@@ -90,7 +88,6 @@ body {
   border-radius: 6px;
 }
 
-/* FOOTER */
 footer {
   background: #f5e6e0;
   padding: 20px;
@@ -98,7 +95,7 @@ footer {
   margin-top: 50px;
 }
 
-/* ADD ADDRESS BUTTON AT BOTTOM */
+
 .add-address-footer {
   margin-top: 25px;
   text-align: right;
@@ -116,4 +113,26 @@ footer {
 
 .add-address-btn:hover {
   background: #333;
+}
+.profile-image-box {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.profile-image-box img {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ddd;
+}
+
+.profile-image-box button {
+  margin-top: 10px;
+  padding: 6px 12px;
+  border: none;
+  background: #000;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
 }

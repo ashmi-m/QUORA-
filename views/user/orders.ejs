@@ -1,92 +1,135 @@
 <link rel="stylesheet" href="/css/orders.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <div class="orders-wrapper">
   <section class="orders-content">
 
     <div class="orders-header">
       <h2>My Orders</h2>
-      <input type="text" placeholder="Search orders">
+      <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Search orders">
+        <button id="searchBtn">🔍</button>
+      </div>
     </div>
 
     <% if (!orders || orders.length === 0) { %>
       <p>No orders found</p>
     <% } %>
 
-    <% orders.forEach(order => { %>
-      <% order.products.forEach(item => { %>
+    <div id="ordersList">
+      <% orders.forEach(order => { %>
+        <% order.products.forEach(item => { %>
+          <div class="order-card" data-product-name="<%= item.productId?.productName?.toLowerCase() || '' %>">
 
-        <div class="order-card">
+            <!-- PRODUCT IMAGE -->
+            <div class="order-image">
+              <img 
+                src="<%= item.productId?.productImage?.[0] || '/images/no-image.png' %>" 
+                alt="product">
+            </div>
 
-          <!-- PRODUCT IMAGE -->
-          <div class="order-image">
-            <img 
-              src="<%= item.productId?.productImage?.[0] || '/images/no-image.png' %>" 
-              alt="product">
+            <!-- PRODUCT DETAILS -->
+            <div class="order-info">
+
+              <h4>
+                <%= item.productId?.productName || "Product unavailable" %>
+              </h4>
+
+              <p class="price">₹ <%= item.price %></p>
+
+              <p class="date">
+                Ordered on
+                <%= new Date(order.createdAt).toLocaleDateString("en-IN", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric"
+                }) %>
+              </p>
+
+              <!-- STATUS -->
+              <span class="status <%= order.status.toLowerCase() %>">
+                ● <%= order.status %>
+              </span>
+
+              <p class="small">
+                Qty: <%= item.quantity %> | Payment: <%= order.paymentMethod %>
+              </p>
+
+              <!-- CANCEL BUTTON -->
+              <% if (order.status === "Placed") { %>
+                <button 
+                  class="cancel-btn"
+                  onclick="confirmCancel('<%= order._id %>')">
+                  Cancel
+                </button>
+              <% } %>
+
+              <!-- DETAILS BUTTON -->
+              <a href="/orders/<%= order._id %>" class="details-btn">
+                Details
+              </a>
+
+            </div>
           </div>
-
-          <!-- PRODUCT DETAILS -->
-          <div class="order-info">
-
-            <!-- ✅ PRODUCT NAME (FIXED) -->
-            <h4>
-              <%= item.productId?.productName || "Product unavailable" %>
-            </h4>
-
-            <p class="price">₹ <%= item.price %></p>
-
-            <p class="date">
-              Ordered on
-              <%= new Date(order.createdAt).toLocaleDateString("en-IN", {
-                day: "2-digit",
-                month: "short",
-                year: "numeric"
-              }) %>
-            </p>
-
-            <!-- STATUS -->
-            <span class="status <%= order.status.toLowerCase() %>">
-              ● <%= order.status %>
-            </span>
-
-            <p class="small">
-              Qty: <%= item.quantity %> |
-              Payment: <%= order.paymentMethod %>
-            </p>
-
-            <!-- ✅ CANCEL BUTTON -->
-            <% if (order.status === "Placed") { %>
-              <button 
-                class="cancel-btn"
-                onclick="cancelOrder('<%= order._id %>')">
-                Cancel
-              </button>
-            <% } %>
-
-            <!-- DETAILS BUTTON -->
-            <a href="/orders/<%= order._id %>" class="details-btn">
-              Details
-            </a>
-
-          </div>
-        </div>
-
+        <% }) %>
       <% }) %>
-    <% }) %>
+    </div>
 
   </section>
 </div>
 
 <script>
+  // Cancel order with SweetAlert confirmation
+  function confirmCancel(orderId) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, cancel it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        cancelOrder(orderId);
+      }
+    });
+  }
+
   function cancelOrder(orderId) {
     fetch(`/user/cancel/${orderId}`, { method: "PUT" })
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-          location.reload();
+          Swal.fire(
+            'Cancelled!',
+            'Your order has been cancelled.',
+            'success'
+          ).then(() => location.reload());
         } else {
-          alert("Cannot cancel this order");
+          Swal.fire(
+            'Error!',
+            'Cannot cancel this order',
+            'error'
+          );
         }
       });
   }
-</script>
 
+  // Search orders by product name
+  const searchInput = document.getElementById("searchInput");
+  const searchBtn = document.getElementById("searchBtn");
+  const ordersList = document.getElementById("ordersList");
+
+  function filterOrders() {
+    const searchValue = searchInput.value.toLowerCase();
+    const cards = ordersList.getElementsByClassName("order-card");
+    Array.from(cards).forEach(card => {
+      const productName = card.getAttribute("data-product-name");
+      card.style.display = productName.includes(searchValue) ? "" : "none";
+    });
+  }
+
+  searchBtn.addEventListener("click", filterOrders);
+  searchInput.addEventListener("keyup", filterOrders);
+</script>

@@ -95,9 +95,8 @@ router.get("/orders", userAuth, orderController.loadOrders);
 router.post("/place-order", userAuth, orderController.placeOrder);
 router.put("/user/cancel/:id", userAuth, orderController.cancelOrder);
 
+router.get("/orders/:id", userAuth, orderController.loadOrderDetails);
+
 
 module.exports = router;
-
-
-  
 
