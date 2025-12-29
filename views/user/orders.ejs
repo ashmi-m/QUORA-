@@ -1,0 +1,92 @@
+<link rel="stylesheet" href="/css/orders.css">
+
+<div class="orders-wrapper">
+  <section class="orders-content">
+
+    <div class="orders-header">
+      <h2>My Orders</h2>
+      <input type="text" placeholder="Search orders">
+    </div>
+
+    <% if (!orders || orders.length === 0) { %>
+      <p>No orders found</p>
+    <% } %>
+
+    <% orders.forEach(order => { %>
+      <% order.products.forEach(item => { %>
+
+        <div class="order-card">
+
+          <!-- PRODUCT IMAGE -->
+          <div class="order-image">
+            <img 
+              src="<%= item.productId?.productImage?.[0] || '/images/no-image.png' %>" 
+              alt="product">
+          </div>
+
+          <!-- PRODUCT DETAILS -->
+          <div class="order-info">
+
+            <!-- ✅ PRODUCT NAME (FIXED) -->
+            <h4>
+              <%= item.productId?.productName || "Product unavailable" %>
+            </h4>
+
+            <p class="price">₹ <%= item.price %></p>
+
+            <p class="date">
+              Ordered on
+              <%= new Date(order.createdAt).toLocaleDateString("en-IN", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric"
+              }) %>
+            </p>
+
+            <!-- STATUS -->
+            <span class="status <%= order.status.toLowerCase() %>">
+              ● <%= order.status %>
+            </span>
+
+            <p class="small">
+              Qty: <%= item.quantity %> |
+              Payment: <%= order.paymentMethod %>
+            </p>
+
+            <!-- ✅ CANCEL BUTTON -->
+            <% if (order.status === "Placed") { %>
+              <button 
+                class="cancel-btn"
+                onclick="cancelOrder('<%= order._id %>')">
+                Cancel
+              </button>
+            <% } %>
+
+            <!-- DETAILS BUTTON -->
+            <a href="/orders/<%= order._id %>" class="details-btn">
+              Details
+            </a>
+
+          </div>
+        </div>
+
+      <% }) %>
+    <% }) %>
+
+  </section>
+</div>
+
+<script>
+  function cancelOrder(orderId) {
+    fetch(`/user/cancel/${orderId}`, { method: "PUT" })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          location.reload();
+        } else {
+          alert("Cannot cancel this order");
+        }
+      });
+  }
+</script>
+

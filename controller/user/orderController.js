@@ -1,43 +1,107 @@
+const Order = require("../../models/orderSchema");
+const Cart = require("../../models/cartSchema");
 
-// const placeOrder = async (req, res) => {
-//   try {
-//     if (!req.session.user) {
-//       return res.redirect("/login");
-//     }
+/* LOAD ORDERS */
+const loadOrders = async (req, res) => {
+  try {
+    if (!req.session.user) return res.redirect("/login");
 
-//     const newOrder = new Order({
-//       user: req.session.user._id,
-//       items: [],
-//       totalAmount: 999,
-//       status: "Placed"
-//     });
+    const orders = await Order.find({
+      userId: req.session.user._id
+    })
+      .populate({
+        path: "products.productId",
+        select: "productName productImage regularPrice salePrice"
+      })
+      .sort({ createdAt: -1 });
 
-//     await newOrder.save();
-//     res.redirect("/userprofile");
+    res.render("orders", { orders });
 
-//   } catch (error) {
-//     console.error(error);
-//     res.redirect("/pageNotFound");
-//   }
-// };
+  } catch (error) {
+    console.error(error);
+    res.redirect("/pageNotFound");
+  }
+};
 
-// // CANCEL ORDER
-// const cancelOrder = async (req, res) => {
-//   try {
-//     const orderId = req.params.id;
+/* PLACE ORDER */
+const placeOrder = async (req, res) => {
+  try {
+    const { addressId, paymentMethod } = req.body;
+    const userId = req.session.user._id;
 
-//     await Order.findByIdAndUpdate(orderId, {
-//       status: "Cancelled"
-//     });
+    const cart = await Cart.findOne({ userId })
+      .populate("items.productId");
 
-//     res.json({ success: true });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ success: false });
-//   }
-// };
+    if (!cart || cart.items.length === 0) {
+      return res.redirect("/checkout");
+    }
 
-// module.exports = {
-//   placeOrder,
-//   cancelOrder   
-// };
+    const products = cart.items.map(item => {
+      const price =
+        item.productId.salePrice ||
+        item.productId.regularPrice;
+
+      return {
+        productId: item.productId._id,
+        quantity: item.quantity,
+        price
+      };
+    });
+
+    const totalAmount = products.reduce(
+      (sum, p) => sum + p.price * p.quantity,
+      0
+    );
+
+    const newOrder = new Order({
+      userId,
+      address: addressId,
+      products,
+      totalAmount,
+      paymentMethod,
+      status: paymentMethod === "COD" ? "Placed" : "Paid"
+    });
+
+    await newOrder.save();
+
+    cart.items = [];
+    await cart.save();
+
+    res.redirect("/orders");
+
+  } catch (err) {
+    console.error(err);
+    res.redirect("/pageNotFound");
+  }
+};
+
+/* CANCEL ORDER */
+const cancelOrder = async (req, res) => {
+  try {
+    const order = await Order.findOne({
+      _id: req.params.id,
+      userId: req.session.user._id
+    });
+
+    if (!order) return res.json({ success: false });
+
+    if (!["Placed", "Paid"].includes(order.status)) {
+      return res.json({ success: false });
+    }
+
+    order.status = "Cancelled";
+    await order.save();
+
+    res.json({ success: true });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false });
+  }
+};
+
+module.exports = {
+  loadOrders,
+  placeOrder,
+  cancelOrder
+};

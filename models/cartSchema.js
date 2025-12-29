@@ -1,46 +1,48 @@
-// const mongoose=require("mongoose");
-// const {schema}=mongoose;
 
-// const cartSchema=new Schema({
+// const mongoose = require("mongoose");
+// const { Schema } = mongoose;   // ✅ CAPITAL S
 
-//     userId:{
-//         type:Schema.Types.ObjectId,
-//         ref:"User", 
-//         required:true
-//     },
-//     items:[{
-//         productId:{
-//             type:Schema.Types.ObjectId,
-//             ref:'Product',
-//             required:true
-//         },
-//         quantity:{
-//             type:Number,
-//             default:1
-//         },
-//         price:{
-//             type:Number,
-//             required:true
-//         },
-//         totalPrice:{
-//             type:Number,
-//             required:true
-//         },
-//         status:{
-//             type:String,
-//             default:'placed'
-//         },
-//         cancellationReasons:{
-//             type:String,
-//             default:"none"
-//         }
-//     }]
-// })
+// const cartSchema = new Schema({
+//   userId: {
+//     type: Schema.Types.ObjectId,
+//     ref: "User",
+//     required: true
+//   },
+//   items: [
+//     {
+//       productId: {
+//         type: Schema.Types.ObjectId,
+//         ref: "Product",
+//         required: true
+//       },
+//       quantity: {
+//         type: Number,
+//         default: 1
+//       },
+//       price: {
+//         type: Number,
+//         required: true
+//       },
+//       totalPrice: {
+//         type: Number,
+//         required: true
+//       },
+//       status: {
+//         type: String,
+//         default: "placed"
+//       },
+//       cancellationReasons: {
+//         type: String,
+//         default: "none"
+//       }
+//     }
+//   ]
+// }, { timestamps: true });
 
-// const Cart=mongoose.model("Cart",cartSchema);
-// module.exports=Cart;
+// const Cart = mongoose.model("Cart", cartSchema);
+// module.exports = Cart;
 const mongoose = require("mongoose");
-const { Schema } = mongoose;   // ✅ CAPITAL S
+const { Schema } = mongoose;
 
 const cartSchema = new Schema({
   userId: {
@@ -48,6 +50,7 @@ const cartSchema = new Schema({
     ref: "User",
     required: true
   },
+
   items: [
     {
       productId: {
@@ -58,26 +61,10 @@ const cartSchema = new Schema({
       quantity: {
         type: Number,
         default: 1
-      },
-      price: {
-        type: Number,
-        required: true
-      },
-      totalPrice: {
-        type: Number,
-        required: true
-      },
-      status: {
-        type: String,
-        default: "placed"
-      },
-      cancellationReasons: {
-        type: String,
-        default: "none"
       }
     }
   ]
+
 }, { timestamps: true });
 
-const Cart = mongoose.model("Cart", cartSchema);
-module.exports = Cart;
+module.exports = mongoose.model("Cart", cartSchema);

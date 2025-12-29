@@ -60,9 +60,6 @@ router.get("/brands", productController.getAllBrands);
 router.get("/userprofile", userAuth, userController.loadProfilePage);
 router.put("/profile/update", userAuth, userController.updateProfile);
 
-// ===== ORDERS =====
-// router.get("/place-order", userAuth, orderController.placeOrder);
-// router.put("/user/cancel/:id", userAuth, orderController.cancelOrder);
 
 // ===== ADDRESS =====
 router.post("/address/add", userAuth, userController.addAddress);
@@ -91,7 +88,13 @@ router.post("/checkout/select-address", checkoutController.selectAddress);
 
 // Payment page
 router.get("/checkout/payment", paymentController.loadPayment);
-router.post("/checkout/payment", paymentController.placeOrder);
+router.post("/checkout/payment/place", paymentController.placeOrder);
+// ===== ORDERS =====
+// ===== ORDERS =====
+router.get("/orders", userAuth, orderController.loadOrders);
+router.post("/place-order", userAuth, orderController.placeOrder);
+router.put("/user/cancel/:id", userAuth, orderController.cancelOrder);
+
 
 module.exports = router;
 

@@ -3,15 +3,19 @@
 <%- include("../partials/user/header") %>
 <link rel="stylesheet" href="/css/payment.css">
 
-<!-- BREADCRUMB -->
+
+
 <div class="breadcrumb">
   Home / <strong>Products</strong>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<form id="paymentForm" action="/checkout/payment/place" method="POST">
 
-<form action="/checkout/payment/place" method="POST">
+  <input type="hidden" name="addressId" value="<%= address._id %>">
+
   <div class="payment-container">
 
-    <!-- LEFT SECTION -->
+   
     <div class="payment-methods">
       <h3>Select payment method</h3>
 
@@ -40,15 +44,16 @@
         <span>Cash on Delivery</span>
       </label>
     </div>
-
-    <!-- RIGHT SECTION -->
     <div class="order-summary">
       <h3>Order summary</h3>
 
       <% cartItems.forEach(item => { %>
         <div class="summary-row">
           <span><%= item.productId.productName %> × <%= item.quantity %></span>
-          <span>₹ <%= item.productId.price * item.quantity %></span>
+<span>
+  ₹ <%= Number(item.productId.regularPrice) * Number(item.quantity) %>
+</span>
+
         </div>
       <% }) %>
 
@@ -70,5 +75,59 @@
 
   </div>
 </form>
+
+<script>
+  const form = document.getElementById("paymentForm");
+
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+
+    try {
+      const res = await fetch(form.action, {
+        method: "POST",
+        headers: {
+          "Accept": "application/json"
+        },
+        body: new URLSearchParams(formData)
+      });
+
+      const contentType = res.headers.get("content-type");
+
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error("Response is not JSON");
+      }
+
+      const data = await res.json();
+
+      if (data.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Order placed successfully",
+          text: "Order placed using wallet successfully",
+          confirmButtonText: "OK"
+        }).then(() => {
+          window.location.href = "/orders";
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Order Failed",
+          text: data.message || "Something went wrong"
+        });
+      }
+
+    } catch (err) {
+      console.error("FETCH ERROR 👉", err);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Server error. Please try again."
+      });
+    }
+  });
+</script>
+
 
 <%- include("../partials/user/footer") %>

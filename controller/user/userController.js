@@ -468,9 +468,12 @@ const loadProfilePage = async (req, res) => {
     const addresses = addressDoc?.addresses || [];
 
     const user = await User.findById(userId).lean();
-    const orders = await Order.find({ user: userId })
-      .sort({ createdAt: -1 })
-      .lean();
+    const orders = await Order.find({
+          userId: req.session.user._id
+        })
+          .populate("products.productId")
+          .populate("address")
+          .sort({ createdAt: -1 });
 
     res.render("profile", { user, orders, addresses });
   } catch (error) {

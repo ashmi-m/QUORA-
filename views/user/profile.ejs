@@ -80,37 +80,12 @@
 
         <!-- ORDERS -->
         <div id="ordersSection" class="profile-section hidden">
-          <h2>My Orders</h2>
+          <%- include("./orders", { orders: orders }) %>
 
-          <% if (!orders.length) { %>
-            <p>No orders found.</p>
-            <% } else { %>
-              <% orders.forEach(order=> { %>
-                <div class="card">
-                  <p><b>Order ID:</b>
-                    <%= order._id %>
-                  </p>
-                  <p><b>Total:</b> ₹<%= order.totalAmount %>
-                  </p>
-                  <p><b>Status:</b>
-                    <%= order.status %>
-                  </p>
-
-                  <% if (order.status !=="Cancelled" ) { %>
-                    <button class="cancel-order-btn" data-id="<%= order._id %>">
-                      Cancel Order
-                    </button>
-                    <% } %>
-                </div>
-                <% }) %>
-                  <% } %>
         </div>
 
         <!-- ADDRESSES -->
         <div id="addressSection" class="profile-section hidden">
-
-
-
 
           <%- include("./manageAddress", { addresses: addresses }) %>
         </div>
