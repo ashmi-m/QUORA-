@@ -1,4 +1,4 @@
-/* Navbar Container */
+
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -8,16 +8,12 @@
   border-bottom: 1px solid #ddd;
   font-family: Arial, sans-serif;
 }
-
-/* Logo */
 .logo {
   font-family: 'Arial Black', sans-serif;
   font-size: 24px;
   color: black;
   margin: 0;
 }
-
-/* Navigation Links */
 .nav-links {
   display: flex;
   gap: 25px;
@@ -37,7 +33,6 @@
   color: #ff6600;
 }
 
-/* Right Icons */
 .right-icons {
   display: flex;
   align-items: center;

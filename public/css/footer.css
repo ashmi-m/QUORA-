@@ -1,4 +1,4 @@
-/* Footer Styles for Quora Cosmetics */
+
 footer {
   background: #FFDBC3;
   color: #f8f6f3;
@@ -7,8 +7,6 @@ footer {
   position: relative;
   overflow: hidden;
 }
-
-/* Add subtle pattern overlay */
 footer::before {
   content: '';
   position: absolute;
@@ -32,7 +30,6 @@ footer::before {
   z-index: 1;
 }
 
-/* About Section */
 .about h2 {
   font-size: 2.5rem;
   font-weight: 700;
@@ -50,7 +47,6 @@ footer::before {
   font-style: italic;
 }
 
-/* Links Section */
 .links h4 {
   font-size: 1.3rem;
   font-weight: 600;
@@ -99,7 +95,6 @@ footer::before {
   width: 100%;
 }
 
-/* Contact Section */
 .contact h4 {
   font-size: 1.3rem;
   font-weight: 600;
@@ -123,7 +118,6 @@ footer::before {
   color: #0f0e0e;
 }
 
-/* Footer Bottom */
 .footer-bottom {
   background: rgba(0, 0, 0, 0.3);
   padding: 25px 0;
@@ -140,7 +134,6 @@ footer::before {
   font-weight: 300;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   footer {
     padding: 40px 0 0;

@@ -2,18 +2,16 @@
 <link rel="stylesheet" href="/css/orderDetails.css">
 
 <div class="order-details-wrapper">
-
-  <!-- Breadcrumb -->
   <div class="breadcrumb">
-    <a href="/">Home</a> / <a href="/orders">My Orders</a> / <span>Order Details</span>
+    <a href="/">Home</a> /
+    <a href="/orders">My Orders</a> /
+    <span>Order Details</span>
   </div>
 
   <div class="order-container">
-
-    <!-- ===== SIDEBAR ===== -->
     <aside class="sidebar">
       <div class="user-info">
-        <img src="<%= user.profilePic || '/images/default-avatar.png' %>" alt="user">
+        <img src="<%= user.profileImage || '/images/default-avatar.png' %>" alt="user">
         <p>Hello, <strong><%= user.name %></strong></p>
       </div>
 
@@ -26,16 +24,14 @@
       </nav>
     </aside>
 
-    <!-- ===== MAIN ===== -->
     <main class="order-main">
-
       <h2 class="page-title">Order Details</h2>
 
-      <!-- ORDER SUMMARY -->
       <div class="order-summary">
         <div>
           <p><strong>Order ID:</strong> <%= order._id %></p>
-          <p><strong>Ordered On:</strong>
+          <p>
+            <strong>Ordered On:</strong>
             <%= new Date(order.createdAt).toLocaleDateString("en-IN", {
               day: "2-digit",
               month: "short",
@@ -55,7 +51,6 @@
         </div>
       </div>
 
-      <!-- PRODUCTS -->
       <section class="products-section">
         <h3>Items in this Order</h3>
 
@@ -75,15 +70,18 @@
         <% }) %>
       </section>
 
-      <!-- SHIPPING + PRICE -->
       <section class="details-grid">
-
         <div class="details-box">
           <h3>Shipping Details</h3>
-          <p><%= order.shipping?.name %></p>
-          <p><%= order.shipping?.address %></p>
-          <p><%= order.shipping?.city %> - <%= order.shipping?.pincode %></p>
-          <p>Phone: <%= order.shipping?.phone %></p>
+
+          <% if (order.shipping) { %>
+            <p><%= order.shipping.name %></p>
+            <p><%= order.shipping.address %></p>
+            <p><%= order.shipping.city %> - <%= order.shipping.pincode %></p>
+            <p>Phone: <%= order.shipping.phone %></p>
+          <% } else { %>
+            <p><em>Shipping details not available for this order</em></p>
+          <% } %>
         </div>
 
         <div class="details-box">
@@ -96,19 +94,27 @@
             Total Amount: ₹ <%= order.totalAmount %>
           </p>
         </div>
-
       </section>
 
-      <!-- ACTIONS -->
       <div class="order-actions">
-        <% if (order.status === "Placed") { %>
-          <button class="cancel-btn"
-            onclick="confirmCancel('<%= order._id %>')">
+        <% if (order.status === "Placed" || order.status === "Paid") { %>
+          <button class="cancel-btn" onclick="confirmCancel('<%= order._id %>')">
             Cancel Order
           </button>
         <% } %>
 
-        <button class="invoice-btn">Download Invoice</button>
+        <% if (order.status === "Delivered") { %>
+          <button class="return-btn" onclick="returnOrder('<%= order._id %>')">
+            Return Order
+          </button>
+        <% } %>
+
+        <!-- ✅ INVOICE ONLY FOR VALID STATUSES -->
+        <% if (["Placed", "Paid", "Delivered"].includes(order.status)) { %>
+          <a href="/orders/invoice/<%= order._id %>" class="invoice-btn">
+            Download Invoice
+          </a>
+        <% } %>
       </div>
 
     </main>
@@ -116,19 +122,48 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
   function confirmCancel(orderId) {
     Swal.fire({
-      title: 'Cancel this order?',
-      icon: 'warning',
+      title: "Cancel this order?",
+      input: "textarea",
+      inputPlaceholder: "Reason (optional)",
       showCancelButton: true,
-      confirmButtonColor: '#d33',
-      confirmButtonText: 'Yes, cancel it'
-    }).then((result) => {
+      confirmButtonColor: "#d33",
+      confirmButtonText: "Yes, cancel it"
+    }).then(result => {
       if (result.isConfirmed) {
-        fetch(`/user/cancel/${orderId}`, { method: "PUT" })
-          .then(res => res.json())
-          .then(() => location.reload());
+        fetch(`/user/cancel/${orderId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ reason: result.value })
+        })
+        .then(res => res.json())
+        .then(() => location.reload());
+      }
+    });
+  }
+
+  function returnOrder(orderId) {
+    Swal.fire({
+      title: "Return this order?",
+      input: "textarea",
+      inputPlaceholder: "Reason for return (required)",
+      inputValidator: value => {
+        if (!value) return "Return reason is required";
+      },
+      showCancelButton: true,
+      confirmButtonText: "Return Order"
+    }).then(result => {
+      if (result.isConfirmed) {
+        fetch(`/orders/return/${orderId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ reason: result.value })
+        })
+        .then(res => res.json())
+        .then(() => location.reload());
       }
     });
   }

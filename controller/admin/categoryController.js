@@ -42,8 +42,6 @@ const addCategory = async (req, res) => {
     if (!name || !description) {
       return res.status(400).json({ success: false, error: "All fields required" });
     }
-
-    // Check if category already exists (case-insensitive)
     const existing = await Category.findOne({ name: { $regex: `^${name.trim()}$`, $options: "i" } });
     if (existing) {
       return res.status(400).json({ success: false, error: "Category name already exists" });

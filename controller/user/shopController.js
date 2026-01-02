@@ -35,6 +35,7 @@ const loadShopPage = async (req, res) => {
     }
 
  let selectedBrands = [];
+ 
     if (brandsParam.length) {
       const brandArray = Array.isArray(brandsParam)
         ? brandsParam

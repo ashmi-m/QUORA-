@@ -2,6 +2,8 @@
 const User = require("../../models/userSchema");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const Order = require("../../models/orderSchema");
+
 
 const pageerror=async(req,res)=>{
    res.render("pageerror");
@@ -64,10 +66,60 @@ try {
     res.redirect("/pageerror")
 }
 }
+const loadOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({})
+      .populate("userId", "name email phone")   
+      .populate("products.productId")
+      .sort({ createdAt: -1 });
+
+    res.render("orders", { orders });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Server Error");
+  }
+};
+
+const viewOrderDetails = async (req, res) => {
+  try {
+    const orderId = req.params.id;
+    const order = await Order.findById(orderId)
+      .populate("userId")
+      .populate("products.productId");
+
+    if (!order) {
+      return res.status(404).send("Order not found");
+    }
+
+    res.render("orderDetails", { order });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server Error");
+  }
+};
+const updateOrderStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const orderId = req.params.id;
+
+    const order = await Order.findByIdAndUpdate(orderId, { status }, { new: true });
+
+    if (!order) return res.status(404).send("Order not found");
+
+    res.redirect("/admin/orders");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server Error");
+  }
+};
+
 module.exports = {
-    loadLogin,
-    login,
-    loadDashboard,
-    pageerror,
-    logout
+  loadLogin,
+  login,
+  loadDashboard,
+  pageerror,
+  logout,
+  loadOrders,
+  viewOrderDetails,
+  updateOrderStatus
 };

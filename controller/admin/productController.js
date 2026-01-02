@@ -30,16 +30,12 @@ const loadShopPage = async(req,res)=>{
     res.status(500).send("Server Error");
   }
 };
-
-
-
 const getProductsData = async (req, res) => {
   try {
    const page = parseInt(req.query.page) || 1;
    const limit = parseInt(req.query.limit) || 10;
    const skip = (page-1)*limit;
    const search = req.query.search?.trim()||"";
-
    const filter ={};
    if(search){
     filter.productName = {$regex:search,$options:"i"};
@@ -94,8 +90,6 @@ const getProductpage = async (req, res) => {
     res.redirect("/admin/pageerror");
   }
 };
-
-
 
 const mongoose = require("mongoose");
 

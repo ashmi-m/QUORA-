@@ -12,74 +12,58 @@
       </div>
     </div>
 
-    <% if (!orders || orders.length === 0) { %>
+    <% if (!orders || orders.length===0) { %>
       <p>No orders found</p>
-    <% } %>
+      <% } %>
 
-    <div id="ordersList">
-      <% orders.forEach(order => { %>
-        <% order.products.forEach(item => { %>
-          <div class="order-card" data-product-name="<%= item.productId?.productName?.toLowerCase() || '' %>">
+        <div id="ordersList">
+          <% orders.forEach(order=> { %>
+            <% order.products.forEach(item=> { %>
+              <div class="order-card" data-product-name="<%= item.productId?.productName?.toLowerCase() || '' %>">
+                <div class="order-image">
+                  <img src="<%= item.productId?.productImage?.[0] || '/images/no-image.png' %>" alt="product">
+                </div>
+                <div class="order-info">
 
-            <!-- PRODUCT IMAGE -->
-            <div class="order-image">
-              <img 
-                src="<%= item.productId?.productImage?.[0] || '/images/no-image.png' %>" 
-                alt="product">
-            </div>
+                  <h4>
+                    <%= item.productId?.productName || "Product unavailable" %>
+                  </h4>
 
-            <!-- PRODUCT DETAILS -->
-            <div class="order-info">
+                  <p class="price">₹ <%= item.price %>
+                  </p>
 
-              <h4>
-                <%= item.productId?.productName || "Product unavailable" %>
-              </h4>
+                  <p class="date">
+                    Ordered on
+                    <%= new Date(order.createdAt).toLocaleDateString("en-IN", { day: "2-digit" , month: "short" ,
+                      year: "numeric" }) %>
+                  </p>
+                  <span class="status <%= order.status.toLowerCase() %>">
+                    ● <%= order.status %>
+                  </span>
 
-              <p class="price">₹ <%= item.price %></p>
+                  <p class="small">
+                    Qty: <%= item.quantity %> | Payment: <%= order.paymentMethod %>
+                  </p>
+                  <% if (order.status==="Placed" || order.status==="Paid" ) { %>
+                    <button class="cancel-btn" onclick="confirmCancel('<%= order._id %>')">
+                      Cancel
+                    </button>
+                    <% } %>
 
-              <p class="date">
-                Ordered on
-                <%= new Date(order.createdAt).toLocaleDateString("en-IN", {
-                  day: "2-digit",
-                  month: "short",
-                  year: "numeric"
-                }) %>
-              </p>
+                      <a href="/orders/<%= order._id %>" class="details-btn">
+                        Details
+                      </a>
 
-              <!-- STATUS -->
-              <span class="status <%= order.status.toLowerCase() %>">
-                ● <%= order.status %>
-              </span>
-
-              <p class="small">
-                Qty: <%= item.quantity %> | Payment: <%= order.paymentMethod %>
-              </p>
-
-              <!-- CANCEL BUTTON -->
-              <% if (order.status === "Placed") { %>
-                <button 
-                  class="cancel-btn"
-                  onclick="confirmCancel('<%= order._id %>')">
-                  Cancel
-                </button>
-              <% } %>
-
-              <!-- DETAILS BUTTON -->
-              <a href="/orders/<%= order._id %>" class="details-btn">
-                Details
-              </a>
-
-            </div>
-          </div>
-        <% }) %>
-      <% }) %>
-    </div>
+                </div>
+              </div>
+              <% }) %>
+                <% }) %>
+        </div>
 
   </section>
 </div>
 
 <script>
-  // Cancel order with SweetAlert confirmation
   function confirmCancel(orderId) {
     Swal.fire({
       title: 'Are you sure?',
@@ -115,8 +99,6 @@
         }
       });
   }
-
-  // Search orders by product name
   const searchInput = document.getElementById("searchInput");
   const searchBtn = document.getElementById("searchBtn");
   const ordersList = document.getElementById("ordersList");

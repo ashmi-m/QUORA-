@@ -5,7 +5,6 @@ const customerInfo = async (req, res) => {
         let search = req.query.search || "";
         let page = parseInt(req.query.page) || 1;
         const limit = 3;
-
         const query = {
             isAdmin: false,
             $or: [
@@ -19,10 +18,7 @@ const customerInfo = async (req, res) => {
         .limit(limit)
         .skip((page - 1)*limit)
         .exec();
-        
-
         const count = await User.countDocuments(query);
-
         res.render("customer",{
             data:userData,
             totalUsers:count,

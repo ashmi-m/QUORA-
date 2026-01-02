@@ -1,6 +1,5 @@
 
 
-/* Body */
 body {
   background: linear-gradient(to bottom, #f9d5b5, #7d7d7d);
   font-family: Arial, sans-serif;
@@ -9,33 +8,25 @@ body {
   color: #333;
 }
 
-/* Breadcrumbs */
 .breadcrumbs {
   padding: 20px 60px;
   font-weight: 500;
   font-size: 16px;
 }
-
-/* Wrapper */
 .wishlist-wrapper {
   padding: 20px 60px;
 }
-
-/* Title */
 .wishlist-title {
   margin-bottom: 20px;
   font-size: 22px;
   font-weight: bold;
 }
 
-/* Grid for wishlist items */
 .wishlist-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 25px;
 }
-
-/* Card styling */
 .wishlist-item {
   background: #fff;
   border-radius: 12px;
@@ -48,7 +39,6 @@ body {
   transform: translateY(-6px);
 }
 
-/* Product image */
 .wishlist-item img {
   width: 100%;
   height: 220px;
@@ -57,7 +47,6 @@ body {
   border-top-right-radius: 12px;
 }
 
-/* Heart icon for remove */
 .heart {
   position: absolute;
   top: 12px;
@@ -79,7 +68,6 @@ body {
   transform: scale(1.1);
 }
 
-/* Product details */
 .details {
   padding: 15px;
 }
@@ -101,7 +89,6 @@ body {
   margin-bottom: 10px;
 }
 
-/* Add to Cart button */
 .details button {
   width: 100%;
   background: #333;
@@ -117,7 +104,6 @@ body {
   background: #555;
 }
 
-/* Empty wishlist message */
 .empty {
   font-size: 16px;
   margin-top: 30px;

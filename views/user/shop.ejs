@@ -23,30 +23,6 @@
         color: inherit;
       }
 
-      /* 
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px 50px;
-      background-color: #fff;
-      border-bottom: 1px solid #ddd;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    } */
-
-      /* header h1 {
-      font-size: 24px;
-      font-weight: bold;
-    }
-
-    header nav {
-      display: flex;
-      gap: 20px;
-      align-items: center;
-    } */
-
       .breadcrumb {
         padding: 15px 50px;
         background-color: #f8e7de;
@@ -483,16 +459,12 @@
   </div>
 </footer>
 
-<!-- Include SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
-  /* ========================
-     ADD TO CART (ALL ITEMS)
-     ======================== */
   document.querySelectorAll(".add-to-cart-btn").forEach(btn => {
     btn.addEventListener("click", async (e) => {
       e.preventDefault();
@@ -531,9 +503,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  /* ========================
-     ADD TO WISHLIST
-     ======================== */
   document.querySelectorAll(".wishlist-overlay").forEach(btn => {
     btn.addEventListener("click", async (e) => {
       e.preventDefault();

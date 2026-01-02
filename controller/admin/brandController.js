@@ -39,7 +39,6 @@ const addBrand = async (req, res) => {
       });
     }
     
-//strt//
     brandName = brandName.trim();
        const existingBrand = await Brand.findOne({
       brandName: { $regex: `^${brandName}$`, $options: "i" },
@@ -52,7 +51,7 @@ const addBrand = async (req, res) => {
       });
     }
     //
-    const imagePath = req.file.path; // Cloudinary URL or local path
+    const imagePath = req.file.path; 
 
     const newBrand = new Brand({
       brandName,
@@ -67,19 +66,6 @@ const addBrand = async (req, res) => {
     return res.status(500).json({ success: false, error: "Internal server error" });
   }
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // const deleteBrand = async (req, res) => {
 //   try {

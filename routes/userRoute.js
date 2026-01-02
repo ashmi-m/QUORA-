@@ -12,6 +12,7 @@ const cartController =require("../controller/user/cartController")
 const wishlistController = require('../controller/user/wishlistController'); 
 const checkoutController = require("../controller/user/checkoutController");
 const paymentController = require("../controller/user/paymentController");
+const upload = require("../middlewares/imageUppload");
 
 const passport = require("../config/passport.js");
 
@@ -53,22 +54,17 @@ router.get("/shop/brand/:brandId", productController.getProductsByBrand);
 router.get("/brands", productController.getAllBrands);
 
 
-//
-// PROFILE
-
 
 router.get("/userprofile", userAuth, userController.loadProfilePage);
 router.put("/profile/update", userAuth, userController.updateProfile);
 
-
-// ===== ADDRESS =====
 router.post("/address/add", userAuth, userController.addAddress);
 router.get("/manage-address", userAuth, userController.loadManageAddressPage);
 
 router.get("/add-address", userAuth, userController.loadAddAddressPage);
 
 
-// EDIT ADDRESS
+
 router.get("/edit-address/:id", userAuth, userController.loadEditAddressPage);
 router.post("/address/edit/:id", userAuth, userController.updateAddress);
 
@@ -86,16 +82,22 @@ router.get("/checkout", userAuth, checkoutController.loadCheckoutPage);
 
 router.post("/checkout/select-address", checkoutController.selectAddress);
 
-// Payment page
+
 router.get("/checkout/payment", paymentController.loadPayment);
 router.post("/checkout/payment/place", paymentController.placeOrder);
-// ===== ORDERS =====
-// ===== ORDERS =====
+
 router.get("/orders", userAuth, orderController.loadOrders);
 router.post("/place-order", userAuth, orderController.placeOrder);
 router.put("/user/cancel/:id", userAuth, orderController.cancelOrder);
 
 router.get("/orders/:id", userAuth, orderController.loadOrderDetails);
+router.put("/profile/upload-image",userAuth,upload.single("profileImage"),userController.updateProfileImage);
+router.put("/orders/cancel-product",userAuth,orderController.cancelSingleProduct);
+router.put("/orders/return/:id",userAuth,orderController.returnOrder);
+
+router.get("/orders/invoice/:id",userAuth,orderController.downloadInvoice);
+// admin routes
+router.get('/orders/:id', userAuth, orderController.viewOrderDetails);
 
 
 module.exports = router;

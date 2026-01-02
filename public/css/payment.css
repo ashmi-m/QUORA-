@@ -5,14 +5,12 @@
   font-family: "Segoe UI", sans-serif;
 }
 
-/* BREADCRUMB */
 .breadcrumb {
   background: #fde6d5;
   padding: 12px 50px;
   font-size: 14px;
 }
 
-/* CONTAINER */
 .payment-container {
   display: flex;
   gap: 30px;
@@ -20,8 +18,6 @@
   background: linear-gradient(to bottom, #f6e1d4, #8f8c8a);
   min-height: 75vh;
 }
-
-/* LEFT */
 .payment-methods {
   width: 60%;
   background: #fff;
@@ -49,7 +45,6 @@
   accent-color: #e53935;
 }
 
-/* RIGHT */
 .order-summary {
   width: 35%;
   background: #d7d7d7;

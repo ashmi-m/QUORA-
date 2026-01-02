@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Orders | Quora</title>
+  <link rel="stylesheet" href="/css/orders.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <div class="logo">QUORA</div>
+
+  <form class="search-box" method="GET" action="/admin/orders">
+    <input type="text" name="search" placeholder="Search by status" value="<%= search || '' %>" />
+    <button type="submit">🔍</button>
+  </form>
+
+  <div class="profile">
+    <img src="https://i.pravatar.cc/40" alt="Admin">
+  </div>
+</header>
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <ul>
+      <li>Dashboard</li>
+      <li class="active">Orders</li>
+      <li>Products</li>
+      <li>Sales Report</li>
+      <li>Customer</li>
+      <li>Coupon</li>
+      <li>Category</li>
+      <li>Banner</li>
+      <li>Refund / Return</li>
+      <li>Sign Out</li>
+    </ul>
+  </aside>
+  <main class="content">
+    <h2>Orders</h2>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Order ID</th>
+            <th>Date</th>
+            <th>Customer</th>
+            <th>Status</th>
+            <th>Amount</th>
+            <th>View</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <% if (!orders || orders.length === 0) { %>
+            <tr>
+              <td colspan="7" class="no-orders">No orders found</td>
+            </tr>
+          <% } else { %>
+            <% orders.forEach(order => { %>
+              <tr>
+                <td class="product-cell">
+                  <% if (order.products.length > 0 && order.products[0].productId) { %>
+                    <img src="/images/<%= order.products[0].productId.image[0] %>" alt="product" />
+                    <span><%= order.products[0].productId.name %></span>
+                    <% if(order.products.length > 1) { %>
+                      <span> + <%= order.products.length - 1 %> more</span>
+                    <% } %>
+                  <% } else { %>
+                    <span>Product unavailable</span>
+                  <% } %>
+                </td>
+                <td><%= order._id %></td>
+                <td><%= order.createdAt.toDateString() %></td>
+                <td><%= order.userId?.name || 'N/A' %></td>
+                <td>
+                  <span class="status <%= order.status.replace(/\s+/g, '').toLowerCase() %>">
+                    <%= order.status %>
+                  </span>
+                </td>
+                <td>₹ <%= order.totalPrice %></td>
+                <td>
+                  <a href="/admin/orders/<%= order._id %>" class="btn-view">View</a>
+                </td>
+              </tr>
+            <% }) %>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+    <div class="pagination">
+      <span>Show result</span>
+      <select>
+        <option>5</option>
+        <option>10</option>
+        <option>20</option>
+      </select>
+
+      <div class="pages">
+        <span>‹</span>
+        <span class="active">1</span>
+        <span>2</span>
+        <span>3</span>
+        <span>›</span>
+      </div>
+    </div>
+
+  </main>
+
+</div>
+
+</body>
+</html>

@@ -2,7 +2,7 @@ const User = require("../../models/userSchema");
 const Product = require("../../models/productSchema");
 const Cart = require("../../models/cartSchema");
 const Wishlist = require("../../models/wishlistSchema");
-const Address = require("../../models/addressSchema"); // import Address model
+const Address = require("../../models/addressSchema"); 
 const mongoose = require("mongoose");
 
 const env = require("dotenv").config();
@@ -24,13 +24,10 @@ const loadHomepage = async (req, res) => {
     let cartCount = 0;
 
     if (req.session.user) {
-      // Wishlist
       const wishlist = await Wishlist.findOne({ userId: req.session.user._id }).lean();
       if (wishlist && wishlist.items) {
         wishlistIds = wishlist.items.map(item => item.productId.toString());
       }
-
-      // Cart
       const cart = await Cart.findOne({ userId: req.session.user._id }).lean();
       if (cart && cart.items) {
         cartCount = cart.items.length;
@@ -63,7 +60,6 @@ const loadlandingpage = async (req, res) => {
 
     if (req.session.user) {
 
-      // CART
       cart = await Cart.findOne({ userId: req.session.user._id })
         .populate("items.productId")
         .lean();
@@ -71,8 +67,6 @@ const loadlandingpage = async (req, res) => {
       if (cart && cart.items) {
         cartCount = cart.items.length;
       }
-
-      // WISHLIST
       const wishlist = await Wishlist.findOne({
         userId: req.session.user._id
       }).lean();
@@ -213,7 +207,6 @@ const securePassword = async (password) => {
 
 const conformOtp = async (req, res) => {
   try {
-    // const passwordHash=await;
     console.log('accessed backend');
 
 
@@ -524,12 +517,8 @@ const loadAddAddressPage = async (req, res) => {
 const loadManageAddressPage = async (req, res) => {
   try {
     const userId =req.session.user._id;
-
-    // fetch address document for this user
     const addressDoc = await Address.findOne({ userId }).lean();
     const addresses = addressDoc?.addresses || [];
-
-    // pass addresses to your EJS page
     res.render("manageAddress", { addresses });
   } catch (error) {
     console.error(error);
@@ -676,10 +665,28 @@ const deleteAddress = async (req, res) => {
   }
 };
 
+const updateProfileImage = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.json({ success: false });
+    }
 
+    const imageUrl = req.file.path; 
 
+    await User.findByIdAndUpdate(req.session.user._id, {
+      profileImage: imageUrl
+    });
+    req.session.user.profileImage = imageUrl;
 
-
+    res.json({
+      success: true,
+      image: imageUrl
+    });
+  } catch (error) {
+    console.error("Profile image error:", error);
+    res.json({ success: false });
+  }
+};
 
 module.exports = {
   loadHomepage,
@@ -701,8 +708,8 @@ module.exports = {
   loadAddAddressPage,
   addAddress,
   loadManageAddressPage,
-
   loadEditAddressPage,
   updateAddress,
-  deleteAddress
+  deleteAddress,
+  updateProfileImage 
 };

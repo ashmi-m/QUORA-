@@ -1,126 +1,4 @@
-/* 
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: Inter, Arial, sans-serif;
-}
-
-body {
-  background: #f5f5f5;
-}
-
-.profile-container {
-  padding: 40px;
-}
-
-.address-wrapper {
-  max-width: 900px;
-  margin: auto;
-}
-
-.address-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 25px;
-}
-
-.add-address-btn {
-  background: #4a5928;
-  color: #fff;
-  padding: 10px 18px;
-  border-radius: 4px;
-  text-decoration: none;
-  font-size: 14px;
-}
-
-.address-card {
-  background: #fff;
-  padding: 18px;
-  border-radius: 8px;
-  margin-bottom: 12px;
-  position: relative;
-}
-
-.address-top {
-  display: flex;
-  justify-content: space-between;
-}
-
-.address-name {
-  font-weight: 700;
-  margin-right: 10px;
-}
-
-.address-phone {
-  color: #555;
-}
-
-.address-text {
-  font-size: 14px;
-  color: #555;
-  margin-top: 8px;
-}
-
-.address-type {
-  display: inline-block;
-  margin-top: 10px;
-  border: 1px solid #aaa;
-  padding: 4px 14px;
-  border-radius: 20px;
-  font-size: 12px;
-}
-
-.address-actions {
-  position: relative;
-}
-
-.dots-btn {
-  border: none;
-  background: #eee;
-  padding: 6px 10px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.dropdown-menu {
-  position: absolute;
-  top: 35px;
-  right: 0;
-  background: #fff;
-  min-width: 120px;
-  box-shadow: 0 2px 8px rgba(0,0,0,.15);
-  border-radius: 6px;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-10px);
-  transition: .2s;
-}
-
-.dropdown-menu.show {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-}
-
-.edit-btn,
-.delete-btn {
-  all: unset;
-  display: block;
-  padding: 10px 14px;
-  cursor: pointer;
-  font-size: 13px;
-}
-
-.edit-btn:hover,
-.delete-btn:hover {
-  background: #f5f5f5;
-}
-
-.delete-btn {
-  color: #d32f2f;
-} */
  
 * {
   margin: 0;
@@ -147,7 +25,6 @@ body {
   padding: 32px;
 }
 
-/* HEADER */
 .address-header {
   display: flex;
   justify-content: space-between;
@@ -169,7 +46,6 @@ body {
   font-size: 14px;
 }
 
-/* CARD */
 .address-card {
   padding: 22px 0;
   border-bottom: 1px solid #e5e5e5;
@@ -185,7 +61,6 @@ body {
   align-items: flex-start;
 }
 
-/* LEFT */
 .address-left {
   display: flex;
   flex-direction: column;
@@ -202,7 +77,6 @@ body {
   color: #6f6f6f;
 }
 
-/* ADDRESS TEXT */
 .address-text {
   margin-top: 8px;
   font-size: 14px;
@@ -210,7 +84,6 @@ body {
   line-height: 1.6;
 }
 
-/* TYPE */
 .address-type {
   margin-top: 14px;
   display: inline-block;
@@ -219,8 +92,6 @@ body {
   border-radius: 20px;
   font-size: 12px;
 }
-
-/* MENU */
 .address-actions {
   position: relative;
 }

@@ -1,0 +1,150 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+body {
+  background: #f5f5f5;
+}
+
+/* Topbar */
+.topbar {
+  height: 70px;
+  background: #fff3df;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.profile img {
+  border-radius: 50%;
+}
+
+/* Layout */
+.layout {
+  display: flex;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 230px;
+  background: #fff;
+  padding: 20px;
+  min-height: calc(100vh - 70px);
+}
+
+.sidebar ul {
+  list-style: none;
+}
+
+.sidebar li {
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.sidebar li.active,
+.sidebar li:hover {
+  background: #3d3b00;
+  color: #fff;
+}
+
+/* Main content */
+.content {
+  flex: 1;
+  padding: 30px;
+}
+
+.content h2 {
+  margin-bottom: 20px;
+}
+
+/* Order wrapper */
+.order-wrapper {
+  display: flex;
+  gap: 20px;
+}
+
+/* Product details */
+.product-details {
+  flex: 2;
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.product-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.product-card img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.product-card h3 {
+  font-size: 18px;
+}
+
+.status-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btn {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn.on-delivery { background: #fff0c2; color: #b38b00; }
+.btn.delivered { background: #d4f5e2; color: #1b8f5a; }
+.btn.returned { background: #eee; color: #555; }
+
+.btn:hover { opacity: 0.8; }
+
+/* Sidebar details */
+.order-sidebar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.card {
+  background: #fff;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.card h4 {
+  margin-bottom: 10px;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .sidebar {
+    display: none;
+  }
+
+  .order-wrapper {
+    flex-direction: column;
+  }
+}

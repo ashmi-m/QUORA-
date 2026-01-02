@@ -161,8 +161,6 @@ const updateCartItem = async (req, res) => {
       }
       item.quantity += 1;
     }
-
-    // Decrement action
     if (action === "dec") {
       if (item.quantity <= 1) {
         return res.status(400).json({
@@ -171,11 +169,7 @@ const updateCartItem = async (req, res) => {
       }
       item.quantity -= 1;
     }
-
-    // Update total price
     item.totalPrice = item.quantity * item.price;
-
-    // Save cart
     await cart.save();
 
     res.json({
