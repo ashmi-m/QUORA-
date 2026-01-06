@@ -1,22 +1,64 @@
-<%- include("../partials/admin/header",{active : 'categories'}) %>
+<%- include("../partials/admin/header", { active: "orders" }) %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
   <title>Admin Orders | Quora</title>
   <link rel="stylesheet" href="/css/admin-orders.css" />
-<header class="topbar">
-  <div class="logo">QUORA</div>
+</head>
 
-  <form class="search-box" method="GET" action="/admin/orders">
-    <input type="text" name="search" placeholder="Search orders" />
-    <button type="submit">🔍</button>
-  </form>
-
-  
-</header>
-
+<body>
 <div class="layout">
-
   <main class="content">
-    <h2>Orders</h2>
 
+    <!-- HEADER -->
+    <div class="header-section">
+      <h2>Orders</h2>
+
+      <!-- SEARCH -->
+      <form class="search-box" method="GET" action="/admin/orders">
+        <div style="position: relative;">
+          <input
+            type="text"
+            name="search"
+            placeholder="Search orders"
+            value="<%= search || '' %>"
+          />
+
+          <% if (search) { %>
+            <a href="/admin/orders" class="clear-search">✖</a>
+          <% } %>
+        </div>
+
+        <button type="submit">🔍</button>
+      </form>
+    </div>
+
+    <!-- STATUS FILTER TABS -->
+    <div class="status-tabs">
+      <% 
+        const statuses = [
+          "All",
+          "Placed",
+          "Processing",
+          "Out for Delivery",
+          "Delivered",
+          "Cancelled",
+          "Payment Failed"
+        ]; 
+      %>
+
+      <% statuses.forEach(s => { %>
+        <a
+          href="?status=<%= s %>&search=<%= search || '' %>"
+          class="tab <%= status === s ? 'active' : '' %>"
+        >
+          <%= s %>
+        </a>
+      <% }) %>
+    </div>
+
+    <!-- TABLE -->
     <div class="table-wrapper">
       <table>
         <thead>
@@ -39,85 +81,102 @@
         <% } else { %>
 
           <% orders.forEach(order => { %>
-          <tr>
-            <td data-label="Product" class="product-cell">
-              <% if (
-                order.products?.length &&
-                order.products[0]?.productId &&
-                order.products[0].productId.productImage?.length
-              ) { %>
-                <img
-                  src="<%= order.products[0].productId.productImage[0] %>"
-                  alt="Product"
-                />
-
-                <span>
-                  <%= order.products[0].productId.name %>
-                </span>
-
-                <% if (order.products.length > 1) { %>
-                  <span class="more">
-                    + <%= order.products.length - 1 %> more
+            <tr>
+              <!-- PRODUCT -->
+              <td data-label="Product" class="product-cell">
+                <% if (order.products && order.products.length > 0) { %>
+                  <span class="product-name">
+                    <%= 
+                      order.products[0].productId?.productName ||
+                      order.products[0].productId?.title ||
+                      order.products[0].productId?.name ||
+                      "Product"
+                    %>
                   </span>
+
+                  <% if (order.products.length > 1) { %>
+                    <span class="more">
+                      + <%= order.products.length - 1 %> more
+                    </span>
+                  <% } %>
+                <% } else { %>
+                  <span>N/A</span>
                 <% } %>
+              </td>
 
-              <% } else { %>
-                <span>No image</span>
-              <% } %>
-            </td>
-            <td data-label="Order ID">
-              <%= order._id %>
-            </td>
-            <td data-label="Date">
-              <%= new Date(order.createdAt).toLocaleDateString() %>
-            </td>
-            <td data-label="Customer">
-              <%= order.userId?.name || "N/A" %>
-            </td>
-            <td data-label="Status">
-              <span class="status <%= order.status.replace(/\s/g,'').toLowerCase() %>">
-                <%= order.status %>
-              </span>
-            </td>
-            
-            <td data-label="Price">
-              ₹ <%= order.totalAmount  %>
-            </td>
-            <td data-label="View">
-              <a href="/admin/orders/<%= order._id %>" class="btn-view">
-                View
-              </a>
-            </td>
+              <!-- ORDER ID -->
+              <td data-label="Order ID">
+                <%= order._id %>
+              </td>
 
-          </tr>
+              <!-- DATE -->
+              <td data-label="Date">
+                <%= new Date(order.createdAt).toLocaleDateString() %>
+              </td>
+
+              <!-- CUSTOMER -->
+              <td data-label="Customer">
+                <%= order.userId?.name || "N/A" %>
+              </td>
+
+              <!-- STATUS -->
+              <td data-label="Status">
+                <span class="status <%= order.status.toLowerCase().replace(/\s/g,'-') %>">
+                  <%= order.status %>
+                </span>
+              </td>
+
+              <!-- PRICE -->
+              <td data-label="Price">
+                ₹ <%= order.totalAmount %>
+              </td>
+
+              <!-- VIEW -->
+              <td data-label="View">
+                <a href="/admin/orders/<%= order._id %>" class="btn-view">
+                  View
+                </a>
+              </td>
+            </tr>
           <% }) %>
 
         <% } %>
         </tbody>
       </table>
     </div>
+
+    <!-- PAGINATION -->
     <div class="pagination">
       <div class="show">
         Show result
-        <select>
-          <option>5</option>
-          <option>10</option>
-          <option>20</option>
+        <select onchange="location.href='?page=1&limit=' + this.value + '&search=<%= search || '' %>&status=<%= status || 'All' %>'">
+          <option value="5"  <%= limit == 5  ? "selected" : "" %>>5</option>
+          <option value="10" <%= limit == 10 ? "selected" : "" %>>10</option>
+          <option value="20" <%= limit == 20 ? "selected" : "" %>>20</option>
         </select>
       </div>
 
       <div class="pages">
-        <span>‹</span>
-        <span class="active">1</span>
-        <span>2</span>
-        <span>3</span>
-        <span>›</span>
+        <% if (currentPage > 1) { %>
+          <a href="?page=<%= currentPage - 1 %>&limit=<%= limit %>&search=<%= search || '' %>&status=<%= status || 'All' %>">‹</a>
+        <% } %>
+
+        <% for (let i = 1; i <= totalPages; i++) { %>
+          <a
+            href="?page=<%= i %>&limit=<%= limit %>&search=<%= search || '' %>&status=<%= status || 'All' %>"
+            class="<%= i === currentPage ? 'active' : '' %>"
+          >
+            <%= i %>
+          </a>
+        <% } %>
+
+        <% if (currentPage < totalPages) { %>
+          <a href="?page=<%= currentPage + 1 %>&limit=<%= limit %>&search=<%= search || '' %>&status=<%= status || 'All' %>">›</a>
+        <% } %>
       </div>
     </div>
 
   </main>
 </div>
-
 </body>
 </html>
-

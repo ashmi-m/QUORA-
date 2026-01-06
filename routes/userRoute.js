@@ -96,7 +96,7 @@ router.put("/orders/cancel-product",userAuth,orderController.cancelSingleProduct
 router.put("/orders/return/:id",userAuth,orderController.returnOrder);
 
 router.get("/orders/invoice/:id",userAuth,orderController.downloadInvoice);
-// admin routes
+
 router.get('/orders/:id', userAuth, orderController.viewOrderDetails);
 
 

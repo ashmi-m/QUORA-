@@ -1,125 +1,86 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Order Details | Quora Admin</title>
-  <link rel="stylesheet" href="/css/admin-OrderDetails.css" />
-</head>
-<body>
-<header class="topbar">
-  <div class="logo">QUORA</div>
-  <div class="profile">
-  </div>
-</header>
+<%- include("../partials/admin/header", { active: "orders" }) %>
 
-<div class="layout">
-  <aside class="sidebar">
-    <ul>
-      <li>Dashboard</li>
-      <li class="active">Order</li>
-      <li>Products</li>
-      <li>Sales report</li>
-      <li>Customer</li>
-      <li>Coupon</li>
-      <li>Category</li>
-      <li>Banner</li>
-      <li>Refund/Return</li>
-      <li>Sign Out</li>
-    </ul>
-  </aside>
-  <main class="content">
-    <h2>Edit Orders Status</h2>
+<!-- 🔴 NOTHING ELSE FROM DASHBOARD HERE -->
 
-    <div class="order-wrapper">
-      <div class="product-section">
+<!-- ===== MODAL ROOT (OUTSIDE DASHBOARD FLOW) ===== -->
+<div id="admin-modal-root">
 
-        <% if (order.products && order.products.length) { %>
-          <% order.products.forEach(product => { %>
+  <div class="order-details-overlay" onclick="window.history.back()"></div>
 
-            <% if (product.productId && product.productId.productImage?.length) { %>
-              <div class="product-card">
+  <div class="order-details-modal">
 
-                <img
-                  src="<%= product.productId.productImage[0] %>"
-                  alt="Product"
-                />
+    <button class="btn-close" onclick="window.history.back()">✕</button>
 
-                <div class="product-info">
-                  <h3><%= product.productId.name %></h3>
-                  <p>Quantity: <%= product.quantity %></p>
-                  <strong>₹ <%= product.price %></strong>
-                </div>
-              </div>
-            <% } else { %>
-              <p>No product image</p>
-            <% } %>
-
-          <% }) %>
-        <% } else { %>
-          <p>No products found</p>
-        <% } %>
-        <form
-          class="status-buttons"
-          method="POST"
-          action="/admin/orders/<%= order._id %>/status"
-        >
-          <button class="btn on-delivery" name="status" value="On Delivery">
-            On Delivery
-          </button>
-          <button class="btn delivered" name="status" value="Delivered">
-            Delivered
-          </button>
-          <button class="btn returned" name="status" value="Returned">
-            Returned
-          </button>
-        </form>
-
-      </div>
-      <div class="info-section">
-
-        <div class="info-card">
-          <h4>Shipping Details</h4>
-          <p><strong><%= order.userId?.name || "N/A" %></strong></p>
-          <p>
-            <%= order.address?.street || "" %>,
-            <%= order.address?.city || "" %><br />
-            <%= order.address?.state || "" %> -
-            <%= order.address?.pincode || "" %>
-          </p>
-        </div>
-
-        <div class="info-card">
-          <h4>Price Details</h4>
-
-          <div class="price-row">
-            <span>Price (<%= order.products.length %> items)</span>
-            <span>₹ <%= order.totalPrice %></span>
-          </div>
-
-          <div class="price-row">
-            <span>Delivery Charges</span>
-            <span>
-              <%= order.deliveryCharges === 0 ? "FREE" : "₹ " + order.deliveryCharges %>
-            </span>
-          </div>
-
-          <div class="price-row">
-            <span>Platform Fee</span>
-            <span>₹ <%= order.platformFee %></span>
-          </div>
-
-          <div class="price-row">
-            <span>Delivery Tip</span>
-            <span>₹ <%= order.tip || 0 %></span>
-          </div>
-
-        </div>
-      </div>
-
+    <div class="modal-header">
+      <h2>📦 Order Details</h2>
     </div>
-  </main>
-</div>
 
-</body>
-</html>
+    <div class="header-grid">
+      <div>
+        <span class="label">Order ID</span>
+        <span class="value"><%= order._id %></span>
+      </div>
+      <div>
+        <span class="label">Placed On</span>
+        <span class="value"><%= order.createdAt.toDateString() %></span>
+      </div>
+      <div>
+        <span class="label">Payment</span>
+        <span class="value"><%= order.paymentMethod %></span>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>👤 Customer</h3>
+      <p><strong>Name:</strong> <%= order.userId.name %></p>
+      <p><strong>Email:</strong> <%= order.userId.email %></p>
+      <p><strong>Phone:</strong> <%= order.userId.phone %></p>
+      <div class="address">
+        <%= order.address.street %>,
+        <%= order.address.city %>,
+        <%= order.address.state %> - <%= order.address.pincode %>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>🛍 Products</h3>
+
+      <% order.products.forEach((item, index) => { %>
+        <div class="product-card">
+
+          <img src="<%= item.productId.images?.[0] || '/placeholder.png' %>" />
+
+          <div class="product-info">
+            <h4><%= item.productId.name %></h4>
+            <p>Qty: <%= item.quantity %></p>
+            <p>₹<%= item.price %></p>
+            <p class="total">₹<%= item.quantity * item.price %></p>
+          </div>
+
+          <form method="POST" action="/admin/orders/<%= order._id %>/update-product-status">
+            <input type="hidden" name="productIndex" value="<%= index %>">
+            <select name="status" onchange="this.form.submit()">
+              <% ["Pending","Processing","Shipped","Delivered","Cancelled"].forEach(s => { %>
+                <option value="<%= s %>" <%= item.status === s ? "selected" : "" %>>
+                  <%= s %>
+                </option>
+              <% }) %>
+            </select>
+          </form>
+
+        </div>
+      <% }) %>
+    </div>
+
+    <div class="section">
+      <h3>💳 Payment Summary</h3>
+      <div class="summary">
+        <div><span>Subtotal</span><span>₹<%= order.totalPrice %></span></div>
+        <div><span>Delivery</span><span>₹<%= order.deliveryCharges %></span></div>
+        <div><span>Platform</span><span>₹<%= order.platformFee %></span></div>
+        <div class="grand"><span>Total</span><span>₹<%= order.grandTotal %></span></div>
+      </div>
+    </div>
+
+  </div>
+</div>

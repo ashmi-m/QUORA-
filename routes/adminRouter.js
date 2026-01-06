@@ -52,6 +52,11 @@ router.get("/orders", adminAuth, adminController.loadOrders);
 router.get('/orders/:id', adminAuth, adminController.viewOrderDetails);
 router.post("/orders/status/:id", adminAuth, adminController.updateOrderStatus);
 
+router.post(
+  "/orders/:id/product/:index/status",
+  adminAuth,
+  adminController.updateProductStatus
+);
 
 module.exports = router;
 
