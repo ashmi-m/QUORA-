@@ -1,65 +1,66 @@
-const mongoose=require("mongoose");
-const {Schema}=mongoose;
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
 
 
-const productSchema=new Schema({
-    productName:{
-        type:String,
-        required:true,
+const productSchema = new Schema({
+    productName: {
+        type: String,
+        required: true,
     },
-    description:{
-        type:String,
-        required:true,
+    description: {
+        type: String,
+        required: true,
     },
-    brand:{
-        type:mongoose.Schema.Types.ObjectId,
-         ref: "Brand",
-        required:true,
+    brand: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Brand",
+        required: true,
     },
-    category:{
-        type:Schema.Types.ObjectId,
-        ref:"Category",
-        required:true,
+    category: {
+        type: Schema.Types.ObjectId,
+        ref: "Category",
+        required: true,
     },
-    regularPrice:{
-          type:Number,
-          required:true,
+    regularPrice: {
+        type: Number,
+        required: true,
     },
-    productOffer:{
-        type:Number,
-        default:0,
+    productOffer: {
+        type: Number,
+        default: 0,
     },
-    quantity:{
-        type:Number,
-        default:1
+    quantity: {
+        type: Number,
+        required: true,
+        min: 0
     },
-    color:{
-        type:String,
-        required:true
+    color: {
+        type: String,
+        required: true
     },
-    productImage:{
-        type:[String],
-        required:true
+    productImage: {
+        type: [String],
+        required: true
     },
-    isBlocked:{
-        type:Boolean,
-        default:false
+    isBlocked: {
+        type: Boolean,
+        default: false
     },
     stock: {
-  type: Number,
-  required: true,
-  min: 0
-},
-
-    status:{
-        type:String,
-        enum:["Available","out of stock","Discountinued"],
-        required:true,
-        default:"Available"
+        type: Number,
+        required: true,
+        min: 0
     },
 
-},{ timestamps: true});
+    status: {
+        type: String,
+        enum: ["Available", "out of stock", "Discountinued"],
+        required: true,
+        default: "Available"
+    },
 
-const Product=mongoose.model("Product",productSchema);
+}, { timestamps: true });
 
-module.exports=Product;
+const Product = mongoose.model("Product", productSchema);
+
+module.exports = Product;

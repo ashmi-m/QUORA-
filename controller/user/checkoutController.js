@@ -4,8 +4,8 @@ const Address = require("../../models/addressSchema");
 
 const loadCheckoutPage = async (req, res) => {
   try {
-    // const userId = req.user._id;
- const userId = req.session.user._id;
+    const userId = req.session.user._id;
+
     const cart = await Cart.findOne({ userId })
       .populate("items.productId")
       .lean();
@@ -15,14 +15,14 @@ const loadCheckoutPage = async (req, res) => {
     }
 
     const addressDoc = await Address.findOne({ userId }).lean();
-    console.log(addressDoc,'=kvgvhbn============')
     const addresses = addressDoc?.addresses || [];
-    console.log(addresses,'==========================')
-
 
     let subtotal = 0;
+
     cart.items.forEach(item => {
-      subtotal += item.totalPrice;
+      const price = Number(item.productId?.price || 0);
+      const quantity = Number(item.quantity || 0);
+      subtotal += price * quantity;
     });
 
     const deliveryCharge = subtotal > 1000 ? 0 : 50;
@@ -36,8 +36,8 @@ const loadCheckoutPage = async (req, res) => {
       total
     });
 
-  } catch (err) {
-    console.error("CHECKOUT ERROR ❌", err);
+  } catch (error) {
+    console.error("CHECKOUT ERROR ❌", error);
     res.redirect("/cart");
   }
 };
@@ -50,7 +50,7 @@ const selectAddress = (req, res) => {
   res.redirect("/checkout/payment");
 };
 
-
-module.exports = { loadCheckoutPage ,
+module.exports = {
+  loadCheckoutPage,
   selectAddress
 };

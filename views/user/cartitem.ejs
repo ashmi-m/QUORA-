@@ -37,7 +37,7 @@
 
             <div class="quantity">
               <button class="decrease-qty" <%= outOfStock ? "disabled" : "" %>>-</button>
-              <input type="text" value="<%= qty %>" readonly>
+              <input type="text" class="quantityinfrontend" value="<%= qty %>" readonly>
               <button class="increase-qty" <%= outOfStock ? "disabled" : "" %>>+</button>
             </div>
 
@@ -89,8 +89,6 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-
-  // 🔹 UPDATE SUMMARY
   function updateSummary() {
     let subtotal = 0;
 
@@ -103,8 +101,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("cart-subtotal").textContent = `₹ ${subtotal}`;
     document.getElementById("cart-total").textContent = `₹ ${subtotal}`;
   }
-
-  // 🔹 REMOVE ITEM
   document.querySelectorAll(".delete").forEach(btn => {
     btn.addEventListener("click", async (e) => {
       const itemEl = e.target.closest(".cart-item");
@@ -146,17 +142,20 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
+
   document.querySelectorAll(".increase-qty, .decrease-qty").forEach(btn => {
     btn.addEventListener("click", async (e) => {
       const itemEl = e.target.closest(".cart-item");
       const itemId = itemEl.dataset.id;
       const action = e.target.classList.contains("increase-qty") ? "inc" : "dec";
+      //newly added code //
+      const quantity = parseInt(itemEl.querySelector(".quantityinfrontend").value) + 1;
 
       try {
         const res = await fetch("/cart/update", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ itemId, action })
+          body: JSON.stringify({ itemId, action, quantity })
         });
 
         const data = await res.json();

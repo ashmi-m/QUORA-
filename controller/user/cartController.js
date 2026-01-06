@@ -43,62 +43,98 @@ const getCartItems = async (req, res) => {
 };
 
 
-
-
 const addToCart = async (req, res) => {
   try {
     if (!req.session.user) {
-      return res.status(401).json({ success: false, message: "Please login first" });
+      return res.status(401).json({
+        success: false,
+        message: "Please login first"
+      });
     }
 
     const userId = req.session.user._id;
     const { productId } = req.body;
 
     const product = await Product.findById(productId).populate("category");
+    console.log("produtc details is ",product);
+    
     if (!product) {
       return res.status(404).json({ success: false, message: "Product not found" });
     }
-
-    if (product.isBlocked || product.isListed === false) {
-      return res.status(403).json({ success: false, message: "This product is unavailable" });
+    if (
+      product.isBlocked ||
+      product.isListed === false ||
+      !product.category ||
+      product.category.isBlocked ||
+      product.category.isListed === false
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "This product is unavailable"
+      });
     }
-
-    if (!product.category || product.category.isBlocked || product.category.isListed === false) {
-      return res.status(403).json({ success: false, message: "This product category is unavailable" });
+    if (product.quantity <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Product is out of stock"
+      });
     }
 
     const price = product.salePrice ?? product.regularPrice;
     if (!price) {
-      return res.status(500).json({ success: false, message: "Product price missing" });
+      return res.status(500).json({
+        success: false,
+        message: "Product price missing"
+      });
     }
 
     let cart = await Cart.findOne({ userId });
+
     if (!cart) {
       cart = new Cart({
         userId,
-        items: [{ productId: product._id, quantity: 1, price, totalPrice: price }]
+        items: [{
+          productId: product._id,
+          quantity: 1,
+          price,
+          totalPrice: price
+        }]
       });
     } else {
-      const index = cart.items.findIndex(item => item.productId.toString() === productId);
+      const index = cart.items.findIndex(
+        item => item.productId.toString() === productId
+      );
 
       if (index > -1) {
         if (cart.items[index].quantity >= MAX_QTY) {
           return res.status(400).json({
             success: false,
-            message: `You can only buy ${MAX_QTY} units of this product`
+            message: `You can only buy ${MAX_QTY} units`
+          });
+        }
+        if (cart.items[index].quantity >= product.quantity) {
+          return res.status(400).json({
+            success: false,
+            message: `Only ${product.quantity} items available in stock`
           });
         }
 
         cart.items[index].quantity += 1;
-        cart.items[index].totalPrice = cart.items[index].quantity * cart.items[index].price;
+        cart.items[index].totalPrice =
+          cart.items[index].quantity * cart.items[index].price;
       } else {
-        cart.items.push({ productId: product._id, quantity: 1, price, totalPrice: price });
+        cart.items.push({
+          productId: product._id,
+          quantity: 1,
+          price,
+          totalPrice: price
+        });
       }
     }
 
     await cart.save();
 
-
+   
     await Wishlist.updateOne(
       { userId },
       { $pull: { items: { productId } } }
@@ -106,7 +142,7 @@ const addToCart = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "Product added to cart and removed from wishlist"
+      message: "Product added to cart"
     });
 
   } catch (error) {
@@ -117,9 +153,15 @@ const addToCart = async (req, res) => {
     });
   }
 };
+
 const updateCartItem = async (req, res) => {
   try {
-    const { itemId, action } = req.body;
+    const { itemId, action, quantity } = req.body;
+
+    console.log("QUANTITY",quantity);
+    
+
+    // console.log("SDKJHJSKHSDHJDSFD",action)
 
     const cart = await Cart.findOne({ userId: req.user._id })
       .populate({
@@ -132,43 +174,68 @@ const updateCartItem = async (req, res) => {
     }
 
     const item = cart.items.id(itemId);
+
+    // console.log(item,"KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK");
+    
+
     if (!item) {
       return res.status(404).json({ message: "Item not found" });
     }
 
     const product = item.productId;
-    if (product.isBlocked || product.isListed === false) {
+
+    // console.log("ASAASASASASASASASSASAASA",product);
+    
+    if (
+      product.isBlocked ||
+      product.isListed === false ||
+      !product.category ||
+      product.category.isBlocked ||
+      product.category.isListed === false
+    ) {
       return res.status(403).json({
         message: "This product is no longer available"
       });
     }
-    if (!product.category || product.category.isBlocked || product.category.isListed === false) {
-      return res.status(403).json({
-        message: "This product category is no longer available"
+    if (product.quantity <= 0) {
+      return res.status(400).json({
+        message: "Product is out of stock"
       });
     }
-
-      if (action === "inc") {
+    if (!["inc", "dec"].includes(action)) {
+      return res.status(400).json({
+        message: "Invalid action"
+      });
+    }
+    
+    if (item.quantity > product.quantity) {
+      return res.status(400).json({
+        message: `Only ${product.quantity} items available`
+      });
+    }
+    
+    if (action === "inc") {
       if (item.quantity >= MAX_QTY) {
         return res.status(400).json({
           message: `You can only buy ${MAX_QTY} units`
         });
       }
-      if (item.quantity >= product.stock) {
-        return res.status(400).json({
-          message: `Only ${product.stock} items in stock`
-        });
-      }
+
+
       item.quantity += 1;
     }
+
+    
     if (action === "dec") {
       if (item.quantity <= 1) {
         return res.status(400).json({
           message: "Minimum quantity is 1"
         });
       }
+
       item.quantity -= 1;
     }
+
     item.totalPrice = item.quantity * item.price;
     await cart.save();
 

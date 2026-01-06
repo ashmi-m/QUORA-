@@ -54,20 +54,50 @@
       <section class="products-section">
         <h3>Items in this Order</h3>
 
-        <% order.products.forEach(item => { %>
-          <div class="product-card">
-            <img src="<%= item.productId?.productImage?.[0] || '/images/no-image.png' %>">
+       <% order.products.forEach(item => { %>
+  <div class="product-card">
+    <img src="<%= item.productId?.productImage?.[0] || '/images/no-image.png' %>">
 
-            <div class="product-details">
-              <h4><%= item.productId?.productName %></h4>
-              <p>Price: ₹ <%= item.price %></p>
-              <p>Quantity: <%= item.quantity %></p>
-              <p class="subtotal">
-                Subtotal: ₹ <%= item.price * item.quantity %>
-              </p>
-            </div>
-          </div>
-        <% }) %>
+    <div class="product-details">
+      <h4><%= item.productId?.productName %></h4>
+      <p>Price: ₹ <%= item.price %></p>
+      <p>Quantity: <%= item.quantity %></p>
+      <p class="subtotal">
+        Subtotal: ₹ <%= item.price * item.quantity %>
+      </p>
+
+  
+
+   
+<p>
+  Status:
+  <strong class="<%= (item.status || 'Active') === 'Cancelled' ? 'text-danger' : 'text-success' %>">
+    <%= item.status || "Active" %>
+  </strong>
+</p>
+
+<% if (
+  (order.status === "Placed" || order.status === "Paid") &&
+  (item.status || "Active") === "Active"
+) { %>
+
+  <button
+    class="cancel-product-btn"
+    onclick="cancelSingleProduct(
+      '<%= order._id %>',
+      '<%= item.productId._id %>'
+    )"
+  >
+    Cancel Product
+  </button>
+
+<% } %>
+
+
+    </div>
+  </div>
+<% }) %>
+
       </section>
 
       <section class="details-grid">
@@ -108,8 +138,6 @@
             Return Order
           </button>
         <% } %>
-
-        <!-- ✅ INVOICE ONLY FOR VALID STATUSES -->
         <% if (["Placed", "Paid", "Delivered"].includes(order.status)) { %>
           <a href="/orders/invoice/<%= order._id %>" class="invoice-btn">
             Download Invoice
@@ -144,6 +172,52 @@
       }
     });
   }
+
+function cancelSingleProduct(orderId, productId) {
+  Swal.fire({
+    title: "Cancel this product?",
+    input: 'select',
+    inputOptions: {
+      "Changed my mind": "Changed my mind",
+      "Found a better deal": "Found a better deal",
+      "Ordered by mistake": "Ordered by mistake",
+      "Shipping is delayed": "Shipping is delayed",
+      "Product no longer needed": "Product no longer needed"
+    },
+    inputPlaceholder: "Select a reason",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    confirmButtonText: "Yes, cancel it",
+    preConfirm: reason => {
+      if (!reason) {
+        Swal.showValidationMessage("You must select a reason");
+      }
+      return reason;
+    }
+  }).then(result => {
+    if (result.isConfirmed) {
+      fetch("/orders/cancel-product", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderId,
+          productId,
+          reason: result.value
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          Swal.fire("Cancelled!", "Product has been cancelled.", "success")
+            .then(() => location.reload());
+        } else {
+          Swal.fire("Error", data.message || "Failed", "error");
+        }
+      });
+    }
+  });
+}
+
 
   function returnOrder(orderId) {
     Swal.fire({

@@ -50,7 +50,7 @@ const addBrand = async (req, res) => {
         error: "Brand already exists",
       });
     }
-    //
+    
     const imagePath = req.file.path; 
 
     const newBrand = new Brand({
@@ -67,17 +67,6 @@ const addBrand = async (req, res) => {
   }
 };
 
-// const deleteBrand = async (req, res) => {
-//   try {
-//     console.log("deletebrand",req.params.id)
-//     await Brand.findByIdAndDelete(req.params.id);
-
-//     return res.json({ success: true, message: "Brand deleted successfully" });
-//   } catch (error) {
-//     console.error(error);
-//     return res.status(500).json({ success: false, error: "Failed to delete brand" });
-//   }
-// };
 const unblockBrand = async (req, res) => {
   try {
     console.log('UNBLOCK request received - id:', req.params.id);

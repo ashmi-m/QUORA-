@@ -83,10 +83,6 @@ if (priceRange === "under500") {
     console.log("Sort:", sortQuery);
    console.log("Category ID:", selectedCategories);
 console.log("Brand ID:", selectedBrands);
-
-    
-
-
      const [products, totalProducts, categories, brands] = await Promise.all([
       Product.find(query)
         .populate("category")

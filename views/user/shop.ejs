@@ -189,7 +189,6 @@
         color: #555;
       }
 
-      /* Search bar style */
       .search-bar {
         display: flex;
         align-items: center;
@@ -314,7 +313,7 @@
 <div class="breadcrumb">
   <span>Home > Products</span>
   <div class="sort">
-    <form action="/shop" method="GET" id="filterForm">
+    <form action="/shop" method="GET" id="filterForm2">
       <% if (searchQuery) { %>
         <input type="hidden" name="search" value="<%= searchQuery %>">
       <% } %>

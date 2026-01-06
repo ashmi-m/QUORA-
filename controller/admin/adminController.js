@@ -10,12 +10,8 @@ const pageerror=async(req,res)=>{
 }
 
 const loadLogin = (req, res) => {
-    
-       
-    
      return res.render("adminlogin", { message: null });
 };
-
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -37,7 +33,6 @@ const login = async (req, res) => {
         return res.redirect("/pageerror");
     }
 };
-
 const loadDashboard = async (req, res) => {
     if (req.session.admin) {
         try {
@@ -72,8 +67,9 @@ const loadOrders = async (req, res) => {
       .populate("userId", "name email phone")   
       .populate("products.productId")
       .sort({ createdAt: -1 });
+      console.log(orders[0].products[0])
 
-    res.render("orders", { orders });
+    res.render("adminOrders", { orders });
   } catch (error) {
     console.log(error);
     res.status(500).send("Server Error");
@@ -86,17 +82,18 @@ const viewOrderDetails = async (req, res) => {
     const order = await Order.findById(orderId)
       .populate("userId")
       .populate("products.productId");
-
     if (!order) {
       return res.status(404).send("Order not found");
     }
 
-    res.render("orderDetails", { order });
+    res.render("adminOrderDetails", { order });
   } catch (err) {
     console.error(err);
     res.status(500).send("Server Error");
   }
 };
+
+
 const updateOrderStatus = async (req, res) => {
   try {
     const { status } = req.body;
@@ -111,7 +108,7 @@ const updateOrderStatus = async (req, res) => {
     console.error(err);
     res.status(500).send("Server Error");
   }
-};
+};  
 
 module.exports = {
   loadLogin,

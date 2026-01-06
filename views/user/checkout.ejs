@@ -45,7 +45,7 @@
             <span>
               <%= item.productId.productName %> × <%= item.quantity %>
             </span>
-            <span>₹ <%= item.totalPrice %></span>
+            <span>₹ <%= item.productId.price * item.quantity%></span>
           </div>
           <% }) %>
 

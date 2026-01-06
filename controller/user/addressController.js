@@ -40,6 +40,7 @@ exports.addAddress = async (req, res) => {
   }
 };
 
+
 exports.getAddresses = async (req, res) => {
   try {
     const userId = req.session.user._id;
@@ -52,4 +53,6 @@ exports.getAddresses = async (req, res) => {
     res.json({ success: false });
   }
 };
+
+
 
