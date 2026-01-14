@@ -57,6 +57,7 @@ router.post(
   adminAuth,
   adminController.updateProductStatus
 );
+router.get("/orders/:id/json", adminAuth, adminController.getOrderDetailsJson);
 
 module.exports = router;
 

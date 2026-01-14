@@ -51,44 +51,174 @@ const loadOrders = async (req, res) => {
   }
 };
 
+
+
+const loadPayment = async (req, res) => {
+  try {
+    const userId = req.session.user._id;
+    const addressId = req.session.selectedAddress;
+
+    if (!addressId) return res.redirect("/checkout");
+
+    const cart = await Cart.findOne({ userId })
+      .populate("items.productId")
+      .lean();
+
+    if (!cart || cart.items.length === 0)
+      return res.redirect("/checkout");
+
+    const addressDoc = await Address.findOne({ userId }).lean();
+    const address = addressDoc.addresses.find(
+      a => a._id.toString() === addressId.toString()
+    );
+
+    if (!address) return res.redirect("/checkout");
+
+    let total = 0;
+    cart.items.forEach(item => {
+      total += Number(item.productId.regularPrice) * Number(item.quantity);
+    });
+
+    res.render("payment", {
+      cartItems: cart.items,
+      address,
+      total
+    });
+
+  } catch (err) {
+    console.error("PAYMENT PAGE ERROR ❌", err);
+    res.redirect("/checkout");
+  }
+};
+
 const placeOrder = async (req, res) => {
-  const { addressId, paymentMethod } = req.body;
-  const userId = req.session.user._id;
+  try {
+    console.log("🔥 PLACE ORDER HIT");
+    console.log("BODY ", req.body);
 
-  const cart = await Cart.findOne({ userId }).populate("items.productId");
-  const user = await User.findById(userId);
+    const userId = req.session.user;
+    const { addressId, paymentMethod } = req.body;
 
-  const address = user.addresses.id(addressId);
+    // 1️⃣ Fetch address DOCUMENT (THIS WAS MISSING)
+    // 🔥 CORRECT address fetch
+    const addressDoc = await Address.findOne({
+      userId: req.session.user._id,
+      "addresses._id": addressId
+    });
 
-  const products = cart.items.map(i => ({
-    productId: i.productId._id,
-    quantity: i.quantity,
-    price: i.productId.salePrice || i.productId.regularPrice
-  }));
+    if (!addressDoc) {
+      return res.status(400).json({ success: false, message: "Address not found" });
+    }
 
-  const totalAmount = products.reduce(
-    (sum, p) => sum + p.price * p.quantity,
-    0
-  );
+    const selectedAddress = addressDoc.addresses.id(addressId);
 
-  const order = new Order({
-    userId,
-    products,
-    totalAmount,
-    paymentMethod,
-    status: paymentMethod === "COD" ? "Placed" : "Paid",
-    shipping: address
-  });
+    console.log("selectedAddress", selectedAddress);
+    if (!selectedAddress) {
+      return res.status(400).json({ success: false, message: "Address not found" });
+    }
 
-  await order.save();
+    // 2️⃣ Get cart
+    const cart = await Cart.findOne({ userId }).populate("items.productId");
 
-  cart.items = [];
-  await cart.save();
+    if (!cart || cart.items.length === 0) {
+      return res.status(400).json({ success: false, message: "Cart empty" });
+    }
 
-  res.redirect("/orders");
+    // 3️⃣ Build products + total
+    let totalAmount = 0;
+
+    const products = cart.items.map(item => {
+      totalAmount += item.productId.price * item.quantity;
+      return {
+        productId: item.productId._id,
+        quantity: item.quantity,
+        price: item.productId.price
+      };
+    });
+
+    // 4️⃣ Create order (✅ FIXED)
+    const order = new Order({
+      userId,
+      address: {
+        name: selectedAddress.name,
+        city: selectedAddress.city,
+        landMark: selectedAddress.landMark,
+        state: selectedAddress.state,
+        pincode: selectedAddress.pincode,
+        phone: selectedAddress.phone,
+        altPhone: selectedAddress.altPhone
+      },
+      products,
+      totalAmount,
+      paymentMethod: "Wallet",
+      status: "Placed" // ✅ VALID ENUM
+    });
+
+    await order.save();
+
+    // 5️⃣ Clear cart
+    cart.items = [];
+    await cart.save();
+
+    res.json({ success: true, message: "Order placed successfully" });
+
+  } catch (error) {
+    console.error("PLACE ORDER ERROR ❌", error);
+    res.status(500).json({ success: false, message: "Order failed" });
+  }
 };
 
 
+
+// const placeOrder = async (req, res) => {
+//   try {
+//     const { paymentMethod } = req.body;
+//     const userId = req.session.user._id;
+
+//     const cart = await Cart.findOne({ userId }).populate("items.productId");
+//     if (!cart || cart.items.length === 0) {
+//       return res.redirect("/cart");
+//     }
+
+//     // ✅ GET ADDRESS DOCUMENT
+//     const addressDoc = await Address.findOne({ userId });
+//     if (!addressDoc) {
+//       console.log("❌ NO ADDRESS DOCUMENT FOUND");
+//       return res.status(400).send("Address not found");
+//     }
+
+//     const products = cart.items.map(i => ({
+//       productId: i.productId._id,
+//       quantity: i.quantity,
+//       price: i.productId.salePrice || i.productId.regularPrice
+//     }));
+
+//     const totalAmount = products.reduce(
+//       (sum, p) => sum + p.price * p.quantity,
+//       0
+//     );
+
+//     const order = new Order({
+//       userId,
+//       address: addressDoc._id, // ✅ ONLY THIS
+//       products,
+//       totalAmount,
+//       paymentMethod,
+//       status: paymentMethod === "COD" ? "Placed" : "Paid"
+//     });
+
+//     await order.save();
+//     console.log("✅ ORDER SAVED WITH ADDRESS:", addressDoc._id);
+
+//     cart.items = [];
+//     await cart.save();
+
+//     res.redirect("/orders");
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).send("Order failed");
+//   }
+// };
 
 const cancelOrder = async (req, res) => {
   try {

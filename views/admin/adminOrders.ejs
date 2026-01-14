@@ -1,21 +1,18 @@
 <%- include("../partials/admin/header", { active: "orders" }) %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>Admin Orders | Quora</title>
   <link rel="stylesheet" href="/css/admin-orders.css" />
+  <link rel="stylesheet" href="/css/adminOrderModal.css" />
 </head>
-
 <body>
 <div class="layout">
   <main class="content">
-
-    <!-- HEADER -->
     <div class="header-section">
       <h2>Orders</h2>
-
-      <!-- SEARCH -->
       <form class="search-box" method="GET" action="/admin/orders">
         <div style="position: relative;">
           <input
@@ -24,41 +21,21 @@
             placeholder="Search orders"
             value="<%= search || '' %>"
           />
-
           <% if (search) { %>
             <a href="/admin/orders" class="clear-search">✖</a>
           <% } %>
         </div>
-
         <button type="submit">🔍</button>
       </form>
     </div>
-
-    <!-- STATUS FILTER TABS -->
     <div class="status-tabs">
-      <% 
-        const statuses = [
-          "All",
-          "Placed",
-          "Processing",
-          "Out for Delivery",
-          "Delivered",
-          "Cancelled",
-          "Payment Failed"
-        ]; 
-      %>
-
+      <% const statuses = ["All","Placed","Processing","Out for Delivery","Delivered","Cancelled","Payment Failed"]; %>
       <% statuses.forEach(s => { %>
-        <a
-          href="?status=<%= s %>&search=<%= search || '' %>"
-          class="tab <%= status === s ? 'active' : '' %>"
-        >
+        <a href="?status=<%= s %>" class="tab <%= status === s ? 'active' : '' %>">
           <%= s %>
         </a>
       <% }) %>
     </div>
-
-    <!-- TABLE -->
     <div class="table-wrapper">
       <table>
         <thead>
@@ -79,104 +56,123 @@
             <td colspan="7" class="no-orders">No orders found</td>
           </tr>
         <% } else { %>
-
           <% orders.forEach(order => { %>
             <tr>
-              <!-- PRODUCT -->
-              <td data-label="Product" class="product-cell">
-                <% if (order.products && order.products.length > 0) { %>
-                  <span class="product-name">
-                    <%= 
-                      order.products[0].productId?.productName ||
-                      order.products[0].productId?.title ||
-                      order.products[0].productId?.name ||
-                      "Product"
-                    %>
-                  </span>
-
-                  <% if (order.products.length > 1) { %>
-                    <span class="more">
-                      + <%= order.products.length - 1 %> more
-                    </span>
-                  <% } %>
-                <% } else { %>
-                  <span>N/A</span>
+              <td class="product-cell">
+                <%= order.products[0]?.productId?.productName || "Product" %>
+                <% if (order.products.length > 1) { %>
+                  <span class="more">+ <%= order.products.length - 1 %> more</span>
                 <% } %>
               </td>
-
-              <!-- ORDER ID -->
-              <td data-label="Order ID">
-                <%= order._id %>
-              </td>
-
-              <!-- DATE -->
-              <td data-label="Date">
-                <%= new Date(order.createdAt).toLocaleDateString() %>
-              </td>
-
-              <!-- CUSTOMER -->
-              <td data-label="Customer">
-                <%= order.userId?.name || "N/A" %>
-              </td>
-
-              <!-- STATUS -->
-              <td data-label="Status">
+              <td><%= order._id %></td>
+              <td><%= new Date(order.createdAt).toLocaleDateString() %></td>
+              <td><%= order.userId?.name || "N/A" %></td>
+              <td>
                 <span class="status <%= order.status.toLowerCase().replace(/\s/g,'-') %>">
                   <%= order.status %>
                 </span>
               </td>
-
-              <!-- PRICE -->
-              <td data-label="Price">
-                ₹ <%= order.totalAmount %>
-              </td>
-
-              <!-- VIEW -->
-              <td data-label="View">
-                <a href="/admin/orders/<%= order._id %>" class="btn-view">
+              <td>₹ <%= order.totalAmount %></td>
+              <td>
+                <button class="btn-view" onclick="openOrderModal('<%= order._id %>')">
                   View
-                </a>
+                </button>
               </td>
             </tr>
           <% }) %>
-
         <% } %>
         </tbody>
       </table>
     </div>
 
-    <!-- PAGINATION -->
-    <div class="pagination">
-      <div class="show">
-        Show result
-        <select onchange="location.href='?page=1&limit=' + this.value + '&search=<%= search || '' %>&status=<%= status || 'All' %>'">
-          <option value="5"  <%= limit == 5  ? "selected" : "" %>>5</option>
-          <option value="10" <%= limit == 10 ? "selected" : "" %>>10</option>
-          <option value="20" <%= limit == 20 ? "selected" : "" %>>20</option>
-        </select>
-      </div>
-
-      <div class="pages">
-        <% if (currentPage > 1) { %>
-          <a href="?page=<%= currentPage - 1 %>&limit=<%= limit %>&search=<%= search || '' %>&status=<%= status || 'All' %>">‹</a>
-        <% } %>
-
-        <% for (let i = 1; i <= totalPages; i++) { %>
-          <a
-            href="?page=<%= i %>&limit=<%= limit %>&search=<%= search || '' %>&status=<%= status || 'All' %>"
-            class="<%= i === currentPage ? 'active' : '' %>"
-          >
-            <%= i %>
-          </a>
-        <% } %>
-
-        <% if (currentPage < totalPages) { %>
-          <a href="?page=<%= currentPage + 1 %>&limit=<%= limit %>&search=<%= search || '' %>&status=<%= status || 'All' %>">›</a>
-        <% } %>
-      </div>
-    </div>
-
   </main>
 </div>
+<div id="orderModal" class="modal-overlay">
+  <div class="modal-box">
+    <span class="close-btn" onclick="closeOrderModal()">×</span>
+    <h3>Order Details</h3>
+    <div id="modalContent">Loading...</div>
+  </div>
+</div>
+
+<script>
+const modal = document.getElementById("orderModal");
+const modalContent = document.getElementById("modalContent");
+
+function openOrderModal(orderId) {
+  modal.style.display = "flex";
+  modalContent.innerHTML = "Loading...";
+
+  fetch(`/admin/orders/${orderId}/json`)
+    .then(res => res.json())
+    .then(order => {
+      modalContent.innerHTML = `
+        <div class="modal-section">
+          <strong>Name:</strong> ${order.user.name}<br>
+          <strong>Email:</strong> ${order.user.email}<br>
+          <strong>Phone:</strong> ${order.user.phone}
+        </div>
+
+        <div class="modal-section">
+          <strong>Delivery Address</strong><br>
+          ${order.address}
+        </div>
+
+        <div class="modal-section">
+          <strong>Products (${order.products.length})</strong>
+          ${order.products.map((p, i) => `
+            <div class="product-row">
+              <img src="${p.image}" onerror="this.src='/images/no-image.png'" alt="${p.name}">
+              <div>
+                <strong>${i + 1}. ${p.name}</strong><br>
+                Quantity: ${p.quantity} | Price: ₹${p.price}
+              </div>
+              <div class="product-status">
+                <select onchange="updateProductStatus('${orderId}', ${p.index}, this.value)">
+                  <option ${p.status === "Pending" ? "selected" : ""}>Pending</option>
+                  <option ${p.status === "Processing" ? "selected" : ""}>Processing</option>
+                  <option ${p.status === "Shipped" ? "selected" : ""}>Shipped</option>
+                  <option ${p.status === "Delivered" ? "selected" : ""}>Delivered</option>
+                  <option ${p.status === "Cancelled" ? "selected" : ""}>Cancelled</option>
+                </select>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+
+        <div class="modal-section">
+          <strong>Payment Summary</strong><br><br>
+          <div class="payment-row"><span>Payment Method</span><span>${order.payment.method}</span></div>
+          <div class="payment-row"><span>Payment Status</span><span>${order.payment.status}</span></div>
+          <div class="payment-row"><span>Subtotal</span><span>₹${order.payment.subTotal}</span></div>
+          <div class="payment-row"><span>Discount</span><span>- ₹${order.payment.discount}</span></div>
+          <hr>
+          <div class="payment-row total"><strong>Total</strong><strong>₹${order.payment.total}</strong></div>
+        </div>
+      `;
+    })
+    .catch(err => {
+      console.error(err);
+      modalContent.innerHTML = "Failed to load order";
+    });
+}
+
+function closeOrderModal() {
+  modal.style.display = "none";
+}
+
+function updateProductStatus(orderId, index, status) {
+  fetch(`/admin/orders/${orderId}/product-status`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ index, status })
+  }).then(res => {
+    if(!res.ok) alert("Failed to update product status");
+  });
+}
+</script>
+
+
 </body>
 </html>
+

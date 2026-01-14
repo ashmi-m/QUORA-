@@ -4,7 +4,6 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const Order = require("../../models/orderSchema");
 
-
 const pageerror=async(req,res)=>{
    res.render("pageerror");
 }
@@ -206,8 +205,8 @@ const updateOrderStatus = async (req, res) => {
 };  
 const updateProductStatus = async (req, res) => {
   try {
-    const { id, index } = req.params;
-    const { status } = req.body;
+    const { index, status } = req.body;
+    const { id } = req.params;
 
     const order = await Order.findById(id);
     if (!order) return res.status(404).send("Order not found");
@@ -215,13 +214,157 @@ const updateProductStatus = async (req, res) => {
     order.products[index].status = status;
     await order.save();
 
-    res.redirect(`/admin/orders/${id}`);
+    res.json({ success: true });
   } catch (err) {
     console.error(err);
     res.status(500).send("Server Error");
   }
 };
 
+// const getOrderDetailsJson = async (req, res) => {
+//   try {
+//     console.log("🔥 JSON API HIT", req.params.id);
+
+//     const order = await Order.findById(req.params.id)
+//       .populate("userId")
+//       .populate("products.productId")
+//       .populate("address");
+
+//     if (!order) {
+//       return res.status(404).json({ message: "Order not found" });
+//     }
+
+//     let addressText = "Address not available";
+
+//     if (
+//       order.address &&
+//       Array.isArray(order.address.addresses) &&
+//       order.address.addresses.length > 0
+//     ) {
+//       const a = order.address.addresses[0];
+//       addressText = `${a.name}, ${a.landMark}, ${a.city}, ${a.state} - ${a.pincode}`;
+//     }
+
+//     res.json({
+//       user: {
+//         name: order.userId?.name,
+//         email: order.userId?.email,
+//         phone: order.userId?.phone
+//       },
+//       address: addressText,
+//       total: order.totalAmount,
+//       products: order.products.map((p, index) => ({
+//         index,
+//         name: p.productId?.productName || "Product",
+//         image: p.productId?.image?.length
+//           ? `/uploads/${p.productId.image[0]}`
+//           : "/images/no-image.png",
+//         quantity: p.quantity,
+//         price: p.price,
+//         status: p.status || "Active"
+//       }))
+//     });
+//   } catch (err) {
+//     console.error("❌ JSON API ERROR:", err);
+//     res.status(500).json({ message: "Server error" });
+//   }
+//  };
+const getOrderDetailsJson = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id)
+      .populate("userId")
+      .populate("products.productId")
+      .lean();
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    /* ================= ADDRESS LOGIC ================= */
+    let addressText = "Address not available";
+
+    try {
+      const Address = require("../../models/addressSchema");
+
+      // Find address document by userId (CORRECT)
+      const addressDoc = await Address.findOne({
+        userId: order.userId?._id
+      }).lean();
+
+      if (addressDoc && addressDoc.addresses?.length > 0) {
+
+        // Find exact address used in order
+        const selectedAddress = addressDoc.addresses.find(
+          a => a._id.toString() === order.address?.toString()
+        );
+
+        if (selectedAddress) {
+          addressText = `
+            ${selectedAddress.name},
+            ${selectedAddress.landMark},
+            ${selectedAddress.city},
+            ${selectedAddress.state} - ${selectedAddress.pincode}
+            <br>Phone: ${selectedAddress.phone}
+          `;
+        } else {
+          // Fallback if original address deleted
+          const a = addressDoc.addresses[0];
+          addressText = `
+            ⚠️ Original address not found. User's current address:
+            ${a.name}, ${a.landMark}, ${a.city},
+            ${a.state} - ${a.pincode}
+            <br>Phone: ${a.phone}
+          `;
+        }
+      } else {
+        addressText = "Address not found (no saved addresses)";
+      }
+    } catch (err) {
+      console.error("❌ Address fetch error:", err.message);
+    }
+
+    /* ================= PRODUCTS ================= */
+    const products = order.products.map((p, index) => {
+      let imagePath = "/images/no-image.png";
+
+      if (p.productId?.productImage?.length > 0) {
+        const img = p.productId.productImage[0];
+        imagePath = img.startsWith("http") ? img : `/uploads/${img}`;
+      }
+
+      return {
+        index,
+        name: p.productId?.productName || "Product",
+        image: imagePath,
+        quantity: p.quantity,
+        price: p.price,
+        status: p.status || "Pending"
+      };
+    });
+
+    /* ================= RESPONSE ================= */
+    res.json({
+      user: {
+        name: order.userId?.name || "N/A",
+        email: order.userId?.email || "N/A",
+        phone: order.userId?.phone || "N/A"
+      },
+      address: addressText,
+      payment: {
+        method: order.paymentMethod || "N/A",
+        status: order.status || "Pending",
+        subTotal: order.totalAmount || 0,
+        discount: 0,
+        total: order.totalAmount || 0
+      },
+      products
+    });
+
+  } catch (err) {
+    console.error("❌ getOrderDetailsJson Error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 module.exports = {
   loadLogin,
@@ -232,5 +375,7 @@ module.exports = {
   loadOrders,
   viewOrderDetails,
   updateOrderStatus,
-  updateProductStatus 
+  updateProductStatus,
+ getOrderDetailsJson 
+
 };

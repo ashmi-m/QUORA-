@@ -40,14 +40,19 @@
       <div class="summary-section">
         <h3>Order Summary</h3>
 
-        <% cart.items.forEach(item=> { %>
-          <div class="summary-item">
-            <span>
-              <%= item.productId.productName %> × <%= item.quantity %>
-            </span>
-            <span>₹ <%= item.productId.price * item.quantity%></span>
-          </div>
-          <% }) %>
+        <% cart.items.forEach(item => { 
+     const price = Number(item.productId?.price || 0);
+     const quantity = Number(item.quantity || 0);
+     const itemTotal = price * quantity;
+%>
+  <div class="summary-item">
+    <span>
+      <%= item.productId?.productName || "Product" %> × <%= quantity %>
+    </span>
+    <span>₹ <%= itemTotal %></span>
+  </div>
+<% }) %>
+
 
             <hr>
 

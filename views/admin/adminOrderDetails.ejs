@@ -1,62 +1,50 @@
-<%- include("../partials/admin/header", { active: "orders" }) %>
+<!-- <%- include("../partials/admin/header", { active: "orders" }) %> -->
 
-<!-- 🔴 NOTHING ELSE FROM DASHBOARD HERE -->
-
-<!-- ===== MODAL ROOT (OUTSIDE DASHBOARD FLOW) ===== -->
 <div id="admin-modal-root">
 
-  <div class="order-details-overlay" onclick="window.history.back()"></div>
+  <div class="order-details-overlay" onclick="window.location.href='/admin/orders'"></div>
 
+ 
   <div class="order-details-modal">
 
-    <button class="btn-close" onclick="window.history.back()">✕</button>
+    <button class="btn-close" onclick="window.location.href='/admin/orders'">✕</button>
 
     <div class="modal-header">
-      <h2>📦 Order Details</h2>
+      <h2>Order Details</h2>
+      <span class="order-id">#<%= order._id %></span>
     </div>
 
-    <div class="header-grid">
-      <div>
-        <span class="label">Order ID</span>
-        <span class="value"><%= order._id %></span>
-      </div>
-      <div>
-        <span class="label">Placed On</span>
-        <span class="value"><%= order.createdAt.toDateString() %></span>
-      </div>
-      <div>
-        <span class="label">Payment</span>
-        <span class="value"><%= order.paymentMethod %></span>
-      </div>
+    <div class="meta-grid">
+      <div><b>Date:</b> <%= order.createdAt.toDateString() %></div>
+      <div><b>Payment:</b> <%= order.paymentMethod %></div>
+      <div><b>Status:</b> <%= order.status %></div>
     </div>
-
     <div class="section">
-      <h3>👤 Customer</h3>
-      <p><strong>Name:</strong> <%= order.userId.name %></p>
-      <p><strong>Email:</strong> <%= order.userId.email %></p>
-      <p><strong>Phone:</strong> <%= order.userId.phone %></p>
-      <div class="address">
+      <h3>Customer Details</h3>
+      <p><b>Name:</b> <%= order.userId.name %></p>
+      <p><b>Email:</b> <%= order.userId.email %></p>
+      <p><b>Phone:</b> <%= order.userId.phone %></p>
+      <p>
+        <b>Address:</b>
         <%= order.address.street %>,
         <%= order.address.city %>,
         <%= order.address.state %> - <%= order.address.pincode %>
-      </div>
+      </p>
     </div>
-
     <div class="section">
-      <h3>🛍 Products</h3>
+      <h3>Products</h3>
 
       <% order.products.forEach((item, index) => { %>
-        <div class="product-card">
+        <div class="product-row">
 
           <img src="<%= item.productId.images?.[0] || '/placeholder.png' %>" />
 
-          <div class="product-info">
-            <h4><%= item.productId.name %></h4>
+          <div class="info">
+            <h4><%= item.productId.productName || item.productId.name %></h4>
             <p>Qty: <%= item.quantity %></p>
-            <p>₹<%= item.price %></p>
-            <p class="total">₹<%= item.quantity * item.price %></p>
+            <p>Price: ₹<%= item.price %></p>
+            <p class="line-total">₹<%= item.price * item.quantity %></p>
           </div>
-
           <form method="POST" action="/admin/orders/<%= order._id %>/update-product-status">
             <input type="hidden" name="productIndex" value="<%= index %>">
             <select name="status" onchange="this.form.submit()">
@@ -71,15 +59,11 @@
         </div>
       <% }) %>
     </div>
-
-    <div class="section">
-      <h3>💳 Payment Summary</h3>
-      <div class="summary">
-        <div><span>Subtotal</span><span>₹<%= order.totalPrice %></span></div>
-        <div><span>Delivery</span><span>₹<%= order.deliveryCharges %></span></div>
-        <div><span>Platform</span><span>₹<%= order.platformFee %></span></div>
-        <div class="grand"><span>Total</span><span>₹<%= order.grandTotal %></span></div>
-      </div>
+    <div class="section summary">
+      <h3>Payment Summary</h3>
+      <div><span>Subtotal</span><span>₹<%= order.totalPrice %></span></div>
+      <div><span>Delivery</span><span>₹<%= order.deliveryCharges %></span></div>
+      <div class="total"><span>Total</span><span>₹<%= order.grandTotal %></span></div>
     </div>
 
   </div>
