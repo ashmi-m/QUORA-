@@ -12,6 +12,8 @@ const cartController =require("../controller/user/cartController")
 const wishlistController = require('../controller/user/wishlistController'); 
 const checkoutController = require("../controller/user/checkoutController");
 const paymentController = require("../controller/user/paymentController");
+
+const profileController = require("../controller/user/profileController")
 const upload = require("../middlewares/imageUppload");
 
 const passport = require("../config/passport.js");
@@ -43,11 +45,6 @@ router.post("/verify-reset-otp", userController.verifyResetOtp);
 router.post("/reset-password", userController.resetPassword);
 
 
-//shoppage//
-
-
-// router.get("/shop/products/data",shopController.getProductsData);
-// router.post("/shop/addProduct", shopController.addProducts);
 router.get("/shop", shopController.loadShopPage);
 router.get("/product/:id", shopController.loadProductDetails);
 router.get("/shop/brand/:brandId", productController.getProductsByBrand);
@@ -59,10 +56,13 @@ router.get("/userprofile", userAuth, userController.loadProfilePage);
 router.put("/profile/update", userAuth, userController.updateProfile);
 
 router.post("/address/add", userAuth, userController.addAddress);
-router.get("/manage-address", userAuth, userController.loadManageAddressPage);
+
+router.get( "/manage-address",userAuth, userController.loadManageAddressPage);
 
 router.get("/add-address", userAuth, userController.loadAddAddressPage);
+router.get("/add-address-profile", userAuth, userController.loadAddAddressPageProfile);
 
+router.post("/profile/address/add", userAuth, userController.addAddressFromProfile);
 
 
 router.get("/edit-address/:id", userAuth, userController.loadEditAddressPage);
@@ -98,6 +98,12 @@ router.put("/orders/return/:id",userAuth,orderController.returnOrder);
 router.get("/orders/invoice/:id",userAuth,orderController.downloadInvoice);
 
 router.get('/orders/:id', userAuth, orderController.viewOrderDetails);
+
+
+router.get(
+  "/userprofile/privacy-security",
+  profileController.loadPrivacySecurity
+);
 
 
 module.exports = router;

@@ -171,8 +171,8 @@ if (req.files && req.files.length > 0) {
     // const salePrice = products.salePrice
     //   ? parseFloat(products.salePrice)
     //   : null;
-    const quantity = parseInt(products.quantity, 10) || 0;
-
+    const  quantity= parseInt(products.quantity, 10) || 0;
+    const stock = quantity;
 
     const newProduct = new Product({
       productName: products.productName,
@@ -181,7 +181,8 @@ if (req.files && req.files.length > 0) {
       category: categoryDoc._id,
       regularPrice,
       createdOn: new Date(),
-      quantity,
+       quantity,
+       stock,
       size: products.size,
       color: products.color,
       productImage: productImages,

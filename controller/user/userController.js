@@ -424,12 +424,6 @@ const resetPassword = async (req, res) => {
     res.render("resetPassword", { message: "Something went wrong" });
   }
 };
-
-
-
-
-
-
 const logout = async (req, res) => {
   try {
     req.session.destroy((err) => {
@@ -445,8 +439,6 @@ const logout = async (req, res) => {
 
   }
 };
-
-
 
 const loadProfilePage = async (req, res) => {
   try {
@@ -474,9 +466,6 @@ const loadProfilePage = async (req, res) => {
     res.redirect("/pageNotFound");
   }
 };
-
-
-
 const updateProfile = async (req, res) => {
   try {
     if (!req.session.user) {
@@ -512,20 +501,20 @@ const loadAddAddressPage = async (req, res) => {
   }
 };
 
-
-
-const loadManageAddressPage = async (req, res) => {
+const loadAddAddressPageProfile = async (req, res) => {
   try {
-    const userId =req.session.user._id;
-    const addressDoc = await Address.findOne({ userId }).lean();
-    const addresses = addressDoc?.addresses || [];
-    res.render("manageAddress", { addresses });
+    if (!req.session.user) {
+      return res.redirect("/login");
+    }
+
+    res.render("manageaddaddress", {
+      from: "profile"
+    });
   } catch (error) {
-    console.error(error);
+    console.error("Load add address error:", error);
     res.redirect("/pageNotFound");
   }
 };
-
 
 const addAddress = async (req, res) => {
   try {
@@ -566,6 +555,85 @@ const addAddress = async (req, res) => {
     res.redirect("/add-address");
   }
 };
+const addAddressFromProfile = async (req, res) => {
+  try {
+    console.log("fghjkl");
+
+    const { name, mobile, pincode, locality, address, city, state, type, landmark } = req.body;
+    const userId = req.session.user._id;
+
+    if (!name || !mobile || !pincode || !locality || !address || !city || !state) {
+      return res.status(400).json({
+        success: false,
+        message: "All required fields must be filled"
+      });
+    }
+
+    if (!/^\d{10}$/.test(mobile) || !/^\d{6}$/.test(pincode)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid mobile or pincode"
+      });
+    }
+
+    const newAddress = {
+      addressType: type,
+      name,
+      phone: mobile,
+      altPhone: mobile,
+      locality,
+      address,
+      city,
+      state,
+      landMark: landmark,
+      pincode
+    };
+
+    let addressDoc = await Address.findOne({ userId });
+
+    if (addressDoc) {
+      addressDoc.addresses.push(newAddress);
+      await addressDoc.save();
+    } else {
+      await Address.create({ userId, addresses: [newAddress] });
+    }
+
+    // ✅ SEND JSON (NOT redirect)
+    return res.json({
+      success: true,
+      redirect: "/manage-address"
+    });
+
+  } catch (error) {
+    console.error("Add address from profile error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    });
+  }
+};
+const loadManageAddressPage = async (req, res) => {
+  try {
+    if (!req.session.user) {
+      return res.redirect("/login");
+    }
+
+    const userId = req.session.user._id;
+
+    const addressDoc = await Address.findOne({ userId }).lean();
+
+    res.render("manageAddress", {
+      addresses: addressDoc ? addressDoc.addresses : []
+    });
+
+  } catch (error) {
+    console.error("Load manage address error:", error);
+    res.redirect("/pageNotFound");
+  }
+};
+
+
+
 
 
 const loadEditAddressPage = async (req, res) => {
@@ -632,8 +700,6 @@ const updateAddress = async (req, res) => {
     res.status(500).send("Server error");
   }
 };
-
-
 const deleteAddress = async (req, res) => {
   try {
     const userId = req.session.user._id;
@@ -707,9 +773,11 @@ module.exports = {
   updateProfile,
   loadAddAddressPage,
   addAddress,
-  loadManageAddressPage,
+  addAddressFromProfile ,
   loadEditAddressPage,
   updateAddress,
   deleteAddress,
-  updateProfileImage 
+  updateProfileImage,
+  loadAddAddressPageProfile,
+   loadManageAddressPage
 };

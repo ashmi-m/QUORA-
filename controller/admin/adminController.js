@@ -69,13 +69,9 @@ const loadOrders = async (req, res) => {
     const skip = (page - 1) * limit;
 
     let matchStage = {};
-
-    // ✅ Status filter
     if (status !== "All") {
       matchStage.status = status;
     }
-
-    // ✅ Search logic
     if (search) {
       if (mongoose.Types.ObjectId.isValid(search)) {
         matchStage._id = new mongoose.Types.ObjectId(search);
@@ -91,7 +87,6 @@ const loadOrders = async (req, res) => {
     }
 
     const pipeline = [
-      // 🔹 JOIN USER
       {
         $lookup: {
           from: "users",
@@ -101,8 +96,6 @@ const loadOrders = async (req, res) => {
         }
       },
       { $unwind: "$user" },
-
-      // 🔹 JOIN PRODUCTS
       {
         $lookup: {
           from: "products",
@@ -111,37 +104,23 @@ const loadOrders = async (req, res) => {
           as: "productsData"
         }
       },
-
-      // 🔹 APPLY FILTERS
       { $match: matchStage },
-
-      // 🔹 SORT
       { $sort: { createdAt: -1 } },
-
-      // 🔹 PAGINATION
       { $skip: skip },
       { $limit: limit }
     ];
 
     const rawOrders = await Order.aggregate(pipeline);
-
-    // ✅ 🔥 IMPORTANT PART — RESHAPE DATA FOR EJS
     const orders = rawOrders.map(order => {
       return {
         ...order,
-
-        // 👇 make EJS happy (order.userId.name)
         userId: order.user,
-
-        // 👇 rebuild products[].productId
         products: order.products.map((p, index) => ({
           ...p,
           productId: order.productsData[index] || null
         }))
       };
     });
-
-    // 🔢 COUNT FOR PAGINATION
     const countPipeline = pipeline.filter(
       stage => !("$skip" in stage) && !("$limit" in stage)
     );
@@ -221,54 +200,6 @@ const updateProductStatus = async (req, res) => {
   }
 };
 
-// const getOrderDetailsJson = async (req, res) => {
-//   try {
-//     console.log("🔥 JSON API HIT", req.params.id);
-
-//     const order = await Order.findById(req.params.id)
-//       .populate("userId")
-//       .populate("products.productId")
-//       .populate("address");
-
-//     if (!order) {
-//       return res.status(404).json({ message: "Order not found" });
-//     }
-
-//     let addressText = "Address not available";
-
-//     if (
-//       order.address &&
-//       Array.isArray(order.address.addresses) &&
-//       order.address.addresses.length > 0
-//     ) {
-//       const a = order.address.addresses[0];
-//       addressText = `${a.name}, ${a.landMark}, ${a.city}, ${a.state} - ${a.pincode}`;
-//     }
-
-//     res.json({
-//       user: {
-//         name: order.userId?.name,
-//         email: order.userId?.email,
-//         phone: order.userId?.phone
-//       },
-//       address: addressText,
-//       total: order.totalAmount,
-//       products: order.products.map((p, index) => ({
-//         index,
-//         name: p.productId?.productName || "Product",
-//         image: p.productId?.image?.length
-//           ? `/uploads/${p.productId.image[0]}`
-//           : "/images/no-image.png",
-//         quantity: p.quantity,
-//         price: p.price,
-//         status: p.status || "Active"
-//       }))
-//     });
-//   } catch (err) {
-//     console.error("❌ JSON API ERROR:", err);
-//     res.status(500).json({ message: "Server error" });
-//   }
-//  };
 const getOrderDetailsJson = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id)
@@ -279,21 +210,15 @@ const getOrderDetailsJson = async (req, res) => {
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
-
-    /* ================= ADDRESS LOGIC ================= */
     let addressText = "Address not available";
 
     try {
       const Address = require("../../models/addressSchema");
-
-      // Find address document by userId (CORRECT)
       const addressDoc = await Address.findOne({
         userId: order.userId?._id
       }).lean();
 
       if (addressDoc && addressDoc.addresses?.length > 0) {
-
-        // Find exact address used in order
         const selectedAddress = addressDoc.addresses.find(
           a => a._id.toString() === order.address?.toString()
         );
@@ -307,7 +232,6 @@ const getOrderDetailsJson = async (req, res) => {
             <br>Phone: ${selectedAddress.phone}
           `;
         } else {
-          // Fallback if original address deleted
           const a = addressDoc.addresses[0];
           addressText = `
             ⚠️ Original address not found. User's current address:
@@ -322,8 +246,6 @@ const getOrderDetailsJson = async (req, res) => {
     } catch (err) {
       console.error("❌ Address fetch error:", err.message);
     }
-
-    /* ================= PRODUCTS ================= */
     const products = order.products.map((p, index) => {
       let imagePath = "/images/no-image.png";
 
@@ -341,8 +263,6 @@ const getOrderDetailsJson = async (req, res) => {
         status: p.status || "Pending"
       };
     });
-
-    /* ================= RESPONSE ================= */
     res.json({
       user: {
         name: order.userId?.name || "N/A",
