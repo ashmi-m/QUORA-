@@ -31,9 +31,8 @@
 
         <div class="order-summary">
           <div>
-            <p><strong>Order ID:</strong>
-              <%= order._id %>
-            </p>
+            <p><strong>Order ID:</strong> <%= order.orderId %></p>
+
             <p>
               <strong>Ordered On:</strong>
               <%= new Date(order.createdAt).toLocaleDateString("en-IN", { day: "2-digit" , month: "short" ,
@@ -83,24 +82,25 @@
                   </strong>
                 </p>
 
-                <% if ( (order.status==="Placed" || order.status==="Paid" ) && (item.status || "Active" )==="Active" ) {
-                  %>
+                <% if ((order.status === "Placed" || order.status === "Paid") && item.status === "Placed") { %>
+  <button class="cancel-product-btn" onclick="cancelSingleProduct(
+    '<%= order._id %>',
+    '<%= item.productId._id %>'
+  )">
+    Cancel Product
+  </button>
+<% } %>
 
-                  <button class="cancel-product-btn" onclick="cancelSingleProduct(
-      '<%= order._id %>',
-      '<%= item.productId._id %>'
-    )">
-                    Cancel Product
-                  </button>
 
-                  <% } %>
+                   <% if (item.status === "Placed") { %>
+  <button class="return-product-btn" onclick="returnSingleProduct(
+    '<%= order._id %>',
+    '<%= item.productId ? item.productId._id : '' %>'
+  )">
+    Return Product
+  </button>
+<% } %>
 
-                    <% if ((item.status==="Active" || !item.status)) { %>
-                      <button class="return-product-btn"
-                        onclick="returnSingleProduct('<%= order._id %>', '<%= item.productId ? item.productId._id : '' %>')">
-                        Return Product
-                      </button>
-                      <% } %>
 
 
               </div>
@@ -192,50 +192,47 @@
       });
     }
 
-    function cancelSingleProduct(orderId, productId) {
-      Swal.fire({
-        title: "Cancel this product?",
-        input: 'select',
-        inputOptions: {
-          "Changed my mind": "Changed my mind",
-          "Found a better deal": "Found a better deal",
-          "Ordered by mistake": "Ordered by mistake",
-          "Shipping is delayed": "Shipping is delayed",
-          "Product no longer needed": "Product no longer needed"
-        },
-        inputPlaceholder: "Select a reason",
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        confirmButtonText: "Yes, cancel it",
-        preConfirm: reason => {
-          if (!reason) {
-            Swal.showValidationMessage("You must select a reason");
-          }
-          return reason;
-        }
-      }).then(result => {
-        if (result.isConfirmed) {
-          fetch("/orders/cancel-product", {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              orderId,
-              productId,
-              reason: result.value
-            })
-          })
-            .then(res => res.json())
-            .then(data => {
-              if (data.success) {
-                Swal.fire("Cancelled!", "Product has been cancelled.", "success")
-                  .then(() => location.reload());
-              } else {
-                Swal.fire("Error", data.message || "Failed", "error");
-              }
-            });
+   function cancelSingleProduct(orderId, productId) {
+  Swal.fire({
+    title: "Cancel this product?",
+    input: 'select',
+    inputOptions: {
+      "Changed my mind": "Changed my mind",
+      "Found a better deal": "Found a better deal",
+      "Ordered by mistake": "Ordered by mistake",
+      "Shipping is delayed": "Shipping is delayed",
+      "Product no longer needed": "Product no longer needed"
+    },
+    inputPlaceholder: "Select a reason",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    confirmButtonText: "Yes, cancel it",
+    inputValidator: value => {
+      if (!value) return "You must select a reason";
+    }
+  }).then(result => {
+    if (result.isConfirmed) {
+      fetch("/orders/cancel-product", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderId,
+          productId,
+          reason: result.value
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          Swal.fire("Cancelled!", "Product has been cancelled.", "success")
+          .then(() => location.reload());
+        } else {
+          Swal.fire("Error", data.message || "Failed", "error");
         }
       });
     }
+  });
+}
 
     function returnSingleProduct(orderId, productId) {
       Swal.fire({

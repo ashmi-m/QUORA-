@@ -9,6 +9,7 @@
       <div class="search-bar">
         <input type="text" id="searchInput" placeholder="Search orders">
         <button id="searchBtn">🔍</button>
+         <button id="clearBtn" style="display:none;">❌</button>
       </div>
     </div>
 
@@ -24,6 +25,9 @@
                   <img src="<%= item.productId?.productImage?.[0] || '/images/no-image.png' %>" alt="product">
                 </div>
                 <div class="order-info">
+<p class="order-id">
+  <strong>Order ID:</strong> <%= order.orderId %>
+</p>
 
                   <h4>
                     <%= item.productId?.productName || "Product unavailable" %>
@@ -59,11 +63,94 @@
               <% }) %>
                 <% }) %>
         </div>
+        <div class="pagination" id="pagination"></div>
+
 
   </section>
 </div>
-
 <script>
+  const ITEMS_PER_PAGE = 5;
+  let currentPage = 1;
+
+  const ordersList = document.getElementById("ordersList");
+  const pagination = document.getElementById("pagination");
+  const searchInput = document.getElementById("searchInput");
+  const searchBtn = document.getElementById("searchBtn");
+const clearBtn = document.getElementById("clearBtn");
+  /* ---------------- PAGINATION ---------------- */
+
+  function getVisibleCards() {
+    return Array.from(
+      ordersList.getElementsByClassName("order-card")
+    ).filter(card => card.dataset.visible !== "false");
+  }
+
+  function showPage(page) {
+    const cards = getVisibleCards();
+    const start = (page - 1) * ITEMS_PER_PAGE;
+    const end = start + ITEMS_PER_PAGE;
+
+    cards.forEach((card, index) => {
+      card.style.display =
+        index >= start && index < end ? "flex" : "none";
+    });
+
+    renderPagination(cards.length, page);
+  }
+
+  function renderPagination(totalItems, page) {
+    pagination.innerHTML = "";
+    const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+
+    for (let i = 1; i <= totalPages; i++) {
+      const btn = document.createElement("button");
+      btn.textContent = i;
+      btn.classList.toggle("active", i === page);
+
+      btn.addEventListener("click", () => {
+        currentPage = i;
+        showPage(currentPage);
+      });
+
+      pagination.appendChild(btn);
+    }
+  }
+
+  /* ---------------- SEARCH ---------------- */
+
+  function filterOrders() {
+    const searchValue = searchInput.value.toLowerCase();
+    const cards = ordersList.getElementsByClassName("order-card");
+   clearBtn.style.display = searchValue ? "inline-block" : "none";
+   
+    Array.from(cards).forEach(card => {
+      const productName = card.getAttribute("data-product-name");
+      const isMatch = productName.includes(searchValue);
+
+      card.dataset.visible = isMatch ? "true" : "false";
+      card.style.display = "none";
+    });
+
+    currentPage = 1;
+    showPage(currentPage);
+  }
+
+clearBtn.addEventListener("click", () => {
+  searchInput.value = "";
+  clearBtn.style.display = "none";
+
+  Array.from(ordersList.getElementsByClassName("order-card")).forEach(card => {
+    card.dataset.visible = "true";
+  });
+
+  currentPage = 1;
+  showPage(currentPage);
+});
+  searchBtn.addEventListener("click", filterOrders);
+  searchInput.addEventListener("keyup", filterOrders);
+
+  /* ---------------- CANCEL ORDER ---------------- */
+
   function confirmCancel(orderId) {
     Swal.fire({
       title: 'Are you sure?',
@@ -99,19 +186,13 @@
         }
       });
   }
-  const searchInput = document.getElementById("searchInput");
-  const searchBtn = document.getElementById("searchBtn");
-  const ordersList = document.getElementById("ordersList");
 
-  function filterOrders() {
-    const searchValue = searchInput.value.toLowerCase();
-    const cards = ordersList.getElementsByClassName("order-card");
-    Array.from(cards).forEach(card => {
-      const productName = card.getAttribute("data-product-name");
-      card.style.display = productName.includes(searchValue) ? "" : "none";
-    });
-  }
+  /* ---------------- INITIAL LOAD ---------------- */
 
-  searchBtn.addEventListener("click", filterOrders);
-  searchInput.addEventListener("keyup", filterOrders);
+  // mark all cards visible initially
+  Array.from(ordersList.getElementsByClassName("order-card")).forEach(card => {
+    card.dataset.visible = "true";
+  });
+
+  showPage(currentPage);
 </script>

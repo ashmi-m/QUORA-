@@ -137,3 +137,29 @@ body {
 .delete-btn {
   color: #d32f2f;
 }
+.pagination {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.page-btn {
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.page-btn:hover {
+  background: #f1f1f1;
+}
+
+.page-btn.active {
+  background: #556b2f;
+  color: #fff;
+  border-color: #556b2f;
+}

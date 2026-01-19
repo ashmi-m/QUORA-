@@ -26,12 +26,14 @@
         <h3>Hello 👋 <%= user?.name %>
         </h3>
 
+       
+  
         <div class="profile-menu">
           <button class="active" data-target="profileSection">Profile Information</button>
           <button data-target="ordersSection">My Orders</button>
           <button data-target="addressSection">Manage Addresses</button>
           <a href="/forgot-password"><button type="button">Forgot Password</button></a>
-          <a href="/logout"><button type="button">Logout</button></a>
+          <button type="button" id="logoutBtn">Logout</button>
         <a href="/userprofile/privacy-security">
   <button type="button">Privacy & Security</button>
 </a>
@@ -47,11 +49,6 @@
         <div id="profileSection" class="profile-section">
 
           <form id="profileForm">
-            <div class="profile-actions">
-              <button type="button" id="editProfileBtn">Edit Profile</button>
-              <button type="button" id="saveProfileBtn" class="hidden">Save Changes</button>
-            </div>
-
             <h2>Personal Information</h2>
 
             <label>Name</label>
@@ -80,6 +77,11 @@
                 <input type="radio" name="gender" value="Female" disabled <%=user.gender==="Female" ? "checked" : "" %>>
                 Female
               </label>
+            </div>
+
+            <div class="profile-actions">
+              <button type="button" id="editProfileBtn">Edit Profile</button>
+              <button type="button" id="saveProfileBtn" class="hidden">Save Changes</button>
             </div>
           </form>
         </div>
@@ -174,7 +176,24 @@
           Swal.fire("Error", "Upload failed", "error");
         }
       });
+       const logoutBtn = document.getElementById("logoutBtn");
 
+      logoutBtn.addEventListener("click", () => {
+        Swal.fire({
+          title: "Are you sure?",
+          text: "You will be logged out of your account",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#3085d6",
+          confirmButtonText: "Yes, Logout",
+          cancelButtonText: "Cancel"
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = "/logout";
+          }
+        });
+      })
 
       });
     </script>

@@ -1,4 +1,3 @@
-
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -80,6 +79,48 @@ body {
   margin-top: 10px;
 }
 
+.profile-actions {
+  margin-top: 30px;
+  display: flex;
+  gap: 15px;
+  justify-content: flex-end;
+}
+
+.profile-actions button {
+  padding: 12px 30px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#editProfileBtn {
+  background: #4CAF50;
+  color: white;
+}
+
+#editProfileBtn:hover {
+  background: #45a049;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+}
+
+#saveProfileBtn {
+  background: #2196F3;
+  color: white;
+}
+
+#saveProfileBtn:hover {
+  background: #0b7dda;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
+}
+
+.profile-actions button.hidden {
+  display: none;
+}
 
 .card {
   border: 1px solid #ddd;

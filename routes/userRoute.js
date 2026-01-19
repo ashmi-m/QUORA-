@@ -100,10 +100,13 @@ router.get("/orders/invoice/:id",userAuth,orderController.downloadInvoice);
 router.get('/orders/:id', userAuth, orderController.viewOrderDetails);
 
 
-router.get(
-  "/userprofile/privacy-security",
-  profileController.loadPrivacySecurity
-);
+router.get("/userprofile/privacy-security", profileController.loadPrivacySecurity);
+
+router.post("/userprofile/change-password",userAuth,profileController.changePassword);
+
+router.post("/userprofile/change-email", userAuth, profileController.changeEmail);
+
+
 
 
 module.exports = router;

@@ -1,7 +1,15 @@
 
 const mongoose = require("mongoose");
-
+const { Schema } = mongoose;
+const { v4: uuidv4 } = require("uuid");
 const orderSchema = new mongoose.Schema({
+    orderId: {
+    type: String,
+    required: true,
+    unique: true,
+    index: true,
+     default: () => `ORD-${uuidv4().split("-")[0].toUpperCase()}`
+  },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
@@ -11,7 +19,14 @@ const orderSchema = new mongoose.Schema({
   address: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Address",
-    required: true
+    required: true,
+    name: String,
+    city: String,
+    landMark: String,
+    state: String,
+    pincode: String,
+    phone: String,
+    altPhone: String
   },
 
   products: [
@@ -28,7 +43,14 @@ const orderSchema = new mongoose.Schema({
       price: {
         type: Number,
         required: true
-      }
+      },
+ status: {
+        type: String,
+        enum: ["Placed", "Cancelled", "Returned"],
+        default: "Placed"
+      },
+      cancelReason: String,
+      returnReason: String
     }
   ],
 
