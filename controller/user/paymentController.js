@@ -39,6 +39,15 @@ const loadPayment = async (req, res) => {
     res.redirect("/checkout");
   }
 };
+
+const loadOrderSuccess = (req, res) => {
+  req.session.cart = null;
+  req.session.selectedAddress = null;
+  res.render("order-success", {
+    ordersPage: "/orders" 
+  });
+};
+
 const placeOrder = async (req, res) => {
   try {
     console.log("🔥 PLACE ORDER HIT");
@@ -102,4 +111,7 @@ const placeOrder = async (req, res) => {
     });
   }
 };
-module.exports = { loadPayment, placeOrder };
+module.exports = { 
+  loadPayment, 
+  placeOrder,
+  loadOrderSuccess };

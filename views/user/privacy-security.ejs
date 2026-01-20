@@ -1,7 +1,7 @@
 <%- include("../partials/user/header") %>
-  <title>Privacy & Security</title>
-  <link rel="stylesheet" href="/css/privacy-security.css">
-
+<title>Privacy & Security</title>
+<link rel="stylesheet" href="/css/privacy-security.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 
@@ -32,10 +32,8 @@
       <a href="/logout"><button type="button">Logout</button></a>
       <a href="/userprofile/privacy-security"><button type="button" class="active">Privacy & Security</button></a>
     </div>
-
   </aside>
 
-  <!-- Main Content -->
   <main class="profile-content">
 
     <div class="page-header">
@@ -80,28 +78,24 @@
           </div>
           <button class="action-btn" onclick="openEmailModal()">Change</button>
         </div>
-
       </div>
     <% } %>
 
   </main>
 
 </div>
-
-<!-- Password Modal -->
 <div id="passwordModal" class="modal-overlay">
   <div class="modal-content-box">
-    
     <button class="modal-close" onclick="closePasswordModal()">✕</button>
-       
+
     <div class="modal-header">
       <h2>🔒 Privacy & Security</h2>
       <p>Manage your account security settings and change your password or email address</p>
     </div>
 
     <div id="passwordSuccessMessage" class="success-message">
-      ✅ Password updated successfully
     </div>
+
     <div class="password-section">
       <div class="section-header">
         <h3>Change Password</h3>
@@ -109,36 +103,29 @@
       </div>
 
       <form id="passwordForm">
-        
         <div class="input-group">
           <label>🔑 Current Password</label>
-          <input 
-            type="password" 
-            name="currentPassword" 
-            placeholder="Enter your current password"
-            required
-          />
+          <div class="password-wrapper">
+            <input type="password" name="currentPassword" id="currentPassword" placeholder="Enter your current password" required />
+            <span class="eye-icon" onclick="togglePassword('currentPassword')">👁</span>
+          </div>
         </div>
 
         <div class="input-row">
           <div class="input-group">
             <label>✨ New Password</label>
-            <input 
-              type="password" 
-              name="newPassword" 
-              placeholder="Create a new password"
-              required
-            />
+            <div class="password-wrapper">
+              <input type="password" name="newPassword" id="newPassword" placeholder="Create a new password" required />
+              <span class="eye-icon" onclick="togglePassword('newPassword')">👁</span>
+            </div>
           </div>
 
           <div class="input-group">
             <label>✓ Confirm Password</label>
-            <input 
-              type="password" 
-              name="confirmPassword" 
-              placeholder="Confirm your new password"
-              required
-            />
+            <div class="password-wrapper">
+              <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Confirm your new password" required />
+              <span class="eye-icon" onclick="togglePassword('confirmPassword')">👁</span>
+            </div>
           </div>
         </div>
 
@@ -146,26 +133,17 @@
           <button type="button" class="cancel-btn" onclick="closePasswordModal()">Cancel</button>
           <button type="submit" class="update-btn">Update Password</button>
         </div>
-
       </form>
     </div>
-
   </div>
 </div>
-
-<!-- Email Modal -->
 <div id="emailModal" class="modal-overlay">
   <div class="modal-content-box">
-    
     <button class="modal-close" onclick="closeEmailModal()">✕</button>
-       
+
     <div class="modal-header">
       <h2>🔒 Privacy & Security</h2>
-      <p>Manage your account security settings and change your password or email address</p>
-    </div>
-
-    <div id="emailSuccessMessage" class="success-message">
-      ✅ Verification code sent to your new email address
+      <p>Manage your account security settings and change your email address</p>
     </div>
 
     <div class="password-section">
@@ -174,138 +152,204 @@
         <p>Update your email address for account recovery and notifications</p>
       </div>
 
+      <!-- STEP 1 : ENTER EMAIL -->
       <form id="emailForm">
-        
         <div class="input-group">
           <label>📧 Current Email</label>
-          <input 
-            type="email" 
-            value="<%= user?.email || '' %>" 
-            disabled
-            class="disabled-input"
-          />
-        </div>
-        <div class="input-group">
-          <label>📮 New Email Address</label>
-          <input 
-            type="email" 
-            name="newEmail" 
-            placeholder="Enter your new email address"
-            required
-          />
+          <input type="email" value="<%= user?.email || '' %>" disabled class="disabled-input" />
         </div>
 
         <div class="input-group">
-          <label>🔑 Confirm Password</label>
-          <input 
-            type="password" 
-            name="password" 
-            placeholder="Enter your password for verification"
-            required
-          />
+          <label>📮 New Email Address</label>
+          <input type="email" name="newEmail" placeholder="Enter your new email address" required />
         </div>
+
+     
 
         <div class="form-actions">
           <button type="button" class="cancel-btn" onclick="closeEmailModal()">Cancel</button>
           <button type="submit" class="update-btn">Send Verification Code</button>
         </div>
-
       </form>
-    </div>
 
+      <!-- STEP 2 : VERIFY CODE -->
+      <form id="verifyEmailForm" style="display:none;">
+        <div class="input-group">
+          <label>🔐 Verification Code</label>
+          <input type="text" name="code" placeholder="Enter 6-digit code" required />
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="cancel-btn" onclick="closeEmailModal()">Cancel</button>
+          <button type="submit" class="update-btn">Verify & Update Email</button>
+        </div>
+      </form>
+
+    </div>
   </div>
 </div>
 
 <script>
-
-function openPasswordModal() {
-  document.getElementById("passwordModal").style.display = "flex";
-  document.getElementById("passwordSuccessMessage").style.display = "none";
-}
-
-function closePasswordModal() {
-  document.getElementById("passwordModal").style.display = "none";
-  document.getElementById("passwordForm").reset();
-  document.getElementById("passwordSuccessMessage").style.display = "none";
-}
-function openEmailModal() {
-  document.getElementById("emailModal").style.display = "flex";
-  document.getElementById("emailSuccessMessage").style.display = "none";
-}
-
-function closeEmailModal() {
+document.addEventListener("DOMContentLoaded", function () {
+  window.togglePassword = function(inputId) {
+    const input = document.getElementById(inputId);
+    const eyeIcon = input.parentElement.querySelector('.eye-icon');
+    
+    if (input.type === 'password') {
+      input.type = 'text';
+      eyeIcon.textContent = '🙈';
+    } else {
+      input.type = 'password';
+      eyeIcon.textContent = '👁';
+    }
+  };
+  window.openPasswordModal = function () {
+    document.getElementById("passwordModal").style.display = "flex";
+  };
+  
+  window.closePasswordModal = function () {
+    document.getElementById("passwordModal").style.display = "none";
+    document.getElementById("passwordForm").reset();
+    const passwordInputs = ['currentPassword', 'newPassword', 'confirmPassword'];
+    passwordInputs.forEach(id => {
+      const input = document.getElementById(id);
+      const eyeIcon = input.parentElement.querySelector('.eye-icon');
+      input.type = 'password';
+      eyeIcon.textContent = '👁';
+    });
+  };
+  
+  window.openEmailModal = function () {
+    document.getElementById("emailModal").style.display = "flex";
+  };
+  
+ window.closeEmailModal = function () {
   document.getElementById("emailModal").style.display = "none";
   document.getElementById("emailForm").reset();
-  document.getElementById("emailSuccessMessage").style.display = "none";
-}
+  document.getElementById("emailForm").style.display = "block";
+  document.getElementById("verifyEmailForm").style.display = "none";
+};
 
-document.getElementById("passwordForm").addEventListener("submit", async function (e) {
-  e.preventDefault();
+  const passwordForm = document.getElementById("passwordForm");
+  passwordForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
 
-  const formData = new FormData(this);
-
-  const currentPassword = formData.get("currentPassword")?.trim();
-  const newPassword = formData.get("newPassword")?.trim();
-  const confirmPassword = formData.get("confirmPassword")?.trim();
-
-  if (!currentPassword || !newPassword || !confirmPassword) {
-    alert("All fields are required");
-    return;
-  }
-
-  if (newPassword !== confirmPassword) {
-    alert("Passwords do not match");
-    return;
-  }
-
-  try {
-    const res = await fetch("/userprofile/change-password", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        currentPassword,
-        newPassword,
-        confirmPassword,
-      }),
-    });
-
-    const data = await res.json();
-
-    if (data.success) {
-      const successMsg = document.getElementById("passwordSuccessMessage");
-      successMsg.textContent = "✅ Password updated successfully";
-      successMsg.style.display = "block";
-
-      this.reset();
-
-      setTimeout(() => {
-        closePasswordModal();
-      }, 2000);
-    } else {
-      alert(data.message || "Failed to update password");
+    const currentPassword = passwordForm.currentPassword.value.trim();
+    const newPassword = passwordForm.newPassword.value.trim();
+    const confirmPassword = passwordForm.confirmPassword.value.trim();
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      Swal.fire({
+        icon: "warning",
+        title: "Missing Fields",
+        text: "All fields are required"
+      });
+      return;
     }
-  } catch (error) {
-    console.error("Password change error:", error);
-    alert("Something went wrong. Please try again.");
-  }
-});
+    
+    if (newPassword.length < 8) {
+      Swal.fire({
+        icon: "error",
+        title: "Weak Password",
+        text: "Password must be at least 8 characters long"
+      });
+      return;
+    }
+    
+    if (currentPassword === newPassword) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Password",
+        text: "New password must be different from current password"
+      });
+      return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+      Swal.fire({
+        icon: "error",
+        title: "Password Mismatch",
+        text: "New password and confirm password do not match"
+      });
+      return;
+    }
 
-document.getElementById("emailForm").addEventListener("submit", async function (e) {
+    try {
+      const res = await fetch("/userprofile/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword, newPassword, confirmPassword }),
+      });
+      
+      const data = await res.json();
+
+      if (data.success === true) {
+        closePasswordModal();
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "Password updated successfully",
+          showConfirmButton: false,
+          timer: 2000
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: data.message || "Could not update password"
+        });
+      }
+    } catch (err) {
+      console.error("Error:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Server Error",
+        text: "Unable to connect to server. Please try again later."
+      });
+    }
+  });
+
+  const emailForm = document.getElementById("emailForm");
+const currentEmail = "<%= user?.email || '' %>";
+
+emailForm.addEventListener("submit", async function (e) {
   e.preventDefault();
 
-  const formData = new FormData(this);
+  const newEmail = emailForm.newEmail.value.trim();
 
-  const newEmail = formData.get("newEmail")?.trim();
-  const password = formData.get("password")?.trim();
+  if (!newEmail) {
+    Swal.fire({
+      icon: "warning",
+      title: "Missing Fields",
+      text: "New email is required"
+    });
+    return;
+  }
 
-  if (!newEmail || !password) {
-    alert("All fields are required");
+  if (!currentEmail) {
+    Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: "Current email not found. Please refresh the page."
+    });
+    return;
+  }
+
+  if (newEmail.toLowerCase() === currentEmail.toLowerCase()) {
+    Swal.fire({
+      icon: "error",
+      title: "Invalid Email",
+      text: "New email must be different from current email"
+    });
     return;
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(newEmail)) {
-    alert("Please enter a valid email address");
+    Swal.fire({
+      icon: "error",
+      title: "Invalid Email",
+      text: "Please enter a valid email address"
+    });
     return;
   }
 
@@ -313,53 +357,90 @@ document.getElementById("emailForm").addEventListener("submit", async function (
     const res = await fetch("/userprofile/change-email", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        newEmail,
-        password,
-      }),
+      body: JSON.stringify({ newEmail }),
+    });
+
+    const data = await res.json();
+
+    if (data.success === true) {
+      Swal.fire({
+        icon: "success",
+        title: "Verification Sent!",
+        text: data.message,
+        showConfirmButton: false,
+        timer: 2500
+      });
+
+      // OPTIONAL: hide email form & show verify form
+      document.getElementById("emailForm").style.display = "none";
+      document.getElementById("verifyEmailForm").style.display = "block";
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: data.message || "Could not send verification email"
+      });
+    }
+  } catch (err) {
+    console.error("Email change error:", err);
+    Swal.fire({
+      icon: "error",
+      title: "Server Error",
+      text: "Unable to connect to server"
+    });
+  }
+});
+const verifyEmailForm = document.getElementById("verifyEmailForm");
+
+verifyEmailForm.addEventListener("submit", async function (e) {
+  e.preventDefault();
+
+  const code = verifyEmailForm.code.value.trim();
+
+  if (!code) {
+    Swal.fire("Error", "Please enter verification code", "error");
+    return;
+  }
+
+  try {
+    const res = await fetch("/userprofile/verify-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code }),
     });
 
     const data = await res.json();
 
     if (data.success) {
-      const successMsg = document.getElementById("emailSuccessMessage");
-      successMsg.textContent = "✅ " + data.message;
-      successMsg.style.display = "block";
+      Swal.fire({
+        icon: "success",
+        title: "Email Updated!",
+        text: data.message,
+        timer: 2000,
+        showConfirmButton: false,
+      });
 
-      this.reset();
-
-      setTimeout(() => {
-        closeEmailModal();
-      }, 2000);
+      closeEmailModal();
+      setTimeout(() => location.reload(), 2000);
     } else {
-      alert(data.message || "Failed to send verification code");
+      Swal.fire("Error", data.message, "error");
     }
-  } catch (error) {
-    console.error("Email change error:", error);
-    alert("Something went wrong. Please try again.");
+  } catch (err) {
+    Swal.fire("Server Error", "Try again later", "error");
   }
 });
 
-window.onclick = function (event) {
-  const passwordModal = document.getElementById("passwordModal");
-  const emailModal = document.getElementById("emailModal");
+  window.onclick = function (e) {
+    if (e.target.id === "passwordModal") closePasswordModal();
+    if (e.target.id === "emailModal") closeEmailModal();
+  };
 
-  if (event.target === passwordModal) {
-    closePasswordModal();
-  }
-  if (event.target === emailModal) {
-    closeEmailModal();
-  }
-};
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") {
+      closePasswordModal();
+      closeEmailModal();
+    }
+  });
 
-document.addEventListener("keydown", function (event) {
-  if (event.key === "Escape") {
-    closePasswordModal();
-    closeEmailModal();
-  }
 });
 </script>
-
-
-</body>
-</html>

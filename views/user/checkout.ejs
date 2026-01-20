@@ -35,41 +35,48 @@
                 </div>
               </label>
               <% }) %>
+             <% if (totalPages > 1) { %>
+    <div class="pagination">
+      <% if (currentPage > 1) { %>
+        <a href="/checkout?page=<%= currentPage - 1 %>">&laquo; Prev</a>
+      <% } %>
+       <% for (let i = 1; i <= totalPages; i++) { %>
+        <a href="/checkout?page=<%= i %>" class="<%= currentPage === i ? 'active' : '' %>"><%= i %></a>
+      <% } %>
+
+      <% if (currentPage < totalPages) { %>
+        <a href="/checkout?page=<%= currentPage + 1 %>">Next &raquo;</a>
+      <% } %>
+    </div>
+     <% } %>
 
       </div>
       <div class="summary-section">
         <h3>Order Summary</h3>
-
-        <% cart.items.forEach(item => { 
-     const price = Number(item.productId?.price || 0);
-     const quantity = Number(item.quantity || 0);
-     const itemTotal = price * quantity;
-%>
+     <% cart.items.forEach(item => { %>
   <div class="summary-item">
-    <span>
-      <%= item.productId?.productName || "Product" %> × <%= quantity %>
-    </span>
-    <span>₹ <%= itemTotal %></span>
+    <span><%= item.productName %> × <%= item.quantity %></span>
+    <span>₹ <%= item.itemTotal.toFixed(2) %></span>
   </div>
 <% }) %>
 
+<hr>
 
-            <hr>
+<div class="summary-row">
+  <span>Subtotal</span>
+  <span>₹ <%= subtotal.toFixed(2) %></span>
+</div>
 
-            <div class="summary-row">
-              <span>Subtotal</span>
-              <span>₹ <%= subtotal %></span>
-            </div>
+<div class="summary-row">
+  <span>Delivery</span>
+  <span>₹ <%= deliveryCharge.toFixed(2) %></span>
+</div>
 
-            <div class="summary-row">
-              <span>Delivery</span>
-              <span>₹ <%= deliveryCharge %></span>
-            </div>
+<div class="summary-row total">
+  <span>Total</span>
+  <span>₹ <%= total.toFixed(2) %></span>
+</div>
 
-            <div class="summary-row total">
-              <span>Total</span>
-              <span>₹ <%= total %></span>
-            </div>
 
             <button type="submit" class="pay-btn">Proceed to Pay</button>
       </div>

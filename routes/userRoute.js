@@ -85,6 +85,7 @@ router.post("/checkout/select-address", checkoutController.selectAddress);
 
 router.get("/checkout/payment", paymentController.loadPayment);
 router.post("/checkout/payment/place", paymentController.placeOrder);
+router.get("/order-success", paymentController.loadOrderSuccess);
 
 router.get("/orders", userAuth, orderController.loadOrders);
 router.post("/place-order", userAuth, orderController.placeOrder);
@@ -99,14 +100,13 @@ router.get("/orders/invoice/:id",userAuth,orderController.downloadInvoice);
 
 router.get('/orders/:id', userAuth, orderController.viewOrderDetails);
 
-
-router.get("/userprofile/privacy-security", profileController.loadPrivacySecurity);
+router.get( "/userprofile/privacy-security", userAuth, profileController.loadPrivacySecurity);
 
 router.post("/userprofile/change-password",userAuth,profileController.changePassword);
 
 router.post("/userprofile/change-email", userAuth, profileController.changeEmail);
 
-
+router.post( "/userprofile/verify-email", userAuth, profileController.verifyEmail);
 
 
 module.exports = router;

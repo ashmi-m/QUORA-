@@ -2,7 +2,8 @@ const User=require("../models/userSchema");
 const userAuth = async (req, res, next) => {
   try {
     
-    if (!req.session.user) {
+    // if (!req.session.user) {
+    if (!req.session || !req.session.user || !req.session.user._id) {
       if (req.originalUrl.startsWith("/cart")) {
         return res.status(401).json({ message: "Please login first" });
       }
