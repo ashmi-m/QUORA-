@@ -184,21 +184,42 @@ const updateOrderStatus = async (req, res) => {
 };  
 const updateProductStatus = async (req, res) => {
   try {
-    const { index, status } = req.body;
-    const { id } = req.params;
+    const { status } = req.body;
+    const { id, index } = req.params;
 
     const order = await Order.findById(id);
-    if (!order) return res.status(404).send("Order not found");
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found" });
+    }
 
+    if (!order.products[index]) {
+      return res.status(400).json({ success: false, message: "Product not found" });
+    }
+
+    // Update product status
     order.products[index].status = status;
+
+    // Sync order status
+    const allDelivered = order.products.every(p => p.status === "Delivered");
+    const anyCancelled = order.products.some(p => p.status === "Cancelled");
+
+    if (allDelivered) {
+      order.status = "Delivered";
+    } else if (anyCancelled) {
+      order.status = "Cancelled";
+    } else {
+      order.status = status; // Processing / Shipped / Out for Delivery
+    }
+
     await order.save();
 
     res.json({ success: true });
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Server Error");
+    console.error("❌ STATUS UPDATE ERROR:", err.message);
+    res.status(500).json({ success: false, message: err.message });
   }
 };
+
 
 const getOrderDetailsJson = async (req, res) => {
   try {
@@ -264,6 +285,7 @@ const getOrderDetailsJson = async (req, res) => {
       };
     });
     res.json({
+      orderId: order.orderId,
       user: {
         name: order.userId?.name || "N/A",
         email: order.userId?.email || "N/A",

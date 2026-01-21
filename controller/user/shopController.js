@@ -11,14 +11,14 @@ const loadShopPage = async (req, res) => {
     const categoriesParam = req.query.category || [];
     const brandsParam = req.query.brand || [];
     const sortOption = req.query.sort || "";
-     const priceRange = req.query.priceRange || "";
-        const searchQuery = req.query.search || "";
+    const priceRange = req.query.priceRange || "";
+    const searchQuery = req.query.search || "";
     const page = parseInt(req.query.page) || 1;
     const limit = 12;
-       const skip = (page - 1) * limit;
+    const skip = (page - 1) * limit;
 
-       let query = {isBlocked:false};
-       let selectedCategories = [];
+    let query = { isBlocked: false };
+    let selectedCategories = [];
 
     if (categoriesParam.length) {
       const categoryArray = Array.isArray(categoriesParam)
@@ -34,8 +34,8 @@ const loadShopPage = async (req, res) => {
       }
     }
 
- let selectedBrands = [];
- 
+    let selectedBrands = [];
+
     if (brandsParam.length) {
       const brandArray = Array.isArray(brandsParam)
         ? brandsParam
@@ -50,13 +50,13 @@ const loadShopPage = async (req, res) => {
       }
     }
     if (searchQuery && searchQuery.trim().length > 0) {
-  query.productName = {
-    $regex: searchQuery.trim(),
-    $options: "i"
-  };
-}
+      query.productName = {
+        $regex: searchQuery.trim(),
+        $options: "i"
+      };
+    }
 
-if (priceRange === "under500") {
+    if (priceRange === "under500") {
       query.regularPrice = { $lt: 500 };
     } else if (priceRange === "500-1000") {
       query.regularPrice = { $gte: 500, $lte: 1000 };
@@ -68,7 +68,7 @@ if (priceRange === "under500") {
       query.regularPrice = { $gt: 15000 };
     }
 
-  let sortQuery = {};
+    let sortQuery = {};
     if (sortOption === "low-high") {
       sortQuery.regularPrice = 1;
     } else if (sortOption === "high-low") {
@@ -81,9 +81,9 @@ if (priceRange === "under500") {
 
     console.log("Query:", query);
     console.log("Sort:", sortQuery);
-   console.log("Category ID:", selectedCategories);
-console.log("Brand ID:", selectedBrands);
-     const [products, totalProducts, categories, brands] = await Promise.all([
+    console.log("Category ID:", selectedCategories);
+    console.log("Brand ID:", selectedBrands);
+    const [products, totalProducts, categories, brands] = await Promise.all([
       Product.find(query)
         .populate("category")
         .populate("brand")
@@ -113,7 +113,7 @@ console.log("Brand ID:", selectedBrands);
       searchQuery: searchQuery,
       totalPages,
       currentPage: page,
- 
+
     });
   } catch (error) {
     console.error("Error loading shop page", error);
@@ -126,20 +126,20 @@ const loadProductDetails = async (req, res) => {
   try {
     const productId = req.params.id;
     const product = await Product.findById(productId)
-    .populate("category")
-    .populate("brand")
-    .lean();
+      .populate("category")
+      .populate("brand")
+      .lean();
     if (!product) {
       return res.redirect("/pageNotFound");
     }
-     const categoryId = product.category?._id || product.category;
+    const categoryId = product.category?._id || product.category;
 
     const relatedProducts = await Product.find({
       _id: { $ne: productId },
       category: product.category?._id,
-       isBlocked: false,
+      isBlocked: false,
     }).limit(4).lean();
-     console.log("Related Products Found:", relatedProducts.length);
+    console.log("Related Products Found:", relatedProducts.length);
     let isWishlisted = false;
     if (req.user) {
       const wishlist = await Wishlist.findOne({
@@ -148,7 +148,7 @@ const loadProductDetails = async (req, res) => {
       });
       isWishlisted = !!wishlist;
     }
-    res.render("productDetails", { product, relatedProducts,isWishlisted });
+    res.render("productDetails", { product, relatedProducts, isWishlisted });
   } catch (error) {
     console.error(error);
     res.redirect("/pageNotFound");
@@ -160,5 +160,5 @@ const loadProductDetails = async (req, res) => {
 module.exports = {
   loadShopPage,
   loadProductDetails,
-  
+
 }

@@ -1,227 +1,218 @@
-
-
-
 <%- include("../partials/user/header") %>
 
-<head>
-  <meta charset="UTF-8">
-  <title><%= product.productName %> - Quora</title>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-</head>
+  <head>
+    <meta charset="UTF-8">
+    <title>
+      <%= product.productName %> - Quora
+    </title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  </head>
 
-<body style="margin:0; font-family: Arial, sans-serif; background:#fff; color:#333;">
+  <body style="margin:0; font-family: Arial, sans-serif; background:#fff; color:#333;">
 
-  <div style="padding:10px 30px; background:#fbe9e7; display:flex; justify-content:space-between;"></div>
+    <div style="padding:10px 30px; background:#fbe9e7; display:flex; justify-content:space-between;"></div>
 
-  <div style="padding:30px; display:flex; flex-direction:column; max-width:1000px; margin:auto;">
+    <div style="padding:30px; display:flex; flex-direction:column; max-width:1000px; margin:auto;">
 
-    <div style="display:flex; gap:40px;">
-
-      
-      <div style="flex:1; position:relative; overflow:hidden; width:100%; max-width:400px;">
-        <img 
-          src="<%= product.productImage[0] %>" 
-          alt="<%= product.productName %>" 
-          class="main-product-image" 
-          style="width:100%; transition: transform 0.3s ease; cursor: crosshair;"
-        >
-
-        <div style="display:flex; gap:10px; margin-top:10px;">
-          <% product.productImage.forEach(img => { %>
-            <img 
-              src="<%= img %>" 
-              class="thumbnail-image" 
-              data-src="<%= img %>" 
-              style="width:60px; height:60px; object-fit:cover; border:1px solid #ddd; cursor:pointer; transition: transform 0.3s ease;"
-            >
-          <% }) %>
-        </div>
-      </div>
-
-      <div style="flex:2;">
-        <h2 style="margin-top:0;"><%= product.productName %></h2>
-        <span 
-          id="wishlistBtn"
-          data-id="<%= product._id %>"
-          style="color:<%= isWishlisted ? 'red' : '#bbb' %>; cursor:pointer; font-size:26px; margin-left:10px;">
-          ❤
-        </span>
+      <div style="display:flex; gap:40px;">
 
 
-        <div style="margin:15px 0; padding:15px; border:1px solid #eee; border-radius:8px; background:#fafafa;">
-          <h4 style="margin:0 0 10px; font-size:18px; color:#ff6f61;">Product Description</h4>
-          <p style="font-size:15px; line-height:1.7; color:#444; text-align:justify;">
-            <%= product.description %>
-          </p>
+        <div style="flex:1; position:relative; overflow:hidden; width:100%; max-width:400px;">
+          <img src="<%= product.productImage[0] %>" alt="<%= product.productName %>" class="main-product-image"
+            style="width:100%; transition: transform 0.3s ease; cursor: crosshair;">
+
+          <div style="display:flex; gap:10px; margin-top:10px;">
+            <% product.productImage.forEach(img=> { %>
+              <img src="<%= img %>" class="thumbnail-image" data-src="<%= img %>"
+                style="width:60px; height:60px; object-fit:cover; border:1px solid #ddd; cursor:pointer; transition: transform 0.3s ease;">
+              <% }) %>
+          </div>
         </div>
 
-        <div style="margin:10px 0;">
-          <span style="font-size:26px; font-weight:bold; color:#000;">
-            ₹<%= product.salePrice || product.regularPrice %>
+        <div style="flex:2;">
+          <h2 style="margin-top:0;">
+            <%= product.productName %>
+          </h2>
+          <span id="wishlistBtn" data-id="<%= product._id %>"
+            style="color:<%= isWishlisted ? 'red' : '#bbb' %>; cursor:pointer; font-size:26px; margin-left:10px;">
+            ❤
           </span>
 
-         
-        </div>
 
-        <br>
-        <p>Stock: <%= product.quantity %></p>
-
-        <div style="display:flex; gap:15px; margin-top:20px;">
-        <button
-          id="addToCartBtn"
-          data-id="<%= product._id %>"
-          style="padding:12px 20px; background:black; color:white; border:none; cursor:pointer;">
-          🛒 Add to Cart
-        </button>
-      </div>
-
-        <div style="margin:10px 0;">
-          <span>⭐⭐⭐⭐⭐</span>
-          <span style="margin-left:10px;">(5 Reviews)</span>
-        </div>
-      </div>
-    </div>
-
-  
-    <h3 style="margin-top:50px;">Related Products</h3>
-    <div style="display:flex; gap:20px; overflow-x:auto; padding-bottom:20px;">
-      <% relatedProducts.forEach(rp => { %>
-        <a href="/product/<%= rp._id %>" style="text-decoration:none; color:inherit;">
-          <div style="flex:0 0 150px; border:1px solid #ddd; padding:10px; text-align:center;">
-            <img src="<%= rp.productImage[0] %>" style="width:100%; height:100px; object-fit:cover;">
-            <p style="margin:5px 0; font-size:14px;"><%= rp.productName %></p>
-            <p style="font-weight:bold;">₹<%= rp.regularPrice %></p>
+          <div style="margin:15px 0; padding:15px; border:1px solid #eee; border-radius:8px; background:#fafafa;">
+            <h4 style="margin:0 0 10px; font-size:18px; color:#ff6f61;">Product Description</h4>
+            <p style="font-size:15px; line-height:1.7; color:#444; text-align:justify;">
+              <%= product.description %>
+            </p>
           </div>
-        </a>
-      <% }) %>
+
+          <div style="margin:10px 0;">
+            <span style="font-size:26px; font-weight:bold; color:#000;">
+              ₹<%= product.salePrice || product.regularPrice %>
+            </span>
+
+
+          </div>
+
+          <br>
+          <p>Stock: <%= product.quantity %>
+          </p>
+
+          <div style="display:flex; gap:15px; margin-top:20px;">
+            <button id="addToCartBtn" data-id="<%= product._id %>"
+              style="padding:12px 20px; background:black; color:white; border:none; cursor:pointer;">
+              🛒 Add to Cart
+            </button>
+          </div>
+
+          <div style="margin:10px 0;">
+            <span>⭐⭐⭐⭐⭐</span>
+            <span style="margin-left:10px;">(5 Reviews)</span>
+          </div>
+        </div>
+      </div>
+
+
+      <h3 style="margin-top:50px;">Related Products</h3>
+      <div style="display:flex; gap:20px; overflow-x:auto; padding-bottom:20px;">
+        <% relatedProducts.forEach(rp=> { %>
+          <a href="/product/<%= rp._id %>" style="text-decoration:none; color:inherit;">
+            <div style="flex:0 0 150px; border:1px solid #ddd; padding:10px; text-align:center;">
+              <img src="<%= rp.productImage[0] %>" style="width:100%; height:100px; object-fit:cover;">
+              <p style="margin:5px 0; font-size:14px;">
+                <%= rp.productName %>
+              </p>
+              <p style="font-weight:bold;">₹<%= rp.regularPrice %>
+              </p>
+            </div>
+          </a>
+          <% }) %>
+      </div>
+
     </div>
 
-  </div>
-
-  <footer style="background:#f5e6e0; padding:20px 30px; margin-top:50px;">
-    <div style="display:flex; justify-content:space-between;">
-      <div>
-        <h4>About</h4>
-        <p>Welcome to Quora, your ultimate destination for beauty products...</p>
+    <footer style="background:#f5e6e0; padding:20px 30px; margin-top:50px;">
+      <div style="display:flex; justify-content:space-between;">
+        <div>
+          <h4>About</h4>
+          <p>Welcome to Quora, your ultimate destination for beauty products...</p>
+        </div>
+        <div>
+          <h4>Contact Us</h4>
+          <p>Email: support@quora.com</p>
+          <p>Phone: +91-123-456-7890</p>
+        </div>
       </div>
-      <div>
-        <h4>Contact Us</h4>
-        <p>Email: support@quora.com</p>
-        <p>Phone: +91-123-456-7890</p>
-      </div>
-    </div>
-    <div style="text-align:center; margin-top:10px;">&copy; 2025 Quora - All Rights Reserved.</div>
-  </footer>
+      <div style="text-align:center; margin-top:10px;">&copy; 2025 Quora - All Rights Reserved.</div>
+    </footer>
 
-  <script>
+    <script>
 
 
-  const addToCartBtn = document.getElementById("addToCartBtn");
+      const addToCartBtn = document.getElementById("addToCartBtn");
 
-  addToCartBtn.addEventListener("click", async () => {
-    const productId = addToCartBtn.dataset.id;
+      addToCartBtn.addEventListener("click", async () => {
+        const productId = addToCartBtn.dataset.id;
 
-    try {
-      const res = await fetch("/cart/add", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId })
-      });
+        try {
+          const res = await fetch("/cart/add", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ productId })
+          });
 
-      const data = await res.json();
+          const data = await res.json();
 
-      if (res.ok && data.success) {
-        Swal.fire({
-          icon: "success",
-          title: "Added to Cart",
-          timer: 1200,
-          showConfirmButton: false
-        });
-
-        const badge = document.querySelector('a[href="/cart"] .badge');
-        if (badge) badge.textContent = Number(badge.textContent || 0) + 1;
-
-      } else {
-        Swal.fire("Warning", data.message, "warning");
-      }
-
-    } catch (err) {
-      Swal.fire("Login Required", "Please login first", "warning");
-    }
-  });
-  
-    
-    document.addEventListener("DOMContentLoaded", function () {
-      const mainImage = document.querySelector(".main-product-image");
-      const thumbnails = document.querySelectorAll(".thumbnail-image");
-
-      mainImage.addEventListener("mousemove", function (e) {
-        const rect = mainImage.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        const xPercent = x / rect.width * 100;
-        const yPercent = y / rect.height * 100;
-
-        mainImage.style.transformOrigin = `${xPercent}% ${yPercent}%`;
-        mainImage.style.transform = "scale(2)";
-      });
-
-      mainImage.addEventListener("mouseleave", function () {
-        mainImage.style.transform = "scale(1)";
-        mainImage.style.transformOrigin = "center center";
-      });
-
-      thumbnails.forEach(thumbnail => {
-        thumbnail.addEventListener("click", function () {
-          mainImage.src = this.dataset.src;
-        });
-      });
-
-    
-    
- const wishlistBtn = document.getElementById("wishlistBtn");
-      if (wishlistBtn) {
-        wishlistBtn.addEventListener("click", async () => {
-          const productId = wishlistBtn.dataset.id;
-          const isActive = wishlistBtn.style.color === "red";
-
-          try {
-            const url = isActive ? "/wishlist/remove" : "/wishlist/add";
-
-            const res = await fetch(url, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ productId })
+          if (res.ok && data.success) {
+            Swal.fire({
+              icon: "success",
+              title: "Added to Cart",
+              timer: 1200,
+              showConfirmButton: false
             });
-            
-            const data = await res.json();
 
-            if (data.success) {
-              wishlistBtn.style.color = isActive ? "#bbb" : "red";
-              wishlistBtn.dataset.active = (!isActive).toString();
-              Swal.fire({
-                icon: "success",
-                title: isActive ? "Removed from Wishlist" : "Added to Wishlist",
-                timer: 1000,
-                showConfirmButton: false
-              });
-            } else {
-              Swal.fire("Error", data.message || "Something went wrong", "error");
-            }
-            
-          } catch (err) {
-            console.error(err);
-            Swal.fire("Error", "Please login to use wishlist", "error");
+            const badge = document.querySelector('a[href="/cart"] .badge');
+            if (badge) badge.textContent = Number(badge.textContent || 0) + 1;
+
+          } else {
+            Swal.fire("Warning", data.message, "warning");
           }
+
+        } catch (err) {
+          Swal.fire("Login Required", "Please login first", "warning");
+        }
+      });
+
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const mainImage = document.querySelector(".main-product-image");
+        const thumbnails = document.querySelectorAll(".thumbnail-image");
+
+        mainImage.addEventListener("mousemove", function (e) {
+          const rect = mainImage.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const xPercent = x / rect.width * 100;
+          const yPercent = y / rect.height * 100;
+
+          mainImage.style.transformOrigin = `${xPercent}% ${yPercent}%`;
+          mainImage.style.transform = "scale(2)";
         });
-      }
-    });
+
+        mainImage.addEventListener("mouseleave", function () {
+          mainImage.style.transform = "scale(1)";
+          mainImage.style.transformOrigin = "center center";
+        });
+
+        thumbnails.forEach(thumbnail => {
+          thumbnail.addEventListener("click", function () {
+            mainImage.src = this.dataset.src;
+          });
+        });
 
 
-  </script>
 
-</body>
-</html>
+        const wishlistBtn = document.getElementById("wishlistBtn");
+        if (wishlistBtn) {
+          wishlistBtn.addEventListener("click", async () => {
+            const productId = wishlistBtn.dataset.id;
+            const isActive = wishlistBtn.style.color === "red";
+
+            try {
+              const url = isActive ? "/wishlist/remove" : "/wishlist/add";
+
+              const res = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ productId })
+              });
+
+              const data = await res.json();
+
+              if (data.success) {
+                wishlistBtn.style.color = isActive ? "#bbb" : "red";
+                wishlistBtn.dataset.active = (!isActive).toString();
+                Swal.fire({
+                  icon: "success",
+                  title: isActive ? "Removed from Wishlist" : "Added to Wishlist",
+                  timer: 1000,
+                  showConfirmButton: false
+                });
+              } else {
+                Swal.fire("Error", data.message || "Something went wrong", "error");
+              }
+
+            } catch (err) {
+              console.error(err);
+              Swal.fire("Error", "Please login to use wishlist", "error");
+            }
+          });
+        }
+      });
 
 
+    </script>
 
+  </body>
+
+  </html>

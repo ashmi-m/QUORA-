@@ -19,31 +19,31 @@
     <div class="profile-container">
       <div class="profile-sidebar">
         <div class="profile-image-box">
-        <img src="<%= user.profileImage %>" alt="Profile Image" id="profilePreview">
-        <input type="file" id="profileImageInput" hidden>
-        <button type="button" id="changeImageBtn">Change Photo</button>
-      </div>
+          <img src="<%= user.profileImage %>" alt="Profile Image" id="profilePreview">
+          <input type="file" id="profileImageInput" hidden>
+          <button type="button" id="changeImageBtn">Change Photo</button>
+        </div>
         <h3>Hello 👋 <%= user?.name %>
         </h3>
 
-       
-  
+
+
         <div class="profile-menu">
           <button class="active" data-target="profileSection">Profile Information</button>
           <button data-target="ordersSection">My Orders</button>
           <button data-target="addressSection">Manage Addresses</button>
           <a href="/forgot-password"><button type="button">Forgot Password</button></a>
           <button type="button" id="logoutBtn">Logout</button>
-        <a href="/userprofile/privacy-security">
-  <button type="button">Privacy & Security</button>
-</a>
+          <a href="/userprofile/privacy-security">
+            <button type="button">Privacy & Security</button>
+          </a>
 
 
 
         </div>
       </div>
 
-    
+
       <div class="profile-content">
 
         <div id="profileSection" class="profile-section">
@@ -150,50 +150,50 @@
           }
         });
         const changeBtn = document.getElementById("changeImageBtn");
-      const imageInput = document.getElementById("profileImageInput");
-      const preview = document.getElementById("profilePreview");
-     
-      changeBtn.addEventListener("click", () => imageInput.click());
+        const imageInput = document.getElementById("profileImageInput");
+        const preview = document.getElementById("profilePreview");
 
-      imageInput.addEventListener("change", async () => {
-        const file = imageInput.files[0];
-        if (!file) return;
+        changeBtn.addEventListener("click", () => imageInput.click());
 
-        const formData = new FormData();
-        formData.append("profileImage", file);
+        imageInput.addEventListener("change", async () => {
+          const file = imageInput.files[0];
+          if (!file) return;
 
-        const res = await fetch("/profile/upload-image", {
-          method: "PUT",
-          body: formData
-        });
-        
-        const result = await res.json();
+          const formData = new FormData();
+          formData.append("profileImage", file);
 
-        if (result.success) {
-          preview.src = result.image;
-          Swal.fire("Success", "Profile image updated", "success");
-        } else {
-          Swal.fire("Error", "Upload failed", "error");
-        }
-      });
-       const logoutBtn = document.getElementById("logoutBtn");
+          const res = await fetch("/profile/upload-image", {
+            method: "PUT",
+            body: formData
+          });
 
-      logoutBtn.addEventListener("click", () => {
-        Swal.fire({
-          title: "Are you sure?",
-          text: "You will be logged out of your account",
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonColor: "#d33",
-          cancelButtonColor: "#3085d6",
-          confirmButtonText: "Yes, Logout",
-          cancelButtonText: "Cancel"
-        }).then((result) => {
-          if (result.isConfirmed) {
-            window.location.href = "/logout";
+          const result = await res.json();
+
+          if (result.success) {
+            preview.src = result.image;
+            Swal.fire("Success", "Profile image updated", "success");
+          } else {
+            Swal.fire("Error", "Upload failed", "error");
           }
         });
-      })
+        const logoutBtn = document.getElementById("logoutBtn");
+
+        logoutBtn.addEventListener("click", () => {
+          Swal.fire({
+            title: "Are you sure?",
+            text: "You will be logged out of your account",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, Logout",
+            cancelButtonText: "Cancel"
+          }).then((result) => {
+            if (result.isConfirmed) {
+              window.location.href = "/logout";
+            }
+          });
+        })
 
       });
     </script>

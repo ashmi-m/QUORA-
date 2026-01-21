@@ -113,21 +113,7 @@
           <div class="details-box">
             <h3>Shipping Details</h3>
 
-            <% if (order.shipping) { %>
-              <p>
-                <%= order.shipping.name %>
-              </p>
-              <p>
-                <%= order.shipping.address %>
-              </p>
-              <p>
-                <%= order.shipping.city %> - <%= order.shipping.pincode %>
-              </p>
-              <p>Phone: <%= order.shipping.phone %>
-              </p>
-              <% } else { %>
-                <p><em>Shipping details not available for this order</em></p>
-                <% } %>
+           
           </div>
 
           <div class="details-box">

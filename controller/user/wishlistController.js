@@ -8,14 +8,14 @@ const getWishlist = async (req, res) => {
   try {
     const userId = req.user._id;
 
-   
+
     const wishlistDoc = await Wishlist.findOne({ userId })
       .populate("items.productId")
       .lean();
 
     const wishlist = wishlistDoc ? wishlistDoc.items : [];
 
-    console.log("Wishlist Doc:", wishlistDoc); 
+    console.log("Wishlist Doc:", wishlistDoc);
 
     res.render("wishlist", { wishlist });
   } catch (err) {

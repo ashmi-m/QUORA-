@@ -1,11 +1,11 @@
-const Address = require("../../models/addressSchema"); 
+const Address = require("../../models/addressSchema");
 const mongoose = require("mongoose");
 // const addAddress = async (req, res) => {
 //   try {
 //     const { name, mobile, pincode, locality, address, city, state, landmark, type } = req.body;
 //     const userId =req.session.user._id;
 
-   
+
 //     let addressDoc = await Address.findOne({ userId });
 
 //     const newAddress = {
@@ -20,11 +20,11 @@ const mongoose = require("mongoose");
 //     };
 
 //     if (addressDoc) {
-     
+
 //       addressDoc.addresses.push(newAddress);
 //       await addressDoc.save();
 //     } else {
-    
+
 //       addressDoc = new Address({
 //         userId,
 //         addresses: [newAddress]
@@ -143,9 +143,9 @@ const addAddressFromProfile = async (req, res) => {
 
 
 module.exports = {
- addAddress,
-getAddresses,
-addAddressFromProfile
+  addAddress,
+  getAddresses,
+  addAddressFromProfile
 
 
 };

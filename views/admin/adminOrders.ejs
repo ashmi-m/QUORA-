@@ -1,4 +1,5 @@
 <%- include("../partials/admin/header", { active: "orders" }) %>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -6,7 +7,7 @@
   <meta charset="UTF-8" />
   <title>Admin Orders | Quora</title>
   <link rel="stylesheet" href="/css/admin-orders.css" />
-  <link rel="stylesheet" href="/css/adminOrderModal.css" />
+
 </head>
 <body>
 <div class="layout">
@@ -64,7 +65,7 @@
                   <span class="more">+ <%= order.products.length - 1 %> more</span>
                 <% } %>
               </td>
-              <td><%= order._id %></td>
+             <td><%= order.orderId %></td>
               <td><%= new Date(order.createdAt).toLocaleDateString() %></td>
               <td><%= order.userId?.name || "N/A" %></td>
               <td>
@@ -111,6 +112,9 @@ function openOrderModal(orderId) {
           <strong>Name:</strong> ${order.user.name}<br>
           <strong>Email:</strong> ${order.user.email}<br>
           <strong>Phone:</strong> ${order.user.phone}
+          <strong>Order ID:</strong>
+    <span style="color:#555">#${order.orderId}</span>
+
         </div>
 
         <div class="modal-section">
@@ -128,13 +132,17 @@ function openOrderModal(orderId) {
                 Quantity: ${p.quantity} | Price: ₹${p.price}
               </div>
               <div class="product-status">
-                <select onchange="updateProductStatus('${orderId}', ${p.index}, this.value)">
-                  <option ${p.status === "Pending" ? "selected" : ""}>Pending</option>
-                  <option ${p.status === "Processing" ? "selected" : ""}>Processing</option>
-                  <option ${p.status === "Shipped" ? "selected" : ""}>Shipped</option>
-                  <option ${p.status === "Delivered" ? "selected" : ""}>Delivered</option>
-                  <option ${p.status === "Cancelled" ? "selected" : ""}>Cancelled</option>
-                </select>
+               <select onchange="updateProductStatus('${orderId}', ${p.index}, this.value)">
+  <option value="Placed" ${p.status === "Placed" ? "selected" : ""}>Placed</option>
+  <option value="Processing" ${p.status === "Processing" ? "selected" : ""}>Processing</option>
+  <option value="Shipped" ${p.status === "Shipped" ? "selected" : ""}>Shipped</option>
+  <option value="Out for Delivery" ${p.status === "Out for Delivery" ? "selected" : ""}>
+    Out for Delivery
+  </option>
+  <option value="Delivered" ${p.status === "Delivered" ? "selected" : ""}>Delivered</option>
+  <option value="Cancelled" ${p.status === "Cancelled" ? "selected" : ""}>Cancelled</option>
+</select>
+
               </div>
             </div>
           `).join("")}
@@ -162,14 +170,39 @@ function closeOrderModal() {
 }
 
 function updateProductStatus(orderId, index, status) {
-  fetch(`/admin/orders/${orderId}/product-status`, {
+ fetch(`/admin/orders/${orderId}/product/${index}/status`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ index, status })
-  }).then(res => {
-    if(!res.ok) alert("Failed to update product status");
+    body: JSON.stringify({  status })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if(data.success){
+      Swal.fire({
+        icon: 'success',
+        title: 'Product status updated',
+        text: `Status changed to "${status}"`,
+        timer: 1200,
+        showConfirmButton: false
+      });
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Update Failed',
+        text: data.message || 'Failed to update product status',
+      });
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'Something went wrong while updating product status',
+    });
   });
 }
+
 </script>
 
 

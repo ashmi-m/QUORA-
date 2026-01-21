@@ -2,7 +2,7 @@ const User = require("../../models/userSchema");
 const Product = require("../../models/productSchema");
 const Cart = require("../../models/cartSchema");
 const Wishlist = require("../../models/wishlistSchema");
-const Address = require("../../models/addressSchema"); 
+const Address = require("../../models/addressSchema");
 const mongoose = require("mongoose");
 
 const env = require("dotenv").config();
@@ -454,11 +454,11 @@ const loadProfilePage = async (req, res) => {
 
     const user = await User.findById(userId).lean();
     const orders = await Order.find({
-          userId: req.session.user._id
-        })
-          .populate("products.productId")
-          .populate("address")
-          .sort({ createdAt: -1 });
+      userId: req.session.user._id
+    })
+      .populate("products.productId")
+      .populate("address")
+      .sort({ createdAt: -1 });
 
     res.render("profile", { user, orders, addresses });
   } catch (error) {
@@ -737,7 +737,7 @@ const updateProfileImage = async (req, res) => {
       return res.json({ success: false });
     }
 
-    const imageUrl = req.file.path; 
+    const imageUrl = req.file.path;
 
     await User.findByIdAndUpdate(req.session.user._id, {
       profileImage: imageUrl
@@ -773,11 +773,11 @@ module.exports = {
   updateProfile,
   loadAddAddressPage,
   addAddress,
-  addAddressFromProfile ,
+  addAddressFromProfile,
   loadEditAddressPage,
   updateAddress,
   deleteAddress,
   updateProfileImage,
   loadAddAddressPageProfile,
-   loadManageAddressPage
+  loadManageAddressPage
 };

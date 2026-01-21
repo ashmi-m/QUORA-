@@ -202,41 +202,38 @@
       <input type="hidden" name="from" value="<%= from || '' %>">
       
       <div class="form-row">
-        <div class="form-group">
-          <label>Name</label>
-          <input type="text" name="name" required>
+          <div class="form-group">
+            <label>Name</label>
+            <input name="name" required>
+          </div>
+        
+         <div class="form-group">
+            <label>Mobile Number</label>
+            <input name="mobile" required>
+          </div>
         </div>
+     <div class="form-row">
+          <div class="form-group">
+            <label>Pincode</label>
+            <input name="pincode" id="pincode" required>
+          </div>
         
         <div class="form-group">
-          <label>Mobile Number</label>
-          <input type="tel" name="mobile" pattern="[0-9]{10}" required>
+            <label>Locality</label>
+            <input name="locality" required>
+          </div>
         </div>
-      </div>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label>Pincode</label>
-          <input type="text" name="pincode" pattern="[0-9]{6}" required>
-        </div>
-        
-        <div class="form-group">
-          <label>Locality</label>
-          <input type="text" name="locality" required>
-        </div>
-      </div>
-      
-      <div class="form-row">
-        <div class="form-group full-width">
+
+       <div class="form-group">
           <label>Address</label>
           <textarea name="address" required></textarea>
         </div>
-      </div>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label>City</label>
-          <input type="text" name="city" required>
-        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>City / District</label>
+            <input name="city" id="city" readonly required>
+          </div>
         
         <div class="form-group">
           <label>State</label>
@@ -305,7 +302,34 @@
 </div>
 
 <script>
-// Cancel button - go back
+document.getElementById("pincode").addEventListener("input", async function () {
+
+  const pincode = this.value.trim();
+
+  if (!/^\d{6}$/.test(pincode)) return;
+
+  try {
+    const res = await fetch(`https://api.postalpincode.in/pincode/${pincode}`);
+    const data = await res.json();
+
+    if (data[0].Status === "Success") {
+      const po = data[0].PostOffice[0];
+
+      // city
+      document.getElementById("city").value = po.District;
+
+      // state auto select
+      const stateSelect = document.querySelector("select[name='state']");
+      stateSelect.value = po.State;
+    } else {
+      Swal.fire("Invalid Pincode", "Pincode not found", "error");
+      document.getElementById("city").value = "";
+      document.querySelector("select[name='state']").value = "";
+    }
+  } catch (err) {
+    Swal.fire("Error", "Unable to fetch pincode details", "error");
+  }
+});
 document.getElementById('cancelBtn').addEventListener('click', () => {
   const from = '<%= from || "" %>';
   if (from === 'checkout') {

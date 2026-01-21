@@ -44,13 +44,13 @@ const loadOrderSuccess = (req, res) => {
   req.session.cart = null;
   req.session.selectedAddress = null;
   res.render("order-success", {
-    ordersPage: "/orders" 
+    ordersPage: "/orders"
   });
 };
 
 const placeOrder = async (req, res) => {
   try {
-    console.log("🔥 PLACE ORDER HIT");
+    console.log("PLACE ORDER HIT");
     console.log("BODY 👉", req.body);
 
     if (!req.session.user) {
@@ -111,7 +111,8 @@ const placeOrder = async (req, res) => {
     });
   }
 };
-module.exports = { 
-  loadPayment, 
+module.exports = {
+  loadPayment,
   placeOrder,
-  loadOrderSuccess };
+  loadOrderSuccess
+};
