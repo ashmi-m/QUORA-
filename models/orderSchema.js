@@ -17,9 +17,9 @@ const orderSchema = new mongoose.Schema({
   },
 
   address: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Address",
-    required: true,
+    // type: mongoose.Schema.Types.ObjectId,
+    // ref: "Address",
+    // required: true,
     name: String,
     city: String,
     landMark: String,
@@ -46,11 +46,18 @@ const orderSchema = new mongoose.Schema({
       },
  status: {
         type: String,
-        enum: ["Placed", "Cancelled", "Returned"],
+        enum: [  "Placed",
+          "Processing",
+          "Shipped",
+          "Out for Delivery",
+          "Delivered",
+          "Cancelled",
+          "Returned"],
         default: "Placed"
       },
       cancelReason: String,
-      returnReason: String
+      returnReason: String,
+      returnRequested: { type: Boolean, default: false }
     }
   ],
 
@@ -67,9 +74,13 @@ const orderSchema = new mongoose.Schema({
 
   status: {
     type: String,
-     enum: ["Placed",  "Delivered", "Cancelled", "Processing",
-    "Shipped",
-    "Out for Delivery",],
+     enum: [ "Placed",
+      "Processing",
+      "Shipped",
+      "Out for Delivery",
+      "Delivered",
+      "Cancelled",
+      "Payment Failed"],
     default: "Placed"
   }
 

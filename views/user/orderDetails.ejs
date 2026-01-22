@@ -92,10 +92,10 @@
 <% } %>
 
 
-                   <% if (item.status === "Placed") { %>
+         <% if (item.status === "Delivered" && !item.returnRequested) { %>
   <button class="return-product-btn" onclick="returnSingleProduct(
     '<%= order._id %>',
-    '<%= item.productId ? item.productId._id : '' %>'
+    '<%= item.productId._id %>'
   )">
     Return Product
   </button>
@@ -110,11 +110,26 @@
         </section>
 
         <section class="details-grid">
-          <div class="details-box">
-            <h3>Shipping Details</h3>
+        <div class="details-box">
+  <h3>Shipping Details</h3>
 
-           
-          </div>
+  <% if (order.address) { %>
+    <p><strong>Name:</strong> <%= order.address.name %></p>
+    <p><strong>Phone:</strong> <%= order.address.phone %></p>
+    <p>
+      <%= order.address.city %>,
+      <%= order.address.state %> –
+      <%= order.address.pincode %>
+    </p>
+
+    <% if (order.address.landMark) { %>
+      <p><strong>Landmark:</strong> <%= order.address.landMark %></p>
+    <% } %>
+  <% } else { %>
+    <p>Address not available</p>
+  <% } %>
+</div>
+
 
           <div class="details-box">
             <h3>Price Details</h3>
@@ -138,11 +153,9 @@
             </button>
             <% } %>
 
-              <% if (order.status==="Delivered" ) { %>
-                <button class="return-btn" onclick="returnOrder('<%= order._id %>')">
-                  Return Order
-                </button>
-                <% } %>
+             <% if (order.status === "Delivered" && !order.returnRequested) { %>
+  <button class="return-btn" onclick="returnOrder('<%= order._id %>')">Return Order</button>
+<% } %>
                   <% if (["Placed", "Paid" , "Delivered" ].includes(order.status)) { %>
                     <a href="/orders/invoice/<%= order._id %>" class="invoice-btn">
                       Download Invoice

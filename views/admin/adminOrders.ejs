@@ -1,113 +1,137 @@
 <%- include("../partials/admin/header", { active: "orders" }) %>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Admin Orders | Quora</title>
-  <link rel="stylesheet" href="/css/admin-orders.css" />
+  <!DOCTYPE html>
+  <html lang="en">
 
-</head>
-<body>
-<div class="layout">
-  <main class="content">
-    <div class="header-section">
-      <h2>Orders</h2>
-      <form class="search-box" method="GET" action="/admin/orders">
-        <div style="position: relative;">
-          <input
-            type="text"
-            name="search"
-            placeholder="Search orders"
-            value="<%= search || '' %>"
-          />
-          <% if (search) { %>
-            <a href="/admin/orders" class="clear-search">✖</a>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Admin Orders | Quora</title>
+    <link rel="stylesheet" href="/css/admin-orders.css" />
+
+  </head>
+
+  <body>
+    <div class="layout">
+      <main class="content">
+        <div class="header-section">
+          <h2>Orders</h2>
+          <form class="search-box" method="GET" action="/admin/orders">
+            <div style="position: relative;">
+              <input type="text" name="search" placeholder="Search orders" value="<%= search || '' %>" />
+              <% if (search) { %>
+                <a href="/admin/orders" class="clear-search">✖</a>
+                <% } %>
+            </div>
+            <button type="submit">🔍</button>
+          </form>
+        </div>
+        <div class="status-tabs">
+          <% const statuses=["All","Placed","Processing","Out for Delivery","Delivered","Cancelled","Payment Failed"];
+            %>
+            <% statuses.forEach(s=> { %>
+              <a href="?status=<%= s %>" class="tab <%= status === s ? 'active' : '' %>">
+                <%= s %>
+              </a>
+              <% }) %>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Order ID</th>
+                <th>Date</th>
+                <th>Customer</th>
+                <th>Status</th>
+                <th>Price</th>
+                <th>View</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <% if (!orders || orders.length===0) { %>
+                <tr>
+                  <td colspan="7" class="no-orders">No orders found</td>
+                </tr>
+                <% } else { %>
+                  <% orders.forEach(order=> { %>
+                    <tr>
+                      <td class="product-cell">
+                        <%= order.products[0]?.productId?.productName || "Product" %>
+                          <% if (order.products.length> 1) { %>
+                            <span class="more">+ <%= order.products.length - 1 %> more</span>
+                            <% } %>
+                      </td>
+                      <td>
+                        <%= order.orderId %>
+                      </td>
+                      <td>
+                        <%= new Date(order.createdAt).toLocaleDateString() %>
+                      </td>
+                      <td>
+                        <%= order.userId?.name || "N/A" %>
+                      </td>
+                      <td>
+                        <span class="status <%= order.status.toLowerCase().replace(/\s/g,'-') %>">
+                          <%= order.status %>
+                        </span>
+                      </td>
+                      <td>₹ <%= order.totalAmount %>
+                      </td>
+                      <td>
+                        <button class="btn-view" onclick="openOrderModal('<%= order._id %>')">
+                          View
+                        </button>
+                      </td>
+                    </tr>
+                    <% }) %>
+                      <% } %>
+            </tbody>
+            
+          </table>
+
+           <div class="pagination">
+          <% if (totalPages > 1) { %>
+            <% if (currentPage > 1) { %>
+              <a href="?status=<%= status %>&page=<%= currentPage - 1 %>&search=<%= search %>">« Prev</a>
+            <% } %>
+
+            <% for (let i = 1; i <= totalPages; i++) { %>
+              <a href="?status=<%= status %>&page=<%= i %>&search=<%= search %>" class="<%= currentPage === i ? 'active' : '' %>"><%= i %></a>
+            <% } %>
+
+            <% if (currentPage < totalPages) { %>
+              <a href="?status=<%= status %>&page=<%= currentPage + 1 %>&search=<%= search %>">Next »</a>
+            <% } %>
           <% } %>
         </div>
-        <button type="submit">🔍</button>
-      </form>
-    </div>
-    <div class="status-tabs">
-      <% const statuses = ["All","Placed","Processing","Out for Delivery","Delivered","Cancelled","Payment Failed"]; %>
-      <% statuses.forEach(s => { %>
-        <a href="?status=<%= s %>" class="tab <%= status === s ? 'active' : '' %>">
-          <%= s %>
-        </a>
-      <% }) %>
-    </div>
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th>Product</th>
-            <th>Order ID</th>
-            <th>Date</th>
-            <th>Customer</th>
-            <th>Status</th>
-            <th>Price</th>
-            <th>View</th>
-          </tr>
-        </thead>
 
-        <tbody>
-        <% if (!orders || orders.length === 0) { %>
-          <tr>
-            <td colspan="7" class="no-orders">No orders found</td>
-          </tr>
-        <% } else { %>
-          <% orders.forEach(order => { %>
-            <tr>
-              <td class="product-cell">
-                <%= order.products[0]?.productId?.productName || "Product" %>
-                <% if (order.products.length > 1) { %>
-                  <span class="more">+ <%= order.products.length - 1 %> more</span>
-                <% } %>
-              </td>
-             <td><%= order.orderId %></td>
-              <td><%= new Date(order.createdAt).toLocaleDateString() %></td>
-              <td><%= order.userId?.name || "N/A" %></td>
-              <td>
-                <span class="status <%= order.status.toLowerCase().replace(/\s/g,'-') %>">
-                  <%= order.status %>
-                </span>
-              </td>
-              <td>₹ <%= order.totalAmount %></td>
-              <td>
-                <button class="btn-view" onclick="openOrderModal('<%= order._id %>')">
-                  View
-                </button>
-              </td>
-            </tr>
-          <% }) %>
-        <% } %>
-        </tbody>
-      </table>
+      </div>
+        </div>
+
+      </main>
+    </div>
+    <div id="orderModal" class="modal-overlay">
+      <div class="modal-box">
+        <span class="close-btn" onclick="closeOrderModal()">×</span>
+        <h3>Order Details</h3>
+        <div id="modalContent">Loading...</div>
+      </div>
     </div>
 
-  </main>
-</div>
-<div id="orderModal" class="modal-overlay">
-  <div class="modal-box">
-    <span class="close-btn" onclick="closeOrderModal()">×</span>
-    <h3>Order Details</h3>
-    <div id="modalContent">Loading...</div>
-  </div>
-</div>
+    <script>
+      const modal = document.getElementById("orderModal");
+      const modalContent = document.getElementById("modalContent");
 
-<script>
-const modal = document.getElementById("orderModal");
-const modalContent = document.getElementById("modalContent");
+      function openOrderModal(orderId) {
+        modal.style.display = "flex";
+        modalContent.innerHTML = "Loading...";
 
-function openOrderModal(orderId) {
-  modal.style.display = "flex";
-  modalContent.innerHTML = "Loading...";
-
-  fetch(`/admin/orders/${orderId}/json`)
-    .then(res => res.json())
-    .then(order => {
-      modalContent.innerHTML = `
+        fetch(`/admin/orders/${orderId}/json`)
+          .then(res => res.json())
+          .then(order => {
+            modalContent.innerHTML = `
         <div class="modal-section">
           <strong>Name:</strong> ${order.user.name}<br>
           <strong>Email:</strong> ${order.user.email}<br>
@@ -132,7 +156,9 @@ function openOrderModal(orderId) {
                 Quantity: ${p.quantity} | Price: ₹${p.price}
               </div>
               <div class="product-status">
-               <select onchange="updateProductStatus('${orderId}', ${p.index}, this.value)">
+     <select onchange="updateProductStatus('${order._id}', ${i}, this.value)">
+
+
   <option value="Placed" ${p.status === "Placed" ? "selected" : ""}>Placed</option>
   <option value="Processing" ${p.status === "Processing" ? "selected" : ""}>Processing</option>
   <option value="Shipped" ${p.status === "Shipped" ? "selected" : ""}>Shipped</option>
@@ -142,6 +168,17 @@ function openOrderModal(orderId) {
   <option value="Delivered" ${p.status === "Delivered" ? "selected" : ""}>Delivered</option>
   <option value="Cancelled" ${p.status === "Cancelled" ? "selected" : ""}>Cancelled</option>
 </select>
+${
+        p.status === "Delivered" && !p.returnRequested
+          ? `<button class="btn-return" onclick="requestReturn('${order._id}', ${i})">Request Return</button>`
+          : ""
+      }
+      ${
+        p.returnRequested
+          ? `<span class="return-pending">Return Requested</span>`
+          : ""
+      }
+
 
               </div>
             </div>
@@ -158,26 +195,42 @@ function openOrderModal(orderId) {
           <div class="payment-row total"><strong>Total</strong><strong>₹${order.payment.total}</strong></div>
         </div>
       `;
-    })
-    .catch(err => {
-      console.error(err);
-      modalContent.innerHTML = "Failed to load order";
-    });
-}
+          })
+          .catch(err => {
+            console.error(err);
+            modalContent.innerHTML = "Failed to load order";
+          });
+      }
 
-function closeOrderModal() {
-  modal.style.display = "none";
-}
-
+      function closeOrderModal() {
+        modal.style.display = "none";
+      }
 function updateProductStatus(orderId, index, status) {
- fetch(`/admin/orders/${orderId}/product/${index}/status`, {
+  fetch(`/admin/orders/${orderId}/product/${index}/status`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({  status })
+    body: JSON.stringify({ status })
   })
-  .then(res => res.json())
-  .then(data => {
-    if(data.success){
+  .then(async (res) => {
+    // handle redirect to login
+    if (res.redirected) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Session Expired',
+        text: 'Please login again'
+      }).then(() => {
+        window.location.href = '/admin/login';
+      });
+      return;
+    }
+
+    const contentType = res.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      throw new Error('Unexpected response from server');
+    }
+
+    const data = await res.json();
+    if (data.success) {
       Swal.fire({
         icon: 'success',
         title: 'Product status updated',
@@ -203,9 +256,36 @@ function updateProductStatus(orderId, index, status) {
   });
 }
 
-</script>
+function requestReturn(orderId, index) {
+  const reason = prompt("Enter return reason");
+  if (!reason) return;
+
+  fetch(`/admin/orders/${orderId}/product/${index}/return`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ reason })
+  })
+  .then(res => res.json())
+  .then(data => {
+    Swal.fire({
+      icon: data.success ? 'success' : 'error',
+      title: data.success ? 'Return Requested' : 'Failed',
+      text: data.message
+    }).then(() => location.reload());
+  })
+  .catch(err => {
+    console.error(err);
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'Something went wrong while requesting return'
+    });
+  });
+}
+
+    </script>
 
 
-</body>
-</html>
+  </body>
 
+  </html>

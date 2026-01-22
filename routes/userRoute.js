@@ -98,7 +98,7 @@ router.put("/orders/return/:id",userAuth,orderController.returnOrder);
 
 router.get("/orders/invoice/:id",userAuth,orderController.downloadInvoice);
 
-router.get('/orders/:id', userAuth, orderController.viewOrderDetails);
+// router.get('/orders/:id', userAuth, orderController.viewOrderDetails);
 
 router.get( "/userprofile/privacy-security", userAuth, profileController.loadPrivacySecurity);
 

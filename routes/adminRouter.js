@@ -54,11 +54,15 @@ router.post("/orders/status/:id", adminAuth, adminController.updateOrderStatus);
 
 router.post(
   "/orders/:id/product/:index/status",
-  adminAuth,
+  adminAuth,  
   adminController.updateProductStatus
 );
+
+
 router.get("/orders/:id/json", adminAuth, adminController.getOrderDetailsJson);
 
+router.post("/orders/:id/product/:index/return", adminAuth, adminController.requestReturn);
+router.post("/orders/:id/product/:index/return-approve", adminAuth, adminController.approveReturn);
 
 module.exports = router;
 

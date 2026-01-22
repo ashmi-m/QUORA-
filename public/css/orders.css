@@ -84,6 +84,7 @@
 .status.paid { background-color: blue; }
 .status.delivered { background-color: green; }
 .status.cancelled { background-color: red; }
+.status.Shipped{background:  Purple (#6f42c1);}
 
 .cancel-btn, .details-btn {
   padding: 5px 10px;

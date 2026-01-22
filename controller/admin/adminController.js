@@ -184,39 +184,31 @@ const updateOrderStatus = async (req, res) => {
 };  
 const updateProductStatus = async (req, res) => {
   try {
+    if (!req.session || !req.session.admin) {
+      return res.status(401).json({
+        success: false,
+        message: "Session expired"
+      });
+    }
+
     const { status } = req.body;
     const { id, index } = req.params;
 
     const order = await Order.findById(id);
     if (!order) {
-      return res.status(404).json({ success: false, message: "Order not found" });
+      return res.json({ success: false, message: "Order not found" });
     }
 
-    if (!order.products[index]) {
-      return res.status(400).json({ success: false, message: "Product not found" });
-    }
-
-    // Update product status
     order.products[index].status = status;
-
-    // Sync order status
-    const allDelivered = order.products.every(p => p.status === "Delivered");
-    const anyCancelled = order.products.some(p => p.status === "Cancelled");
-
-    if (allDelivered) {
-      order.status = "Delivered";
-    } else if (anyCancelled) {
-      order.status = "Cancelled";
-    } else {
-      order.status = status; // Processing / Shipped / Out for Delivery
-    }
+    order.status = status;
 
     await order.save();
 
-    res.json({ success: true });
+    return res.json({ success: true });
+
   } catch (err) {
-    console.error("❌ STATUS UPDATE ERROR:", err.message);
-    res.status(500).json({ success: false, message: err.message });
+    console.error(err);
+    res.status(500).json({ success: false });
   }
 };
 
@@ -285,6 +277,7 @@ const getOrderDetailsJson = async (req, res) => {
       };
     });
     res.json({
+       _id: order._id,
       orderId: order.orderId,
       user: {
         name: order.userId?.name || "N/A",
@@ -307,6 +300,59 @@ const getOrderDetailsJson = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+const requestReturn = async (req, res) => {
+  try {
+    const { id, index } = req.params;
+    const { reason } = req.body;
+
+    const order = await Order.findById(id);
+    if (!order) return res.status(404).json({ success: false, message: "Order not found" });
+
+    const product = order.products[index];
+    if (!product) return res.status(404).json({ success: false, message: "Product not found" });
+
+    if (product.status !== "Delivered") {
+      return res.status(400).json({ success: false, message: "Return only allowed after delivery" });
+    }
+
+    product.returnRequested = true;
+    product.returnReason = reason;
+    await order.save();
+
+    res.json({ success: true, message: "Return requested. Admin will review." });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+const approveReturn = async (req, res) => {
+  try {
+    const { id, index } = req.params;
+    const order = await Order.findById(id).populate("userId");
+    if (!order) return res.status(404).json({ success: false, message: "Order not found" });
+
+    const product = order.products[index];
+    if (!product || !product.returnRequested) {
+      return res.status(400).json({ success: false, message: "No return requested for this product" });
+    }
+
+    product.status = "Returned";
+    product.returnRequested = false;
+    await order.save();
+
+    // Update user's wallet
+    const User = require("../../models/userSchema");
+    const user = await User.findById(order.userId._id);
+    user.wallet = (user.wallet || 0) + product.price;
+    await user.save();
+
+    res.json({ success: true, message: "Return approved and wallet updated" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
 
 module.exports = {
   loadLogin,
@@ -318,6 +364,8 @@ module.exports = {
   viewOrderDetails,
   updateOrderStatus,
   updateProductStatus,
- getOrderDetailsJson 
+ getOrderDetailsJson ,
+ requestReturn,
+  approveReturn
 
 };
