@@ -4,61 +4,61 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const Order = require("../../models/orderSchema");
 
-const pageerror=async(req,res)=>{
-   res.render("pageerror");
+const pageerror = async (req, res) => {
+  res.render("pageerror");
 }
 
 const loadLogin = (req, res) => {
-     return res.render("adminlogin", { message: null });
+  return res.render("adminlogin", { message: null });
 };
 const login = async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        const admin = await User.findOne({ email, isAdmin: true });
+  try {
+    const { email, password } = req.body;
+    const admin = await User.findOne({ email, isAdmin: true });
 
-        if (admin) {
-            const passwordMatch = await bcrypt.compare(password, admin.password);
-            if (passwordMatch) {
-                req.session.admin = true;
-                return res.redirect("/admin/dashboard");  
-            } else {
-                return res.redirect("/admin/login");  
-            }
-        } else {
-            return res.redirect("/admin/login");  
-        }
-    } catch (error) {
-        console.log("login error", error);
-        return res.redirect("/pageerror");
+    if (admin) {
+      const passwordMatch = await bcrypt.compare(password, admin.password);
+      if (passwordMatch) {
+        req.session.admin = true;
+        return res.redirect("/admin/dashboard");
+      } else {
+        return res.redirect("/admin/login");
+      }
+    } else {
+      return res.redirect("/admin/login");
     }
+  } catch (error) {
+    console.log("login error", error);
+    return res.redirect("/pageerror");
+  }
 };
 const loadDashboard = async (req, res) => {
-    if (req.session.admin) {
-        try {
-           return res.render("dashboard"); 
-        } catch (error) {
-            console.log("error in loaddashborad function",error);
-            
-            res.redirect("/pageerror");
-        }
-    } else {
-        res.redirect("/admin/login");  
+  if (req.session.admin) {
+    try {
+      return res.render("dashboard");
+    } catch (error) {
+      console.log("error in loaddashborad function", error);
+
+      res.redirect("/pageerror");
     }
+  } else {
+    res.redirect("/admin/login");
+  }
 }
 
-const logout=async(req,res)=>{
-try {
-    req.session.destroy(err=>{
-        if(err){
-            console.log("Error destroying session",err);
-            return res.redirect("/pageerror")
-        }
-        res.redirect("/admin/login")
+const logout = async (req, res) => {
+  try {
+    req.session.destroy(err => {
+      if (err) {
+        console.log("Error destroying session", err);
+        return res.redirect("/pageerror")
+      }
+      res.redirect("/admin/login")
     })
-} catch (error) {
-    console.log("unexpected error during logout",error);
+  } catch (error) {
+    console.log("unexpected error during logout", error);
     res.redirect("/pageerror")
-}
+  }
 }
 const loadOrders = async (req, res) => {
   try {
@@ -181,7 +181,7 @@ const updateOrderStatus = async (req, res) => {
     console.error(err);
     res.status(500).send("Server Error");
   }
-};  
+};
 const updateProductStatus = async (req, res) => {
   try {
     if (!req.session || !req.session.admin) {
@@ -213,6 +213,96 @@ const updateProductStatus = async (req, res) => {
 };
 
 
+// const getOrderDetailsJson = async (req, res) => {
+//   try {
+//     const order = await Order.findById(req.params.id)
+//       .populate("userId")
+//       .populate("products.productId")
+//       .lean();
+
+//     if (!order) {
+//       return res.status(404).json({ message: "Order not found" });
+      
+//     }
+//     let addressText = "Address not available";
+
+//     try {
+//       const Address = require("../../models/addressSchema");
+//       const addressDoc = await Address.findOne({
+//         userId: order.userId?._id
+//       }).lean();
+
+//       if (addressDoc && addressDoc.addresses?.length > 0) {
+//         const selectedAddress = addressDoc.addresses.find(
+//           a => a._id.toString() === order.address?.toString()
+//         );
+
+//         if (selectedAddress) {
+//           addressText = `
+//             ${selectedAddress.name},
+//             ${selectedAddress.landMark},
+//             ${selectedAddress.city},
+//             ${selectedAddress.state} - ${selectedAddress.pincode}
+//             <br>Phone: ${selectedAddress.phone}
+//           `;
+//         } else {
+//           const a = addressDoc.addresses[0];
+//           addressText = `
+//             ⚠️ Original address not found. User's current address:
+//             ${a.name}, ${a.landMark}, ${a.city},
+//             ${a.state} - ${a.pincode}
+//             <br>Phone: ${a.phone}
+//           `;
+//         }
+//       } else {
+//         addressText = "Address not found (no saved addresses)";
+//       }
+//     } catch (err) {
+//       console.error("❌ Address fetch error:", err.message);
+//     }
+//     const products = order.products.map((p, index) => {
+//       let imagePath = "/images/no-image.png";
+
+//       if (p.productId?.productImage?.length > 0) {
+//         const img = p.productId.productImage[0];
+//         imagePath = img.startsWith("http") ? img : `/uploads/${img}`;
+//       }
+
+//       return {
+//         index,
+//         name: p.productId?.productName || "Product",
+//         image: imagePath,
+//         quantity: p.quantity,
+//         price: p.price,
+//         status: p.status || "Pending",
+//            returnRequested: !!p.returnRequested, 
+//     returnReason: p.returnReason || "" 
+//       };
+//     });
+//     res.json({
+//       _id: order._id,
+//       orderId: order.orderId,
+//       user: {
+//         name: order.userId?.name || "N/A",
+//         email: order.userId?.email || "N/A",
+//         phone: order.userId?.phone || "N/A"
+//       },
+//       address: addressText,
+//       payment: {
+//         method: order.paymentMethod || "N/A",
+//         status: order.status || "Pending",
+//         subTotal: order.totalAmount || 0,
+//         discount: 0,
+//         total: order.totalAmount || 0
+//       },
+//       products: products
+//     });
+
+//   } catch (err) {
+//     console.error("❌ getOrderDetailsJson Error:", err);
+//     res.status(500).json({ message: "Server error" });
+//   }
+// };
 const getOrderDetailsJson = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id)
@@ -223,42 +313,60 @@ const getOrderDetailsJson = async (req, res) => {
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
-    let addressText = "Address not available";
 
-    try {
-      const Address = require("../../models/addressSchema");
-      const addressDoc = await Address.findOne({
-        userId: order.userId?._id
-      }).lean();
+    // Format address - try embedded first, then lookup from Address collection
+    let addressData = {
+      name: "N/A",
+      city: "N/A",
+      state: "N/A",
+      pincode: "N/A",
+      phone: "N/A"
+    };
 
-      if (addressDoc && addressDoc.addresses?.length > 0) {
-        const selectedAddress = addressDoc.addresses.find(
-          a => a._id.toString() === order.address?.toString()
-        );
+    // Check if address is embedded in order
+    if (order.address && order.address.name) {
+      addressData = {
+        name: order.address.name || "N/A",
+        city: order.address.city || "N/A",
+        landMark: order.address.landMark || "",
+        state: order.address.state || "N/A",
+        pincode: order.address.pincode || "N/A",
+        phone: order.address.phone || "N/A"
+      };
+    } else {
+      // Fallback: Try to get from Address collection
+      try {
+        const Address = require("../../models/addressSchema");
+        const addressDoc = await Address.findOne({
+          userId: order.userId?._id
+        }).lean();
 
-        if (selectedAddress) {
-          addressText = `
-            ${selectedAddress.name},
-            ${selectedAddress.landMark},
-            ${selectedAddress.city},
-            ${selectedAddress.state} - ${selectedAddress.pincode}
-            <br>Phone: ${selectedAddress.phone}
-          `;
-        } else {
-          const a = addressDoc.addresses[0];
-          addressText = `
-            ⚠️ Original address not found. User's current address:
-            ${a.name}, ${a.landMark}, ${a.city},
-            ${a.state} - ${a.pincode}
-            <br>Phone: ${a.phone}
-          `;
+        if (addressDoc && addressDoc.addresses?.length > 0) {
+          // Use the first address or match by ID if address field is ObjectId
+          let selectedAddress = addressDoc.addresses[0];
+          
+          if (order.address && mongoose.Types.ObjectId.isValid(order.address)) {
+            const matched = addressDoc.addresses.find(
+              a => a._id.toString() === order.address.toString()
+            );
+            if (matched) selectedAddress = matched;
+          }
+
+          addressData = {
+            name: selectedAddress.name || "N/A",
+            city: selectedAddress.city || "N/A",
+            landMark: selectedAddress.landMark || "",
+            state: selectedAddress.state || "N/A",
+            pincode: selectedAddress.pincode || "N/A",
+            phone: selectedAddress.phone || "N/A"
+          };
         }
-      } else {
-        addressText = "Address not found (no saved addresses)";
+      } catch (err) {
+        console.error("Error fetching address:", err);
       }
-    } catch (err) {
-      console.error("❌ Address fetch error:", err.message);
     }
+
+    // Format products
     const products = order.products.map((p, index) => {
       let imagePath = "/images/no-image.png";
 
@@ -273,18 +381,22 @@ const getOrderDetailsJson = async (req, res) => {
         image: imagePath,
         quantity: p.quantity,
         price: p.price,
-        status: p.status || "Pending"
+        status: p.status || "Placed",
+        returnRequested: !!p.returnRequested,
+        returnReason: p.returnReason || ""
       };
     });
+
+    // Send response
     res.json({
-       _id: order._id,
+      _id: order._id,
       orderId: order.orderId,
       user: {
         name: order.userId?.name || "N/A",
         email: order.userId?.email || "N/A",
         phone: order.userId?.phone || "N/A"
       },
-      address: addressText,
+      address: addressData,
       payment: {
         method: order.paymentMethod || "N/A",
         status: order.status || "Pending",
@@ -292,7 +404,7 @@ const getOrderDetailsJson = async (req, res) => {
         discount: 0,
         total: order.totalAmount || 0
       },
-      products
+      products: products
     });
 
   } catch (err) {
@@ -354,6 +466,31 @@ const approveReturn = async (req, res) => {
   }
 };
 
+const rejectReturn = async (req, res) => {
+  try {
+    const { id, index } = req.params;
+
+    const order = await Order.findById(id);
+    if (!order) return res.json({ success: false, message: "Order not found" });
+
+    const product = order.products[index];
+    if (!product || !product.returnRequested) {
+      return res.json({ success: false, message: "No return request found" });
+    }
+
+    product.returnRequested = false;
+    product.returnReason = "";
+
+    await order.save();
+
+    res.json({ success: true, message: "Return rejected" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+
 module.exports = {
   loadLogin,
   login,
@@ -364,8 +501,9 @@ module.exports = {
   viewOrderDetails,
   updateOrderStatus,
   updateProductStatus,
- getOrderDetailsJson ,
- requestReturn,
-  approveReturn
+  getOrderDetailsJson,
+  requestReturn,
+  approveReturn,
+  rejectReturn
 
 };

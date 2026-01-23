@@ -123,85 +123,81 @@
     <script>
       const modal = document.getElementById("orderModal");
       const modalContent = document.getElementById("modalContent");
+function openOrderModal(orderId) {
+  modal.style.display = "flex";
+  modalContent.innerHTML = "Loading...";
 
-      function openOrderModal(orderId) {
-        modal.style.display = "flex";
-        modalContent.innerHTML = "Loading...";
+  fetch(`/admin/orders/${orderId}/json`)
+    .then(res => res.json())
+    .then(order => {
+      modalContent.innerHTML = `
+  <div class="modal-section">
+    <strong>Name:</strong> ${order.user.name}<br>
+    <strong>Email:</strong> ${order.user.email}<br>
+    <strong>Phone:</strong> ${order.user.phone}<br>
+    <strong>Order ID:</strong> <span style="color:#555">#${order.orderId}</span>
+  </div>
 
-        fetch(`/admin/orders/${orderId}/json`)
-          .then(res => res.json())
-          .then(order => {
-            modalContent.innerHTML = `
-        <div class="modal-section">
-          <strong>Name:</strong> ${order.user.name}<br>
-          <strong>Email:</strong> ${order.user.email}<br>
-          <strong>Phone:</strong> ${order.user.phone}
-          <strong>Order ID:</strong>
-    <span style="color:#555">#${order.orderId}</span>
+  <div class="modal-section">
+    <strong>Delivery Address</strong><br>
+    ${order.address.name || 'N/A'}<br>
+    ${order.address.landMark ? order.address.landMark + '<br>' : ''}
+    ${order.address.city || 'N/A'}, ${order.address.state || 'N/A'} - ${order.address.pincode || 'N/A'}<br>
+    Phone: ${order.address.phone || 'N/A'}
+  </div>
 
+  <div class="modal-section">
+    <strong>Products (${order.products.length})</strong>
+    ${order.products.map((p, i) => `
+      <div class="product-row">
+        <img src="${p.image}" onerror="this.src='/images/no-image.png'" alt="${p.name}">
+        <div>
+          <strong>${i + 1}. ${p.name}</strong><br>
+          Quantity: ${p.quantity} | Price: ₹${p.price}
         </div>
+        <div class="product-status">
+          <select onchange="updateProductStatus('${order._id}', ${i}, this.value)">
+            <option value="Placed" ${p.status === "Placed" ? "selected" : ""}>Placed</option>
+            <option value="Processing" ${p.status === "Processing" ? "selected" : ""}>Processing</option>
+            <option value="Shipped" ${p.status === "Shipped" ? "selected" : ""}>Shipped</option>
+            <option value="Out for Delivery" ${p.status === "Out for Delivery" ? "selected" : ""}>Out for Delivery</option>
+            <option value="Delivered" ${p.status === "Delivered" ? "selected" : ""}>Delivered</option>
+            <option value="Cancelled" ${p.status === "Cancelled" ? "selected" : ""}>Cancelled</option>
+          </select>
 
-        <div class="modal-section">
-          <strong>Delivery Address</strong><br>
-          ${order.address}
+          ${
+            (p.status === "Delivered" || p.returnRequested)
+              ? `
+                <div class="return-actions">
+                  ${p.returnRequested ? `<p>Return Reason: ${p.returnReason}</p>` : ""}
+                  <button class="btn-approve" onclick="approveReturn('${order._id}', ${i})">Approve</button>
+                  <button class="btn-reject" onclick="rejectReturn('${order._id}', ${i})">Reject</button>
+                </div>
+              `
+              : ""
+          }
         </div>
+      </div>
+    `).join("")}
+  </div>
 
-        <div class="modal-section">
-          <strong>Products (${order.products.length})</strong>
-          ${order.products.map((p, i) => `
-            <div class="product-row">
-              <img src="${p.image}" onerror="this.src='/images/no-image.png'" alt="${p.name}">
-              <div>
-                <strong>${i + 1}. ${p.name}</strong><br>
-                Quantity: ${p.quantity} | Price: ₹${p.price}
-              </div>
-              <div class="product-status">
-     <select onchange="updateProductStatus('${order._id}', ${i}, this.value)">
-
-
-  <option value="Placed" ${p.status === "Placed" ? "selected" : ""}>Placed</option>
-  <option value="Processing" ${p.status === "Processing" ? "selected" : ""}>Processing</option>
-  <option value="Shipped" ${p.status === "Shipped" ? "selected" : ""}>Shipped</option>
-  <option value="Out for Delivery" ${p.status === "Out for Delivery" ? "selected" : ""}>
-    Out for Delivery
-  </option>
-  <option value="Delivered" ${p.status === "Delivered" ? "selected" : ""}>Delivered</option>
-  <option value="Cancelled" ${p.status === "Cancelled" ? "selected" : ""}>Cancelled</option>
-</select>
-${
-        p.status === "Delivered" && !p.returnRequested
-          ? `<button class="btn-return" onclick="requestReturn('${order._id}', ${i})">Request Return</button>`
-          : ""
-      }
-      ${
-        p.returnRequested
-          ? `<span class="return-pending">Return Requested</span>`
-          : ""
-      }
-
-
-              </div>
-            </div>
-          `).join("")}
-        </div>
-
-        <div class="modal-section">
-          <strong>Payment Summary</strong><br><br>
-          <div class="payment-row"><span>Payment Method</span><span>${order.payment.method}</span></div>
-          <div class="payment-row"><span>Payment Status</span><span>${order.payment.status}</span></div>
-          <div class="payment-row"><span>Subtotal</span><span>₹${order.payment.subTotal}</span></div>
-          <div class="payment-row"><span>Discount</span><span>- ₹${order.payment.discount}</span></div>
-          <hr>
-          <div class="payment-row total"><strong>Total</strong><strong>₹${order.payment.total}</strong></div>
-        </div>
-      `;
-          })
-          .catch(err => {
-            console.error(err);
-            modalContent.innerHTML = "Failed to load order";
-          });
-      }
-
+  <div class="modal-section">
+    <strong>Payment Summary</strong><br><br>
+    <div class="payment-row"><span>Payment Method</span><span>${order.payment.method}</span></div>
+    <div class="payment-row"><span>Payment Status</span><span>${order.payment.status}</span></div>
+    <div class="payment-row"><span>Subtotal</span><span>₹${order.payment.subTotal}</span></div>
+    <div class="payment-row"><span>Discount</span><span>- ₹${order.payment.discount}</span></div>
+    <hr>
+    <div class="payment-row total"><strong>Total</strong><strong>₹${order.payment.total}</strong></div>
+  </div>
+`;
+    })
+    .catch(err => {
+      console.error(err);
+      modalContent.innerHTML = "Failed to load order";
+    });
+}
+         
       function closeOrderModal() {
         modal.style.display = "none";
       }
@@ -256,30 +252,46 @@ function updateProductStatus(orderId, index, status) {
   });
 }
 
-function requestReturn(orderId, index) {
-  const reason = prompt("Enter return reason");
-  if (!reason) return;
+function approveReturn(orderId, index) {
+  Swal.fire({
+    title: "Approve return?",
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonText: "Yes, approve"
+  }).then(result => {
+    if (!result.isConfirmed) return;
 
-  fetch(`/admin/orders/${orderId}/product/${index}/return`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ reason })
-  })
-  .then(res => res.json())
-  .then(data => {
-    Swal.fire({
-      icon: data.success ? 'success' : 'error',
-      title: data.success ? 'Return Requested' : 'Failed',
-      text: data.message
-    }).then(() => location.reload());
-  })
-  .catch(err => {
-    console.error(err);
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: 'Something went wrong while requesting return'
-    });
+    fetch(`/admin/orders/${orderId}/product/${index}/return-approve`, {
+      method: "POST"
+    })
+      .then(res => res.json())
+      .then(data => {
+        Swal.fire({
+          icon: data.success ? "success" : "error",
+          title: data.message
+        }).then(() => location.reload());
+      });
+  });
+}
+function rejectReturn(orderId, index) {
+  Swal.fire({
+    title: "Reject return?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Reject"
+  }).then(result => {
+    if (!result.isConfirmed) return;
+
+    fetch(`/admin/orders/${orderId}/product/${index}/return-reject`, {
+      method: "POST"
+    })
+      .then(res => res.json())
+      .then(data => {
+        Swal.fire({
+          icon: data.success ? "success" : "error",
+          title: data.message
+        }).then(() => location.reload());
+      });
   });
 }
 

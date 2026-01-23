@@ -298,4 +298,23 @@ tbody tr:hover {
   background: #2563eb;
   color: #fff;
 }
-
+.btn-approve {
+  padding: 5px 10px;
+  margin-right: 5px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+.btn-reject {
+  padding: 5px 10px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+.return-actions p {
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: #dc2626;
+}
