@@ -26,8 +26,6 @@ const loadOrders = async (req, res) => {
   }
 };
 
-
-
   const loadOrderDetails = async (req, res) => {
   try {
     if (!req.session.user) return res.redirect("/login");
@@ -36,14 +34,12 @@ const loadOrders = async (req, res) => {
       _id: req.params.id,
       userId: req.session.user._id,
     }).populate("products.productId");
-
+   
+    console.log("order issss",order)
     if (!order) {
-      return res.status(404).send("Order not found");
+      return res.redirect('/userprofile');
     }
     const user = await User.findById(req.session.user._id);
- console.log("📦 ORDER ADDRESS DATA:", JSON.stringify(order.address, null, 2));
-    console.log("📦 ORDER OBJECT:", JSON.stringify(order, null, 2));
-
     res.render("orderDetails", {
       order,
       user,   
@@ -191,8 +187,9 @@ const loadPayment = async (req, res) => {
 // };
 const placeOrder = async (req, res) => {
   try {
-    console.log("🔥 PLACE ORDER HIT");
-    console.log("BODY 👉", req.body);
+      if (!req.session.user) {
+      return res.redirect('/login')
+    }
 
     const userId = req.session.user._id;
     const { addressId, paymentMethod } = req.body;
@@ -203,43 +200,6 @@ const placeOrder = async (req, res) => {
         message: "Address is required"
       });
     }
-
-    console.log("🔍 Looking for addressId:", addressId);
-    console.log("🔍 For userId:", userId);
-
-    // ✅ Fetch address document
-    const addressDoc = await Address.findOne({ userId });
-
-    console.log("📍 Address Document found:", addressDoc ? "YES" : "NO");
-    
-    if (!addressDoc || !addressDoc.addresses || addressDoc.addresses.length === 0) {
-      console.log("❌ No addresses found for user");
-      return res.status(400).json({
-        success: false,
-        message: "No addresses found. Please add an address first."
-      });
-    }
-
-    console.log("📍 Total addresses found:", addressDoc.addresses.length);
-
-    // ✅ Find the specific address by ID using find() instead of id()
-    const selectedAddress = addressDoc.addresses.find(
-      addr => addr._id.toString() === addressId.toString()
-    );
-    
-    console.log("🎯 Selected Address:", selectedAddress ? "FOUND" : "NOT FOUND");
-    console.log("🎯 Address Details:", JSON.stringify(selectedAddress, null, 2));
-
-    if (!selectedAddress) {
-      console.log("❌ Address ID not found in addresses array");
-      console.log("Available IDs:", addressDoc.addresses.map(a => a._id.toString()));
-      return res.status(400).json({
-        success: false,
-        message: "Selected address not found"
-      });
-    }
-
-    // ✅ Fetch cart
     const cart = await Cart.findOne({ userId }).populate("items.productId");
 
     if (!cart || cart.items.length === 0) {
@@ -249,72 +209,65 @@ const placeOrder = async (req, res) => {
       });
     }
 
-    let totalAmount = 0;
+    const addressDoc = await Address.findOne({ userId });
+
+    if (!addressDoc) {
+      return res.status(400).json({
+        success: false,
+        message: "No addresses found. Please add an address first."
+      });
+    }
+
+    const selectedAddress = addressDoc.addresses.id(addressId)
+  console.log('selectedAddress issssss',selectedAddress)
+    if (!selectedAddress) {
+      return res.status(400).json({
+        success: false,
+        message: "Selected address not found"
+      });
+    }
+
+    let total = 0;
 
     const products = cart.items.map(item => {
-      const price = item.productId.salePrice || item.productId.regularPrice;
-      totalAmount += price * item.quantity;
+
+      total += item.productId.regularPrice * item.quantity;
 
       return {
         productId: item.productId._id,
         quantity: item.quantity,
-        price,
+        price:item.productId.regularPrice,
         status: "Placed"
       };
     });
+ 
 
-    // 🔴 Create address object - EXPLICITLY define each field
-    const orderAddress = {
-      name: String(selectedAddress.name || ""),
-      phone: String(selectedAddress.phone || ""),
-      city: String(selectedAddress.city || ""),
-      state: String(selectedAddress.state || ""),
-      pincode: String(selectedAddress.pincode || ""),
-      landMark: String(selectedAddress.landMark || ""),
-      altPhone: String(selectedAddress.altPhone || "")
-    };
-
-    console.log("📦 Order Address to be saved:", JSON.stringify(orderAddress, null, 2));
-
-    // Create order with explicit address field
-    const order = new Order({
-      userId: userId,
-      address: orderAddress,  // Explicitly set address
-      products: products,
-      totalAmount: totalAmount,
-      paymentMethod: paymentMethod,
+    await Order.create({
+      userId,
+      address:{
+        addressType: selectedAddress.addressType,
+        name: selectedAddress.name,
+        city: selectedAddress.city,
+        landMark: selectedAddress.landMark,
+        state: selectedAddress.state,
+        pincode: selectedAddress.pincode,
+        phone: selectedAddress.phone,
+        altPhone: selectedAddress.altPhone
+      }, 
+      products,
+      totalAmount: total,
+      paymentMethod,
       status: paymentMethod === "COD" ? "Placed" : "Paid"
     });
+console.log("order created.......................")
+   await Cart.deleteOne({ userId });
 
-    console.log("💾 Order object before save:", JSON.stringify(order.toObject(), null, 2));
+  return res.status(200).json({ success: true });
 
-    await order.save();
-
-    console.log("✅ Order saved successfully");
-    console.log("✅ Order ID:", order._id);
-    console.log("✅ Order address after save:", JSON.stringify(order.address, null, 2));
-
-    // Verify the order was saved with address
-    const savedOrder = await Order.findById(order._id);
-    console.log("🔍 Verification - Address in DB:", JSON.stringify(savedOrder.address, null, 2));
-
-    // ✅ Clear cart
-    cart.items = [];
-    await cart.save();
-
-    res.json({
-      success: true,
-      message: "Order placed successfully",
-      orderId: order.orderId
-    });
 
   } catch (error) {
     console.error("PLACE ORDER ERROR ❌", error);
-    console.error("Error stack:", error.stack);
-    res.status(500).json({
-      success: false,
-      message: "Order failed: " + error.message
-    });
+    res.status(500).json({ success: false, message: "Order failed: " + error.message});
   }
 };
 
@@ -386,14 +339,13 @@ const cancelSingleProduct = async (req, res) => {
     product.status = "Cancelled";
     product.cancelReason = reason || "";
 
-    // Update stock
     if (product.productId) {
       await Product.findByIdAndUpdate(product.productId._id, {
         $inc: { stock: product.quantity }
       });
     }
 
-    // If all products cancelled, cancel order
+
     if (order.products.every(p => p.status === "Cancelled")) {
       order.status = "Cancelled";
     }

@@ -259,7 +259,7 @@
             .then(data => {
               if (data.success) {
                 Swal.fire("Returned!", "Product has been returned.", "success")
-                  .then(() => location.reload());
+                  .then(() => window.location.reload());
               } else {
                 Swal.fire("Error", data.message || "Failed to return product", "error");
               }

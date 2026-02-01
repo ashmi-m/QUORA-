@@ -56,8 +56,6 @@ const addToCart = async (req, res) => {
     const { productId } = req.body;
 
     const product = await Product.findById(productId).populate("category");
-    console.log("produtc details is ", product);
-
     if (!product) {
       return res.status(404).json({ success: false, message: "Product not found" });
     }

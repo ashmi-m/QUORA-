@@ -2,8 +2,11 @@
 const Cart = require("../../models/cartSchema");
 const Address = require("../../models/addressSchema");
 const Order = require("../../models/orderSchema");
+
+
 const loadPayment = async (req, res) => {
   try {
+    console
     const userId = req.session.user._id;
     const addressId = req.session.selectedAddress;
 
@@ -50,7 +53,7 @@ const loadOrderSuccess = (req, res) => {
 
 const placeOrder = async (req, res) => {
   try {
-    console.log("PLACE ORDER HIT");
+    console.log("PLACE hel HIT");
     console.log("BODY 👉", req.body);
 
     if (!req.session.user) {
@@ -61,7 +64,7 @@ const placeOrder = async (req, res) => {
     }
 
     const userId = req.session.user._id;
-    const { paymentMethod, addressId } = req.body;
+    const { addressId,paymentMethod } = req.body;
 
     if (!paymentMethod || !addressId) {
       return res.status(400).json({

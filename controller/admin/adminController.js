@@ -37,8 +37,6 @@ const loadDashboard = async (req, res) => {
     try {
       return res.render("dashboard");
     } catch (error) {
-      console.log("error in loaddashborad function", error);
-
       res.redirect("/pageerror");
     }
   } else {
@@ -50,13 +48,13 @@ const logout = async (req, res) => {
   try {
     req.session.destroy(err => {
       if (err) {
-        console.log("Error destroying session", err);
+      
         return res.redirect("/pageerror")
       }
       res.redirect("/admin/login")
     })
   } catch (error) {
-    console.log("unexpected error during logout", error);
+   
     res.redirect("/pageerror")
   }
 }
@@ -313,8 +311,6 @@ const getOrderDetailsJson = async (req, res) => {
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
-
-    // Format address - try embedded first, then lookup from Address collection
     let addressData = {
       name: "N/A",
       city: "N/A",
@@ -322,8 +318,6 @@ const getOrderDetailsJson = async (req, res) => {
       pincode: "N/A",
       phone: "N/A"
     };
-
-    // Check if address is embedded in order
     if (order.address && order.address.name) {
       addressData = {
         name: order.address.name || "N/A",
@@ -334,7 +328,6 @@ const getOrderDetailsJson = async (req, res) => {
         phone: order.address.phone || "N/A"
       };
     } else {
-      // Fallback: Try to get from Address collection
       try {
         const Address = require("../../models/addressSchema");
         const addressDoc = await Address.findOne({
@@ -342,7 +335,6 @@ const getOrderDetailsJson = async (req, res) => {
         }).lean();
 
         if (addressDoc && addressDoc.addresses?.length > 0) {
-          // Use the first address or match by ID if address field is ObjectId
           let selectedAddress = addressDoc.addresses[0];
           
           if (order.address && mongoose.Types.ObjectId.isValid(order.address)) {
@@ -365,8 +357,6 @@ const getOrderDetailsJson = async (req, res) => {
         console.error("Error fetching address:", err);
       }
     }
-
-    // Format products
     const products = order.products.map((p, index) => {
       let imagePath = "/images/no-image.png";
 
@@ -386,8 +376,6 @@ const getOrderDetailsJson = async (req, res) => {
         returnReason: p.returnReason || ""
       };
     });
-
-    // Send response
     res.json({
       _id: order._id,
       orderId: order.orderId,
@@ -452,8 +440,6 @@ const approveReturn = async (req, res) => {
     product.status = "Returned";
     product.returnRequested = false;
     await order.save();
-
-    // Update user's wallet
     const User = require("../../models/userSchema");
     const user = await User.findById(order.userId._id);
     user.wallet = (user.wallet || 0) + product.price;

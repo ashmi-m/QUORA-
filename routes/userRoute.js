@@ -80,11 +80,13 @@ router.post('/wishlist/add', userAuth, wishlistController.addToWishlist);
 router.post('/wishlist/remove', userAuth, wishlistController.removeFromWishlist);
 router.get("/checkout", userAuth, checkoutController.loadCheckoutPage);
 
+//enthinnnn
+
 router.post("/checkout/select-address", checkoutController.selectAddress);
 
 
 router.get("/checkout/payment", paymentController.loadPayment);
-router.post("/checkout/payment/place", paymentController.placeOrder);
+router.post("/checkout/payment/place", orderController.placeOrder);
 router.get("/order-success", paymentController.loadOrderSuccess);
 
 router.get("/orders", userAuth, orderController.loadOrders);
