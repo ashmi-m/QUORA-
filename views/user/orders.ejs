@@ -1,48 +1,75 @@
 
-
+<%- include("../partials/user/header") %>
 <link rel="stylesheet" href="/css/orders.css">
-
+<link rel="stylesheet" href="/css/profile.css">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<div class="orders-wrapper">
-  <section class="orders-content">
-
-    <div class="orders-header">
-      <h2>My Orders</h2>
-      <div class="search-bar">
-        <input type="text" id="searchInput" placeholder="Search orders">
-        <button id="searchBtn">🔍</button>
-         <button id="clearBtn" style="display:none;">❌</button>
-      </div>
+<div class="profile-container">
+  <div class="profile-sidebar">
+    <div class="profile-image-box">
+      <img src="<%= user.profileImage %>" alt="Profile Image" id="profilePreview">
+      <input type="file" id="profileImageInput" hidden>
+      <button type="button" id="changeImageBtn">Change Photo</button>
     </div>
+    <h3>Hello 👋 <%= user?.name %></h3>
 
-    <% if (!orders || orders.length===0) { %>
-      <p>No orders found</p>
-      <% } %>
+    <div class="profile-menu">
+      <a href="/userprofile">
+        <button type="button">Profile Information</button>
+      </a>
+      <a href="/orders">
+        <button class="active" type="button">My Orders</button>
+      </a>
+      <a href="/manage-address">
+        <button type="button">Manage Address</button>
+      </a>
+      <a href="/forgot-password">
+        <button type="button">Forgot Password</button>
+      </a>
+      <button type="button" id="logoutBtn">Logout</button>
+      <a href="/userprofile/privacy-security">
+        <button type="button">Privacy & Security</button>
+      </a>
+    </div>
+  </div>
+
+  <div class="profile-content">
+    <div class="orders-wrapper">
+      <section class="orders-content">
+        <div class="orders-header">
+          <h2>My Orders</h2>
+          <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search orders">
+            <button id="searchBtn">🔍</button>
+            <button id="clearBtn" style="display:none;">❌</button>
+          </div>
+        </div>
+
+        <% if (!orders || orders.length === 0) { %>
+          <p>No orders found</p>
+        <% } %>
 
         <div id="ordersList">
-          <% orders.forEach(order=> { %>
-            <% order.products.forEach(item=> { %>
+          <% orders.forEach(order => { %>
+            <% order.products.forEach(item => { %>
               <div class="order-card" data-product-name="<%= item.productId?.productName?.toLowerCase() || '' %>">
                 <div class="order-image">
                   <img src="<%= item.productId?.productImage?.[0] || '/images/no-image.png' %>" alt="product">
                 </div>
                 <div class="order-info">
-<p class="order-id">
-  <strong>Order ID:</strong> <%= order.orderId %>
-</p>
+                  <p class="order-id">
+                    <strong>Order ID:</strong> <%= order.orderId %>
+                  </p>
 
                   <h4>
                     <%= item.productId?.productName || "Product unavailable" %>
                   </h4>
 
-                  <p class="price">₹ <%= item.price %>
-                  </p>
+                  <p class="price">₹ <%= item.price %></p>
 
                   <p class="date">
                     Ordered on
-                    <%= new Date(order.createdAt).toLocaleDateString("en-IN", { day: "2-digit" , month: "short" ,
-                      year: "numeric" }) %>
+                    <%= new Date(order.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) %>
                   </p>
                   <span class="status <%= order.status.toLowerCase() %>">
                     ● <%= order.status %>
@@ -51,26 +78,28 @@
                   <p class="small">
                     Qty: <%= item.quantity %> | Payment: <%= order.paymentMethod %>
                   </p>
-                  <% if (order.status==="Placed" || order.status==="Paid" ) { %>
+
+                  <% if (order.status === "Placed" || order.status === "Paid") { %>
                     <button class="cancel-btn" onclick="confirmCancel('<%= order._id %>')">
                       Cancel
                     </button>
-                    <% } %>
+                  <% } %>
 
-                      <a href="/orders/<%= order._id %>" class="details-btn">
-                        Details
-                      </a>
-
+                  <a href="/orders/<%= order._id %>" class="details-btn">
+                    Details
+                  </a>
                 </div>
               </div>
-              <% }) %>
-                <% }) %>
+            <% }) %>
+          <% }) %>
         </div>
+
         <div class="pagination" id="pagination"></div>
-
-
-  </section>
+      </section>
+    </div>
+  </div>
 </div>
+
 <script>
   const ITEMS_PER_PAGE = 5;
   let currentPage = 1;

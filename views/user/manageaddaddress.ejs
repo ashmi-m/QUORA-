@@ -147,7 +147,6 @@
 }
 
 .btn-secondary {
-  background: #fff;
   border: 1px solid #ddd;
 }
 
@@ -173,13 +172,6 @@
 </style>
 
 <div class="account-page">
-  <aside class="account-sidebar">
-    <ul class="menu">
-      <li><a href="/userprofile">Profile Information</a></li>
-      <li><a href="/userprofile#ordersSection">My Orders</a></li>
-      <li><a href="/logout">Log out</a></li>
-    </ul>
-  </aside>
 
   <main class="account-content">
     <h3 class="address-form-title">Add new address</h3>
@@ -322,7 +314,7 @@ document.getElementById('cancelBtn').addEventListener('click', () => {
   if (from === 'checkout') {
     window.location.href = '/checkout';
   } else {
-window.location.href = '/userprofile#addressSection';
+window.location.href = '/manage-address';
 
   }
 });
