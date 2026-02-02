@@ -59,11 +59,25 @@ router.post("/address/add", userAuth, userController.addAddress);
 
 router.get( "/manage-address",userAuth, userController.loadManageAddressPage);
 
+// router.get(
+//   "/userprofile/manage-address",
+//   userAuth,
+//   userController.loadManageAddressPage
+// );
+
+
+
+
 router.get("/add-address", userAuth, userController.loadAddAddressPage);
 router.get("/add-address-profile", userAuth, userController.loadAddAddressPageProfile);
 
-router.post("/profile/address/add", userAuth, userController.addAddressFromProfile);
+// router.post("/profile/address/add", userAuth, userController.addAddressFromProfile);
 
+router.post(
+  "/profile/address/add",
+  userAuth,
+  addressController.addAddressFromProfile
+);
 
 router.get("/edit-address/:id", userAuth, userController.loadEditAddressPage);
 router.post("/address/edit/:id", userAuth, userController.updateAddress);

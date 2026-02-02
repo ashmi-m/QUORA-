@@ -5,8 +5,6 @@ const Address = require("../../models/addressSchema");
 const loadCheckoutPage = async (req, res) => {
   try {
     const userId = req.session.user._id;
-
-    // fetch cart and populate product details
     const cart = await Cart.findOne({ userId })
       .populate("items.productId")
       .lean();
@@ -14,8 +12,6 @@ const loadCheckoutPage = async (req, res) => {
     if (!cart || cart.items.length === 0) {
       return res.redirect("/cart");
     }
-
-    // pagination for addresses
     const page = parseInt(req.query.page) || 1;
     const limit = 3;
     const skip = (page - 1) * limit;
@@ -24,8 +20,6 @@ const loadCheckoutPage = async (req, res) => {
     const addresses = addressDoc?.addresses || [];
     const paginatedAddresses = addresses.slice(skip, skip + limit);
     const totalPages = Math.ceil(addresses.length / limit);
-
-    // calculate item totals
     let subtotal = 0;
 
     const itemsWithTotal = cart.items.map(item => {
@@ -47,7 +41,7 @@ const loadCheckoutPage = async (req, res) => {
         quantity,
         itemTotal
       };
-    }).filter(Boolean); // remove nulls
+    }).filter(Boolean); 
 
     const deliveryCharge = subtotal > 1000 ? 0 : 50;
     const total = subtotal + deliveryCharge;

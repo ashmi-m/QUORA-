@@ -131,4 +131,13 @@ textarea {
   background: #f2f2f2;
 }
 
+.input-error {
+  border: 1.5px solid red 
+}
+
+.error-text {
+  color: red;
+  font-size: 12px;
+  margin-top: 4px;
+}
 

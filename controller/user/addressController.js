@@ -113,6 +113,7 @@ const addAddressFromProfile = async (req, res) => {
       name,
       phone: mobile,
       city,
+       altPhone: mobile,
       state,
       landMark: landmark,
       pincode

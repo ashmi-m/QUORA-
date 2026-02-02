@@ -17,7 +17,7 @@ const loadHomepage = async (req, res) => {
   try {
     const products = await Product.find()
       .sort({ createdOn: -1 })
-      .limit(8)
+      .limit(9)
       .lean();
 
     let wishlistIds = [];
@@ -51,7 +51,7 @@ const loadlandingpage = async (req, res) => {
   try {
     const products = await Product.find()
       .sort({ createdOn: -1 })
-      .limit(8)
+      .limit(9)
       .lean();
 
     let cart = null;
@@ -597,12 +597,16 @@ const addAddressFromProfile = async (req, res) => {
     } else {
       await Address.create({ userId, addresses: [newAddress] });
     }
+   let redirectUrl = "/userprofile#addressSection"; 
+    if (from === "checkout") redirectUrl = "/checkout";
 
-    // ✅ SEND JSON (NOT redirect)
-    return res.json({
-      success: true,
-      redirect: "/manage-address"
-    });
+    return res.json({ success: true, redirect: redirectUrl });
+
+
+    // return res.json({
+    //   success: true,
+    //   redirect: "/manage-address"
+    // });
 
   } catch (error) {
     console.error("Add address from profile error:", error);

@@ -33,12 +33,39 @@
   margin-top: 5px;
 }
 
-.add-btn {
-  /* display: inline-block; */
-  margin-top: 10px;
-  color: #6f3fb4;
-  margin-right: 0cap;
+.add-new-address-btn {
+  display: inline-block;
+  margin-top: 14px;
+  padding: 10px 18px;
+  background-color: #0d6efd;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  text-decoration: none;
+  border: none 
 }
+
+
+
+.add-new-address-btn:hover {
+  background-color: #0b5ed7;
+}
+.address-section * {
+  outline: none;
+}
+
+.address-section {
+  border: none 
+}
+
+
+
+.add-new-address-btn:focus {
+  outline: none;
+  box-shadow: none;
+}
+
 
 .summary-item,
 .summary-row {

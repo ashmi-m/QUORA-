@@ -113,6 +113,27 @@
             btn.classList.add("active");
           });
         });
+
+       // 🔥 Open section based on URL hash (Cancel button support)
+const hash = window.location.hash;
+
+if (hash) {
+  const targetId = hash.replace("#", "");
+  const targetSection = document.getElementById(targetId);
+  const targetBtn = document.querySelector(
+    `.profile-menu button[data-target="${targetId}"]`
+  );
+
+  if (targetSection && targetBtn) {
+    sections.forEach(sec => sec.classList.add("hidden"));
+    targetSection.classList.remove("hidden");
+
+    menuButtons.forEach(b => b.classList.remove("active"));
+    targetBtn.classList.add("active");
+  }
+}
+
+
         const editBtn = document.getElementById("editProfileBtn");
         const saveBtn = document.getElementById("saveProfileBtn");
         const inputs = document.querySelectorAll(

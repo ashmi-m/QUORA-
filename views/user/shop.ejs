@@ -297,6 +297,46 @@
   position: absolute;
   width: 100%;
 }
+.wishlist-overlay {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 34px;
+  height: 34px;
+  background: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.wishlist-overlay .heart {
+  color: #ff4d6d;
+  font-size: 18px;
+}
+
+.wishlist-overlay .tick {
+  display: none;
+  color: green;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* when added */
+.wishlist-overlay.active {
+  background: #e6ffe6;
+}
+
+.wishlist-overlay.active .heart {
+  display: none;
+}
+
+.wishlist-overlay.active .tick {
+  display: block;
+}
+
 
 .product-img-wrapper img {
   width: 100%;
@@ -304,6 +344,7 @@
   object-fit: cover;
   border-radius: 6px;
 } */
+
 
 
     </style>
@@ -408,9 +449,12 @@
 <button class="add-to-cart-btn" data-id="<%= product._id %>">
   Add to Cart
 </button>
-   <div class="wishlist-overlay" data-id="<%= product._id %>">
-      ❤
-    </div>
+   <div class="wishlist-overlay <%= product.isWishlisted ? 'active' : '' %>" 
+     data-id="<%= product._id %>">
+  <span class="heart">❤</span>
+  <span class="tick">✔</span>
+</div>
+
 
       </div>
     <% }) %>
@@ -538,6 +582,9 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
 });
+
+
+
 </script>
 
 
