@@ -15,7 +15,6 @@
     margin-bottom: 20px;
   }
 
-  /* Search box */
   input[type="search"] {
     width: 200px;
     padding: 5px 10px;
@@ -49,7 +48,6 @@
     background-color: #f2f2f2;
   }
 
-  /* Buttons */
   .add-btn, .remove-btn, .edit-btn, .delete-btn {
     padding: 5px 10px;
     border: none;
@@ -224,7 +222,7 @@
       <% }) %>
     </table>
 
-    <!-- Pagination -->
+  
     <div class="pagination">
       <% for(let i=1; i<=totalPages; i++){ %>
         <% if(i === currentPage){ %>
@@ -237,7 +235,6 @@
     </div>
   </div>
 
-  <!-- Modal -->
   <div class="modal" id="categoryModal">
     <div class="modal-content">
       <h3 id="modalTitle">Add Category</h3>
@@ -321,39 +318,6 @@
       Swal.fire("Error","Server error","error");
     }
   }
-
-  // async function deleteCategory(id){
-  //   const result=await Swal.fire({
-  //     title:"Are you sure?",
-  //     text:"This will permanently delete the category!",
-  //     icon:"warning",
-  //     showCancelButton: true,
-  //     confirmButtonColor: "#d33",
-  //     cancelButtonColor: "#3085d6",
-  //     confirmButtonText: "Yes, delete it!"
-  //   });
-
-  //   if(!result.isConfirmed)return;
-  //   try{
-  //     const response = await fetch(`/admin/deleteCategory/${id}`, {
-  //       method: "DELETE",
-  //       headers: { "Content-Type": "application/json" }
-  //     });
-
-  //     const data = await response.json();
-
-  //     if (!response.ok) {
-  //       Swal.fire("Error", data.error || "Failed to delete", "error");
-  //       return;
-  //     }
-
-  //     Swal.fire("Deleted!", data.message || "Category deleted successfully", "success")
-  //       .then(() => location.reload());
-
-  //   } catch (err) {
-  //     Swal.fire("Error", "Server error occurred", "error");
-  //   }
-  // }
   
   async function toggleStatus(id, checked){
     try{

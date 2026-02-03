@@ -59,19 +59,9 @@ router.post("/address/add", userAuth, userController.addAddress);
 
 router.get( "/manage-address",userAuth, userController.loadManageAddressPage);
 
-// router.get(
-//   "/userprofile/manage-address",
-//   userAuth,
-//   userController.loadManageAddressPage
-// );
-
-
-
-
 router.get("/add-address", userAuth, userController.loadAddAddressPage);
 router.get("/add-address-profile", userAuth, userController.loadAddAddressPageProfile);
 
-// router.post("/profile/address/add", userAuth, userController.addAddressFromProfile);
 
 router.post(
   "/profile/address/add",
@@ -94,7 +84,7 @@ router.post('/wishlist/add', userAuth, wishlistController.addToWishlist);
 router.post('/wishlist/remove', userAuth, wishlistController.removeFromWishlist);
 router.get("/checkout", userAuth, checkoutController.loadCheckoutPage);
 
-//enthinnnn
+
 
 router.post("/checkout/select-address", checkoutController.selectAddress);
 
@@ -114,7 +104,7 @@ router.put("/orders/return/:id",userAuth,orderController.returnOrder);
 
 router.get("/orders/invoice/:id",userAuth,orderController.downloadInvoice);
 
-// router.get('/orders/:id', userAuth, orderController.viewOrderDetails);
+
 
 router.get( "/userprofile/privacy-security", userAuth, profileController.loadPrivacySecurity);
 

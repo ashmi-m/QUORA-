@@ -11,8 +11,6 @@
   margin: 40px auto;
   padding: 0 20px;
 }
-
-/* SIDEBAR */
 .account-sidebar {
   width: 260px;
   flex-shrink: 0;
@@ -41,8 +39,6 @@
 .account-sidebar .menu a:hover {
   background: #f5f5f5;
 }
-
-/* CONTENT */
 .account-content {
   flex: 1;
   background: #fff;
@@ -50,8 +46,6 @@
   padding: 40px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
-
-/* TITLE */
 .address-form-title {
   font-size: 22px;
   font-weight: 600;
@@ -60,7 +54,6 @@
   border-bottom: 1px solid #eee;
 }
 
-/* FORM */
 .form-row {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -105,7 +98,6 @@
   border-color: #000;
 }
 
-/* RADIO */
 .radio-group {
   display: flex;
   gap: 30px;
@@ -119,7 +111,6 @@
   font-size: 14px;
 }
 
-/* ACTION BUTTONS */
 .form-actions {
   display: flex;
   justify-content: flex-end;
@@ -150,7 +141,6 @@
   border: 1px solid #ddd;
 }
 
-/* RESPONSIVE */
 @media (max-width: 768px) {
   .account-page {
     flex-direction: column;
@@ -292,11 +282,7 @@ document.getElementById("pincode").addEventListener("input", async function () {
 
     if (data[0].Status === "Success") {
       const po = data[0].PostOffice[0];
-
-      // city
       document.getElementById("city").value = po.District;
-
-      // state auto select
       const stateSelect = document.querySelector("select[name='state']");
       stateSelect.value = po.State;
     } else {

@@ -151,7 +151,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const itemEl = e.target.closest(".cart-item");
       const itemId = itemEl.dataset.id;
       const action = e.target.classList.contains("increase-qty") ? "inc" : "dec";
-      //newly added code //
       const quantity = parseInt(itemEl.querySelector(".quantityinfrontend").value) + 1;
 
       try {

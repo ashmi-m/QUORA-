@@ -230,7 +230,7 @@
           </tbody>
         </table>
 
-        <!-- Pagination -->
+       =
         <div class="pagination">
           <% for (let i=1; i <=totalPages; i++) { %>
             <a href="/admin/brands?page=<%= i %>" class="<%= i === currentPage ? 'active' : '' %>">
@@ -244,7 +244,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <script>
-    // Add Brand
+  
     document.getElementById("addBrandForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const brandName = document.getElementById("brandName").value.trim();
@@ -275,8 +275,6 @@
     });
 
 
-
-    // Block Brand
     async function blockBrand(id) {
       try {
         const res = await fetch(`/admin/blockBrand/${id}`, {
@@ -299,8 +297,6 @@
   }
 
 
-
-    // Unblock Brand
       async function unblockBrand(id) {
     try {
       const res = await fetch(`/admin/unblockBrand/${id}`, { method: "PATCH", credentials: "same-origin" });
