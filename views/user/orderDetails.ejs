@@ -31,7 +31,9 @@
 
         <div class="order-summary">
           <div>
-            <p><strong>Order ID:</strong> <%= order.orderId %></p>
+            <p><strong>Order ID:</strong>
+              <%= order.orderId %>
+            </p>
 
             <p>
               <strong>Ordered On:</strong>
@@ -77,29 +79,39 @@
 
                 <p>
                   Status:
-                  <strong class="<%= (item.status || 'Active') === 'Cancelled' ? 'text-danger' : 'text-success' %>">
+<strong class="
+  <%= item.status === 'Cancelled' ? 'text-danger' :
+      item.status === 'Returned' ? 'text-warning' :
+      item.status === 'Delivered' ? 'text-success' : '' %>
+">
+
                     <%= item.status || "Active" %>
                   </strong>
+
+                  <% if (item.returnRequested) { %>
+                    <span class="text-warning"> • Return Requested</span>
+                    <% } %>
                 </p>
 
-                <% if ((order.status === "Placed" || order.status === "Paid") && item.status === "Placed") { %>
-  <button class="cancel-product-btn" onclick="cancelSingleProduct(
+
+                <% if ((order.status==="Placed" || order.status==="Paid" ) && item.status==="Placed" ) { %>
+                  <button class="cancel-product-btn" onclick="cancelSingleProduct(
     '<%= order._id %>',
     '<%= item.productId._id %>'
   )">
-    Cancel Product
-  </button>
-<% } %>
+                    Cancel Product
+                  </button>
+                  <% } %>
 
 
-         <% if (item.status === "Delivered" && !item.returnRequested) { %>
-  <button class="return-product-btn" onclick="returnSingleProduct(
+                    <% if (item.status==="Delivered" && !item.returnRequested) { %>
+                      <button class="return-product-btn" onclick="returnSingleProduct(
     '<%= order._id %>',
     '<%= item.productId._id %>'
   )">
-    Return Product
-  </button>
-<% } %>
+                        Return Product
+                      </button>
+                      <% } %>
 
 
 
@@ -110,25 +122,31 @@
         </section>
 
         <section class="details-grid">
-        <div class="details-box">
-  <h3>Shipping Details</h3>
+          <div class="details-box">
+            <h3>Shipping Details</h3>
 
-  <% if (order.address) { %>
-    <p><strong>Name:</strong> <%= order.address.name %></p>
-    <p><strong>Phone:</strong> <%= order.address.phone %></p>
-    <p>
-      <%= order.address.city %>,
-      <%= order.address.state %> –
-      <%= order.address.pincode %>
-    </p>
+            <% if (order.address) { %>
+              <p><strong>Name:</strong>
+                <%= order.address.name %>
+              </p>
+              <p><strong>Phone:</strong>
+                <%= order.address.phone %>
+              </p>
+              <p>
+                <%= order.address.city %>,
+                  <%= order.address.state %> –
+                    <%= order.address.pincode %>
+              </p>
 
-    <% if (order.address.landMark) { %>
-      <p><strong>Landmark:</strong> <%= order.address.landMark %></p>
-    <% } %>
-  <% } else { %>
-    <p>Address not available</p>
-  <% } %>
-</div>
+              <% if (order.address.landMark) { %>
+                <p><strong>Landmark:</strong>
+                  <%= order.address.landMark %>
+                </p>
+                <% } %>
+                  <% } else { %>
+                    <p>Address not available</p>
+                    <% } %>
+          </div>
 
 
           <div class="details-box">
@@ -153,9 +171,9 @@
             </button>
             <% } %>
 
-             <% if (order.status === "Delivered" && !order.returnRequested) { %>
-  <button class="return-btn" onclick="returnOrder('<%= order._id %>')">Return Order</button>
-<% } %>
+              <% if (order.status==="Delivered" && !order.returnRequested) { %>
+                <button class="return-btn" onclick="returnOrder('<%= order._id %>')">Return Order</button>
+                <% } %>
                   <% if (["Placed", "Paid" , "Delivered" ].includes(order.status)) { %>
                     <a href="/orders/invoice/<%= order._id %>" class="invoice-btn">
                       Download Invoice
@@ -191,47 +209,47 @@
       });
     }
 
-   function cancelSingleProduct(orderId, productId) {
-  Swal.fire({
-    title: "Cancel this product?",
-    input: 'select',
-    inputOptions: {
-      "Changed my mind": "Changed my mind",
-      "Found a better deal": "Found a better deal",
-      "Ordered by mistake": "Ordered by mistake",
-      "Shipping is delayed": "Shipping is delayed",
-      "Product no longer needed": "Product no longer needed"
-    },
-    inputPlaceholder: "Select a reason",
-    showCancelButton: true,
-    confirmButtonColor: "#d33",
-    confirmButtonText: "Yes, cancel it",
-    inputValidator: value => {
-      if (!value) return "You must select a reason";
-    }
-  }).then(result => {
-    if (result.isConfirmed) {
-      fetch("/orders/cancel-product", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          orderId,
-          productId,
-          reason: result.value
-        })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          Swal.fire("Cancelled!", "Product has been cancelled.", "success")
-          .then(() => location.reload());
-        } else {
-          Swal.fire("Error", data.message || "Failed", "error");
+    function cancelSingleProduct(orderId, productId) {
+      Swal.fire({
+        title: "Cancel this product?",
+        input: 'select',
+        inputOptions: {
+          "Changed my mind": "Changed my mind",
+          "Found a better deal": "Found a better deal",
+          "Ordered by mistake": "Ordered by mistake",
+          "Shipping is delayed": "Shipping is delayed",
+          "Product no longer needed": "Product no longer needed"
+        },
+        inputPlaceholder: "Select a reason",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        confirmButtonText: "Yes, cancel it",
+        inputValidator: value => {
+          if (!value) return "You must select a reason";
+        }
+      }).then(result => {
+        if (result.isConfirmed) {
+          fetch("/orders/cancel-product", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              orderId,
+              productId,
+              reason: result.value
+            })
+          })
+            .then(res => res.json())
+            .then(data => {
+              if (data.success) {
+                Swal.fire("Cancelled!", "Product has been cancelled.", "success")
+                  .then(() => location.reload());
+              } else {
+                Swal.fire("Error", data.message || "Failed", "error");
+              }
+            });
         }
       });
     }
-  });
-}
 
     function returnSingleProduct(orderId, productId) {
       Swal.fire({
@@ -258,7 +276,12 @@
             .then(res => res.json())
             .then(data => {
               if (data.success) {
-                Swal.fire("Returned!", "Product has been returned.", "success")
+                Swal.fire(
+                  "Request Sent",
+                  "Return request submitted. Awaiting approval.",
+                  "success"
+                )
+
                   .then(() => window.location.reload());
               } else {
                 Swal.fire("Error", data.message || "Failed to return product", "error");
@@ -286,7 +309,18 @@
             body: JSON.stringify({ reason: result.value })
           })
             .then(res => res.json())
-            .then(() => location.reload());
+           .then(data => {
+  if (data.success) {
+    Swal.fire(
+      "Request Sent",
+      "Order return request submitted. Awaiting approval.",
+      "success"
+    ).then(() => location.reload());
+  } else {
+    Swal.fire("Error", data.message || "Failed", "error");
+  }
+});
+
         }
       });
     }

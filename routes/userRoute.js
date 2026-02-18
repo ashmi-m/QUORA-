@@ -101,6 +101,8 @@ router.get("/orders/:id", userAuth, orderController.loadOrderDetails);
 router.put("/profile/upload-image",userAuth,upload.single("profileImage"),userController.updateProfileImage);
 router.put("/orders/cancel-product",userAuth,orderController.cancelSingleProduct);
 router.put("/orders/return/:id",userAuth,orderController.returnOrder);
+router.put("/orders/return-product",userAuth,orderController.returnSingleProduct);
+
 
 router.get("/orders/invoice/:id",userAuth,orderController.downloadInvoice);
 

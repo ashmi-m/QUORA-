@@ -166,15 +166,16 @@ function openOrderModal(orderId) {
           </select>
 
           ${
-            (p.status === "Delivered" || p.returnRequested)
-              ? `
-                <div class="return-actions">
-                  ${p.returnRequested ? `<p>Return Reason: ${p.returnReason}</p>` : ""}
-                  <button class="btn-approve" onclick="approveReturn('${order._id}', ${i})">Approve</button>
-                  <button class="btn-reject" onclick="rejectReturn('${order._id}', ${i})">Reject</button>
-                </div>
-              `
-              : ""
+          p.returnRequested
+  ? `
+    <div class="return-actions">
+      <p>Return Reason: ${p.returnReason}</p>
+      <button class="btn-approve" onclick="approveReturn('${order._id}', ${i})">Approve</button>
+      <button class="btn-reject" onclick="rejectReturn('${order._id}', ${i})">Reject</button>
+    </div>
+  `
+  : ""
+
           }
         </div>
       </div>

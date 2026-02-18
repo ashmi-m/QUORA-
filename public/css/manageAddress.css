@@ -1,4 +1,4 @@
-/* Address Wrapper - fits inside profile-content */
+
 .address-wrapper {
   width: 100%;
 }
@@ -29,8 +29,6 @@
 .add-address-btn:hover {
   background: #445622;
 }
-
-/* Address Cards */
 .address-card {
   padding: 22px 0;
   border-bottom: 1px solid #e5e5e5;
@@ -78,8 +76,6 @@
   border-radius: 20px;
   font-size: 12px;
 }
-
-/* Address Actions */
 .address-actions {
   position: relative;
 }
@@ -139,8 +135,6 @@
 .delete-btn {
   color: #d32f2f;
 }
-
-/* Pagination */
 .pagination {
   margin-top: 20px;
   display: flex;
@@ -161,14 +155,11 @@
 .page-btn:hover {
   background: #f1f1f1;
 }
-
 .page-btn.active {
   background: #556b2f;
   color: #fff;
   border-color: #556b2f;
 }
-
-/* Make menu links not inherit button styles */
 .profile-menu a {
   display: block;
   text-decoration: none;

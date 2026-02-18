@@ -359,6 +359,58 @@ const cancelSingleProduct = async (req, res) => {
   }
 };
 
+const returnSingleProduct = async (req, res) => {
+  try {
+    const { orderId, productId, reason } = req.body;
+
+    if (!reason) {
+      return res.json({ success: false, message: "Return reason required" });
+    }
+
+    const order = await Order.findOne({
+      _id: orderId,
+      userId: req.session.user._id
+    });
+
+    if (!order) {
+      return res.json({ success: false, message: "Order not found" });
+    }
+
+    const product = order.products.find(
+      p => p.productId.toString() === productId
+    );
+
+    if (!product) {
+      return res.json({ success: false, message: "Product not found" });
+    }
+
+    if (product.status !== "Delivered") {
+      return res.json({
+        success: false,
+        message: "Return allowed only after delivery"
+      });
+    }
+
+    if (product.returnRequested) {
+      return res.json({
+        success: false,
+        message: "Return already requested"
+      });
+    }
+
+    product.returnRequested = true;
+    product.returnReason = reason;
+
+    await order.save();
+
+    res.json({ success: true });
+
+  } catch (error) {
+    console.error("Return single product error:", error);
+    res.status(500).json({ success: false });
+  }
+};
+
 const returnOrder = async (req, res) => {
   try {
     const reason = req.body?.reason;
@@ -377,11 +429,12 @@ const returnOrder = async (req, res) => {
     }
 
     order.products.forEach(p => {
-      p.status = "Returned";
-      p.returnReason = reason;
+      if (p.status === "Delivered") {
+        p.returnRequested = true;
+        p.returnReason = reason;
+      }
     });
 
-    order.status = "Returned";
     await order.save();
 
     res.json({ success: true });
@@ -391,6 +444,7 @@ const returnOrder = async (req, res) => {
     res.status(500).json({ success: false });
   }
 };
+
 
 const downloadInvoice = async (req, res) => {
   try {
@@ -487,6 +541,7 @@ module.exports = {
   cancelOrder,
   loadOrderDetails,
   cancelSingleProduct ,
+  returnSingleProduct,
    returnOrder ,
     downloadInvoice ,
  viewOrderDetails 
