@@ -88,29 +88,32 @@
                     <% }) %>
                       <% } %>
             </tbody>
-            
+
           </table>
 
-           <div class="pagination">
-          <% if (totalPages > 1) { %>
-            <% if (currentPage > 1) { %>
-              <a href="?status=<%= status %>&page=<%= currentPage - 1 %>&search=<%= search %>">« Prev</a>
-            <% } %>
+          <div class="pagination">
+            <% if (totalPages> 1) { %>
+              <% if (currentPage> 1) { %>
+                <a href="?status=<%= status %>&page=<%= currentPage - 1 %>&search=<%= search %>">« Prev</a>
+                <% } %>
 
-            <% for (let i = 1; i <= totalPages; i++) { %>
-              <a href="?status=<%= status %>&page=<%= i %>&search=<%= search %>" class="<%= currentPage === i ? 'active' : '' %>"><%= i %></a>
-            <% } %>
+                  <% for (let i=1; i <=totalPages; i++) { %>
+                    <a href="?status=<%= status %>&page=<%= i %>&search=<%= search %>"
+                      class="<%= currentPage === i ? 'active' : '' %>">
+                      <%= i %>
+                    </a>
+                    <% } %>
 
-            <% if (currentPage < totalPages) { %>
-              <a href="?status=<%= status %>&page=<%= currentPage + 1 %>&search=<%= search %>">Next »</a>
-            <% } %>
-          <% } %>
+                      <% if (currentPage < totalPages) { %>
+                        <a href="?status=<%= status %>&page=<%= currentPage + 1 %>&search=<%= search %>">Next »</a>
+                        <% } %>
+                          <% } %>
+          </div>
+
         </div>
+    </div>
 
-      </div>
-        </div>
-
-      </main>
+    </main>
     </div>
     <div id="orderModal" class="modal-overlay">
       <div class="modal-box">
@@ -123,14 +126,14 @@
     <script>
       const modal = document.getElementById("orderModal");
       const modalContent = document.getElementById("modalContent");
-function openOrderModal(orderId) {
-  modal.style.display = "flex";
-  modalContent.innerHTML = "Loading...";
+      function openOrderModal(orderId) {
+        modal.style.display = "flex";
+        modalContent.innerHTML = "Loading...";
 
-  fetch(`/admin/orders/${orderId}/json`)
-    .then(res => res.json())
-    .then(order => {
-      modalContent.innerHTML = `
+        fetch(`/admin/orders/${orderId}/json`)
+          .then(res => res.json())
+          .then(order => {
+            modalContent.innerHTML = `
   <div class="modal-section">
     <strong>Name:</strong> ${order.user.name}<br>
     <strong>Email:</strong> ${order.user.email}<br>
@@ -165,18 +168,17 @@ function openOrderModal(orderId) {
             <option value="Cancelled" ${p.status === "Cancelled" ? "selected" : ""}>Cancelled</option>
           </select>
 
-          ${
-          p.returnRequested
-  ? `
+          ${p.returnRequested
+                ? `
     <div class="return-actions">
       <p>Return Reason: ${p.returnReason}</p>
       <button class="btn-approve" onclick="approveReturn('${order._id}', ${i})">Approve</button>
       <button class="btn-reject" onclick="rejectReturn('${order._id}', ${i})">Reject</button>
     </div>
   `
-  : ""
+                : ""
 
-          }
+              }
         </div>
       </div>
     `).join("")}
@@ -184,117 +186,116 @@ function openOrderModal(orderId) {
 
   <div class="modal-section">
     <strong>Payment Summary</strong><br><br>
-    <div class="payment-row"><span>Payment Method</span><span>${order.payment.method}</span></div>
+    <div class="payment-row"><span>Payment Method</span><span>${order.payment. method}</span></div>
     <div class="payment-row"><span>Payment Status</span><span>${order.payment.status}</span></div>
     <div class="payment-row"><span>Subtotal</span><span>₹${order.payment.subTotal}</span></div>
-    <div class="payment-row"><span>Discount</span><span>- ₹${order.payment.discount}</span></div>
+    <div class="payment-row"><span>Discount</span><span>- ₹${order. payment .discount}</span></div>
     <hr>
     <div class="payment-row total"><strong>Total</strong><strong>₹${order.payment.total}</strong></div>
   </div>
 `;
-    })
-    .catch(err => {
-      console.error(err);
-      modalContent.innerHTML = "Failed to load order";
-    });
-}
-         
+          })
+          .catch(err => {
+            console.error(err);
+            modalContent.innerHTML = "Failed to load order";
+          });
+      }
+
       function closeOrderModal() {
         modal.style.display = "none";
       }
-function updateProductStatus(orderId, index, status) {
-  fetch(`/admin/orders/${orderId}/product/${index}/status`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ status })
-  })
-  .then(async (res) => {
-    // handle redirect to login
-    if (res.redirected) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Session Expired',
-        text: 'Please login again'
-      }).then(() => {
-        window.location.href = '/admin/login';
-      });
-      return;
-    }
+      function updateProductStatus(orderId, index, status) {
+        fetch(`/admin/orders/${orderId}/product/${index}/status`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status })
+        })
+          .then(async (res) => {
+            if (res.redirected) {
+              Swal.fire({
+                icon: 'warning',
+                title: 'Session Expired',
+                text: 'Please login again'
+              }).then(() => {
+                window.location.href = '/admin/login';
+              });
+              return;
+            }
 
-    const contentType = res.headers.get('content-type');
-    if (!contentType || !contentType.includes('application/json')) {
-      throw new Error('Unexpected response from server');
-    }
+            const contentType = res.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+              throw new Error('Unexpected response from server');
+            }
 
-    const data = await res.json();
-    if (data.success) {
-      Swal.fire({
-        icon: 'success',
-        title: 'Product status updated',
-        text: `Status changed to "${status}"`,
-        timer: 1200,
-        showConfirmButton: false
-      });
-    } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Update Failed',
-        text: data.message || 'Failed to update product status',
-      });
-    }
-  })
-  .catch(err => {
-    console.error(err);
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: 'Something went wrong while updating product status',
-    });
-  });
-}
+            const data = await res.json();
+            if (data.success) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Product status updated',
+                text: `Status changed to "${status}"`,
+                timer: 1200,
+                showConfirmButton: false
+              });
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Update Failed',
+                text: data.message || 'Failed to update product status',
+              });
+            }
+          })
+          .catch(err => {
+            console.error(err);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Something went wrong while updating product status',
+            });
+          });
+      }
 
-function approveReturn(orderId, index) {
-  Swal.fire({
-    title: "Approve return?",
-    icon: "question",
-    showCancelButton: true,
-    confirmButtonText: "Yes, approve"
-  }).then(result => {
-    if (!result.isConfirmed) return;
-
-    fetch(`/admin/orders/${orderId}/product/${index}/return-approve`, {
-      method: "POST"
-    })
-      .then(res => res.json())
-      .then(data => {
+      function approveReturn(orderId, index) {
         Swal.fire({
-          icon: data.success ? "success" : "error",
-          title: data.message
-        }).then(() => location.reload());
-      });
-  });
-}
-function rejectReturn(orderId, index) {
-  Swal.fire({
-    title: "Reject return?",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonText: "Reject"
-  }).then(result => {
-    if (!result.isConfirmed) return;
+          title: "Approve return?",
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonText: "Yes, approve"
+        }).then(result => {
+          if (!result.isConfirmed) return;
 
-    fetch(`/admin/orders/${orderId}/product/${index}/return-reject`, {
-      method: "POST"
-    })
-      .then(res => res.json())
-      .then(data => {
+          fetch(`/admin/orders/${orderId}/product/${index}/return-approve`, {
+            method: "POST"
+          })
+            .then(res => res.json())
+            .then(data => {
+              Swal.fire({
+                icon: data.success ? "success" : "error",
+                title: data.message
+              }).then(() => location.reload());
+            });
+        });
+      }
+      function rejectReturn(orderId, index) {
         Swal.fire({
-          icon: data.success ? "success" : "error",
-          title: data.message
-        }).then(() => location.reload());
-      });
-  });
-}
+          title: "Reject return?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Reject"
+        }).then(result => {
+          if (!result.isConfirmed) return;
+
+          fetch(`/admin/orders/${orderId}/product/${index}/return-reject`, {
+            method: "POST"
+          })
+            .then(res => res.json())
+            .then(data => {
+              Swal.fire({
+                icon: data.success ? "success" : "error",
+                title: data.message
+              }).then(() => location.reload());
+            });
+        });
+      }
 
     </script>
 

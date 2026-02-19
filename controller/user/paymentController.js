@@ -38,7 +38,7 @@ const loadPayment = async (req, res) => {
     });
 
   } catch (err) {
-    console.error("PAYMENT PAGE ERROR ❌", err);
+    console.error("PAYMENT PAGE ERROR ", err);
     res.redirect("/checkout");
   }
 };
@@ -53,9 +53,6 @@ const loadOrderSuccess = (req, res) => {
 
 const placeOrder = async (req, res) => {
   try {
-    console.log("PLACE hel HIT");
-    console.log("BODY 👉", req.body);
-
     if (!req.session.user) {
       return res.status(401).json({
         success: false,
@@ -107,7 +104,7 @@ const placeOrder = async (req, res) => {
     return res.status(200).json({ success: true });
 
   } catch (err) {
-    console.error("PLACE ORDER ERROR ❌", err);
+    console.error("PLACE ORDER ERROR ", err);
     return res.status(500).json({
       success: false,
       message: "Internal server error"

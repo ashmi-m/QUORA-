@@ -197,9 +197,46 @@ const updateProductStatus = async (req, res) => {
       return res.json({ success: false, message: "Order not found" });
     }
 
-    order.products[index].status = status;
-    order.status = status;
 
+     const product = order.products[index];
+    if (!product) {
+      return res.json({ success: false, message: "Product not found" });
+    }
+
+      const currentStatus = product.status;
+
+    if (currentStatus === "Cancelled") {
+      return res.json({
+        success: false,
+        message: "Cancelled product cannot be modified"
+      });
+    }
+
+     const allowedTransitions = {
+      "Placed": ["Processing", "Cancelled"],
+      "Processing": ["Shipped", "Cancelled"],
+      "Shipped": ["Out for Delivery"],
+      "Out for Delivery": ["Delivered"],
+      "Delivered": [],
+      "Cancelled": []
+    };
+     if (!allowedTransitions[currentStatus]?.includes(status)) {
+      return res.json({
+        success: false,
+        message: `Cannot change status from ${currentStatus} to ${status}`
+      });
+    }
+    product.status = status;
+  const allStatuses = order.products.map(p => p.status);
+
+    if (allStatuses.every(s => s === "Cancelled")) {
+      order.status = "Cancelled";
+    } else if (allStatuses.every(s => s === "Delivered")) {
+      order.status = "Delivered";
+    } else {
+      order.status = "Processing";
+    }
+   
     await order.save();
 
     return res.json({ success: true });
@@ -210,97 +247,6 @@ const updateProductStatus = async (req, res) => {
   }
 };
 
-
-// const getOrderDetailsJson = async (req, res) => {
-//   try {
-//     const order = await Order.findById(req.params.id)
-//       .populate("userId")
-//       .populate("products.productId")
-//       .lean();
-
-//     if (!order) {
-//       return res.status(404).json({ message: "Order not found" });
-      
-//     }
-//     let addressText = "Address not available";
-
-//     try {
-//       const Address = require("../../models/addressSchema");
-//       const addressDoc = await Address.findOne({
-//         userId: order.userId?._id
-//       }).lean();
-
-//       if (addressDoc && addressDoc.addresses?.length > 0) {
-//         const selectedAddress = addressDoc.addresses.find(
-//           a => a._id.toString() === order.address?.toString()
-//         );
-
-//         if (selectedAddress) {
-//           addressText = `
-//             ${selectedAddress.name},
-//             ${selectedAddress.landMark},
-//             ${selectedAddress.city},
-//             ${selectedAddress.state} - ${selectedAddress.pincode}
-//             <br>Phone: ${selectedAddress.phone}
-//           `;
-//         } else {
-//           const a = addressDoc.addresses[0];
-//           addressText = `
-//             ⚠️ Original address not found. User's current address:
-//             ${a.name}, ${a.landMark}, ${a.city},
-//             ${a.state} - ${a.pincode}
-//             <br>Phone: ${a.phone}
-//           `;
-//         }
-//       } else {
-//         addressText = "Address not found (no saved addresses)";
-//       }
-//     } catch (err) {
-//       console.error("❌ Address fetch error:", err.message);
-//     }
-//     const products = order.products.map((p, index) => {
-//       let imagePath = "/images/no-image.png";
-
-//       if (p.productId?.productImage?.length > 0) {
-//         const img = p.productId.productImage[0];
-//         imagePath = img.startsWith("http") ? img : `/uploads/${img}`;
-//       }
-
-//       return {
-//         index,
-//         name: p.productId?.productName || "Product",
-//         image: imagePath,
-//         quantity: p.quantity,
-//         price: p.price,
-//         status: p.status || "Pending",
-//            returnRequested: !!p.returnRequested, 
-//     returnReason: p.returnReason || "" 
-//       };
-//     });
-//     res.json({
-//       _id: order._id,
-//       orderId: order.orderId,
-//       user: {
-//         name: order.userId?.name || "N/A",
-//         email: order.userId?.email || "N/A",
-//         phone: order.userId?.phone || "N/A"
-//       },
-//       address: addressText,
-//       payment: {
-//         method: order.paymentMethod || "N/A",
-//         status: order.status || "Pending",
-//         subTotal: order.totalAmount || 0,
-//         discount: 0,
-//         total: order.totalAmount || 0
-//       },
-//       products: products
-//     });
-
-//   } catch (err) {
-//     console.error("❌ getOrderDetailsJson Error:", err);
-//     res.status(500).json({ message: "Server error" });
-//   }
-// };
 const getOrderDetailsJson = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id)

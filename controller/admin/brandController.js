@@ -28,7 +28,6 @@ const getBrandPage = async (req, res) => {
     res.redirect("/pageerror");
   }
 };
-
 const addBrand = async (req, res) => {
   try {
     const { brandName } = req.body;
@@ -38,7 +37,6 @@ const addBrand = async (req, res) => {
         error:"Brand name and logo are required"
       });
     }
-    
     brandName = brandName.trim();
        const existingBrand = await Brand.findOne({
       brandName: { $regex: `^${brandName}$`, $options: "i" },
@@ -50,7 +48,6 @@ const addBrand = async (req, res) => {
         error: "Brand already exists",
       });
     }
-    
     const imagePath = req.file.path; 
 
     const newBrand = new Brand({

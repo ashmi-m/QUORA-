@@ -118,7 +118,8 @@ body.modal-open {
 
 table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;   
+  border-spacing: 0;
 }
 
 thead {
@@ -126,22 +127,40 @@ thead {
 }
 
 th, td {
-  padding: 14px;
-  border-bottom: 1px solid var(--border);
+  padding: 14px 18px;
   font-size: 14px;
   text-align: left;
+  border: none;                
+}
+
+tbody tr {
+  border-bottom: 1px solid var(--border);
+}
+
+tbody tr:last-child {
+  border-bottom: none;
 }
 
 tbody tr:hover {
   background: #fafafa;
 }
 
+tbody tr:hover {
+  background: #fafafa;
+}
 
 .product-cell {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  font-weight: 500;
 }
+
+thead th {
+  font-weight: 600;
+  color: #374151;
+}
+
 
 .more {
   font-size: 12px;

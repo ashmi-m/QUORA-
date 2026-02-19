@@ -28,7 +28,7 @@ const loadCheckoutPage = async (req, res) => {
 
       const regularPrice = Number(product.regularPrice || 0);
       const discount = Number(product.productOffer || 0);
-      const price = regularPrice - (regularPrice * discount) / 100; // price after discount
+      const price = regularPrice - (regularPrice * discount) / 100; 
       const quantity = Number(item.quantity || 1);
       const itemTotal = price * quantity;
 

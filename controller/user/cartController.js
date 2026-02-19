@@ -28,8 +28,6 @@ const loadCartPage = async (req, res) => {
       .send(`Internal Server Error — Current Time: ${currentTime}`);
   }
 };
-
-
 const getCartItems = async (req, res) => {
   try {
     const items = await Cart.find({ userId: req.user._id })
@@ -41,8 +39,6 @@ const getCartItems = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
-
-
 const addToCart = async (req, res) => {
   try {
     if (!req.session.user) {
@@ -51,7 +47,6 @@ const addToCart = async (req, res) => {
         message: "Please login first"
       });
     }
-
     const userId = req.session.user._id;
     const { productId } = req.body;
 
@@ -116,7 +111,6 @@ const addToCart = async (req, res) => {
             message: `Only ${product.quantity} items available in stock`
           });
         }
-
         cart.items[index].quantity += 1;
         cart.items[index].totalPrice =
           cart.items[index].quantity * cart.items[index].price;
@@ -131,8 +125,6 @@ const addToCart = async (req, res) => {
     }
 
     await cart.save();
-
-
     await Wishlist.updateOne(
       { userId },
       { $pull: { items: { productId } } }
@@ -151,16 +143,10 @@ const addToCart = async (req, res) => {
     });
   }
 };
-
 const updateCartItem = async (req, res) => {
   try {
     const { itemId, action, quantity } = req.body;
-
     console.log("QUANTITY", quantity);
-
-
-    // console.log("SDKJHJSKHSDHJDSFD",action)
-
     const cart = await Cart.findOne({ userId: req.user._id })
       .populate({
         path: "items.productId",
@@ -170,20 +156,12 @@ const updateCartItem = async (req, res) => {
     if (!cart) {
       return res.status(404).json({ message: "Cart not found" });
     }
-
     const item = cart.items.id(itemId);
-
-    // console.log(item,"KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK");
-
-
     if (!item) {
       return res.status(404).json({ message: "Item not found" });
     }
 
     const product = item.productId;
-
-    // console.log("ASAASASASASASASASSASAASA",product);
-
     if (
       product.isBlocked ||
       product.isListed === false ||
@@ -211,19 +189,14 @@ const updateCartItem = async (req, res) => {
         message: `Only ${product.quantity} items available`
       });
     }
-
     if (action === "inc") {
       if (item.quantity >= MAX_QTY) {
         return res.status(400).json({
           message: `You can only buy ${MAX_QTY} units`
         });
       }
-
-
       item.quantity += 1;
     }
-
-
     if (action === "dec") {
       if (item.quantity <= 1) {
         return res.status(400).json({
@@ -233,7 +206,6 @@ const updateCartItem = async (req, res) => {
 
       item.quantity -= 1;
     }
-
     item.totalPrice = item.quantity * item.price;
     await cart.save();
 
@@ -249,15 +221,11 @@ const updateCartItem = async (req, res) => {
   }
 };
 
-
-
 const removeCartItem = async (req, res) => {
   try {
     const { itemId } = req.body;
     const cart = await Cart.findOne({ userId: req.user._id });
     if (!cart) return res.status(404).json({ message: "Cart not found" });
-
-
     const initialLength = cart.items.length;
     cart.items = cart.items.filter(item => item._id.toString() !== itemId.toString());
 
