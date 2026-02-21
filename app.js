@@ -26,10 +26,16 @@ app.use(session({
     }
 }));
 
+app.use(passport.initialize());
+app.use(passport.session());
+
+
 // app.use((req, res, next) => {
-//     res.set("Cache-Control", "no-store");
-//     next();
+//   res.locals.user = req.user || req.session.user || null;
+//   console.log("res.locals.user",res.locals.user)
+//   next();
 // });
+
 app.use((req, res, next) => {
     res.set({
         "Cache-Control": "no-store, no-cache, must-revalidate, private",
@@ -39,13 +45,7 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use(passport.initialize());
-app.use(passport.session());
 
-app.use((req,res,next)=>{
-    res.locals.user=req.user;
-    next();
-});
 
 app.set("view engine", "ejs");
 app.set("views", [path.join(__dirname, 'views/user'), path.join(__dirname, 'views/admin')]);

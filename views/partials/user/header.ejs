@@ -82,7 +82,7 @@
     <nav class="nav-links">
       <a href="/">HOME</a>
       <a href="/about">ABOUT</a>
-      <a href="/shop">SHOP</a>
+      <a href="/shop">SHOP </a>
     </nav>
 
     <div class="right-section">
@@ -102,10 +102,11 @@
   </a>
 
 
-        <% if (user ||locals.user) { %>
+        <% if (user) { %>
           <div class="dropdown">
             <a href="#" class="sign-in-link text-dark">
-              <%= user.name || "Username" %>
+               <%= user.name || "Username" %>
+              
             </a>
 
             <div class="dropdown-content">

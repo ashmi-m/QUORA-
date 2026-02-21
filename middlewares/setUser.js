@@ -1,6 +1,10 @@
 
 
 module.exports = (req,res,next)=>{
-    res.locals.user = req.user||req.session.user||null;
+    if (req.user && !req.session.user) {
+    req.session.user = req.user;   // sync google login → session
+  }
+
+    res.locals.user = req.session.user || null;
     next()
 }
