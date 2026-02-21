@@ -622,10 +622,12 @@ const loadManageAddressPage = async (req, res) => {
     }
 
     const userId = req.session.user._id;
-
+   const user = await User.findById(userId)
+   console.log(user)
     const addressDoc = await Address.findOne({ userId }).lean();
 
     res.render("manageAddress", {
+      user,
       addresses: addressDoc ? addressDoc.addresses : []
     });
 

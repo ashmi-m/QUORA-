@@ -217,9 +217,6 @@ clearBtn.addEventListener("click", () => {
       });
   }
 
-  /* ---------------- INITIAL LOAD ---------------- */
-
-  // mark all cards visible initially
   Array.from(ordersList.getElementsByClassName("order-card")).forEach(card => {
     card.dataset.visible = "true";
   });

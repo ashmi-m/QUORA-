@@ -3,11 +3,12 @@ const Cart = require("../../models/cartSchema");
 const User = require("../../models/userSchema");
 const Product = require("../../models/productSchema");
 const Address = require("../../models/addressSchema");
-
 const PDFDocument = require("pdfkit");
+
 const loadOrders = async (req, res) => {
   try {
     if (!req.session.user) return res.redirect("/login");
+ const user= await User.findById(req.session.user._id)
 
     const orders = await Order.find({
       userId: req.session.user._id
@@ -18,7 +19,7 @@ const loadOrders = async (req, res) => {
       })
       .sort({ createdAt: -1 });
 
-    res.render("orders", { orders });
+    res.render("orders", { orders ,user});
 
   } catch (error) {
     console.error(error);
@@ -28,6 +29,7 @@ const loadOrders = async (req, res) => {
   const loadOrderDetails = async (req, res) => {
   try {
     if (!req.session.user) return res.redirect("/login");
+    const userId = req.session.user
 
     const order = await Order.findOne({
       _id: req.params.id,
