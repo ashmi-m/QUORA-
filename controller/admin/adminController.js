@@ -190,21 +190,26 @@ const updateProductStatus = async (req, res) => {
     }
 
     const { status } = req.body;
-    const { id, index } = req.params;
+   console.log("status is",status)
 
+    const {id}= req.params;
+    const index=Number(req.params.index);
+  
     const order = await Order.findById(id);
     if (!order) {
       return res.json({ success: false, message: "Order not found" });
     }
 
 
-     const product = order.products[index];
+     const product = order.products [index];
+
+     console.log("product is ",product)
     if (!product) {
       return res.json({ success: false, message: "Product not found" });
     }
 
       const currentStatus = product.status;
-
+    console.log("currentstatus is",currentStatus)
     if (currentStatus === "Cancelled") {
       return res.json({
         success: false,
@@ -213,7 +218,7 @@ const updateProductStatus = async (req, res) => {
     }
 
      const allowedTransitions = {
-      "Placed": ["Processing", "Cancelled"],
+      "Placed": ["Processing", "Cancelled","Delivered"],
       "Processing": ["Shipped", "Cancelled"],
       "Shipped": ["Out for Delivery"],
       "Out for Delivery": ["Delivered"],
@@ -226,7 +231,10 @@ const updateProductStatus = async (req, res) => {
         message: `Cannot change status from ${currentStatus} to ${status}`
       });
     }
-    product.status = status;
+
+    // product.status = status;//
+    order.products[index].set({ status }); 
+   
   const allStatuses = order.products.map(p => p.status);
 
     if (allStatuses.every(s => s === "Cancelled")) {

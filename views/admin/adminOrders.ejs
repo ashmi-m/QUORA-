@@ -182,17 +182,36 @@
         </div>
       </div>
     `).join("")}
+<div class="modal-section">
+  <strong>Payment Summary</strong><br><br>
+
+  <div class="payment-row">
+    <span>Payment Method:</span>
+    <span>${order.payment.method}</span>
   </div>
 
-  <div class="modal-section">
-    <strong>Payment Summary</strong><br><br>
-    <div class="payment-row"><span>Payment Method</span><span>${order.payment. method}</span></div>
-    <div class="payment-row"><span>Payment Status</span><span>${order.payment.status}</span></div>
-    <div class="payment-row"><span>Subtotal</span><span>₹${order.payment.subTotal}</span></div>
-    <div class="payment-row"><span>Discount</span><span>- ₹${order. payment .discount}</span></div>
-    <hr>
-    <div class="payment-row total"><strong>Total</strong><strong>₹${order.payment.total}</strong></div>
+  <div class="payment-row">
+    <span>Payment Status:</span>
+    <span>${order.payment.status}</span>
   </div>
+
+  <div class="payment-row">
+    <span>Subtotal:</span>
+    <span>₹${order.payment.subTotal}</span>
+  </div>
+
+  <div class="payment-row">
+    <span>Discount:</span>
+    <span>- ₹${order.payment.discount}</span>
+  </div>
+
+  <hr>
+
+  <div class="payment-row total">
+    <strong>Total:</strong>
+    <strong>₹${order.payment.total}</strong>
+  </div>
+</div>
 `;
           })
           .catch(err => {

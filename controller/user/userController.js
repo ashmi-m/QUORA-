@@ -147,7 +147,7 @@ async function sendVerificationEmail(email, otp) {
 }
 const signup = async (req, res) => {
   try {
-    // console.log(req.body)
+    
     const { name, email, password, confirmPassword, phone } = req.body;
 
 
@@ -158,7 +158,7 @@ const signup = async (req, res) => {
 
 
     const findUser = await User.findOne({ email });
-    // console.log("uswer is",findUser)
+    
     if (findUser) {
       console.log("user is already exist", findUser)
       return res.render("signup", { message: "User with this email already exists" });
@@ -168,8 +168,7 @@ const signup = async (req, res) => {
 
     const otp = generateOtp();
 
-    //  console.log("otp",otp)
-
+   
     const emailSent = await sendVerificationEmail(email, otp);
     console.log("emailSent", emailSent)
     if (!emailSent) {
@@ -238,7 +237,7 @@ const conformOtp = async (req, res) => {
 
       console.log("saveUserData is", saveUserData);
 
-      // req.session.user = saveUserData._id;
+      
       req.session.user = {
         _id: saveUserData._id,
         name: saveUserData.name,
@@ -303,7 +302,7 @@ const login = async (req, res) => {
   try {
     console.log("req ", req.body);
     const { email, password } = req.body;
-    // console.log("email",email)
+   
     const findUser = await User.findOne({ isAdmin: 0, email: email });
     console.log("find user", findUser)
     if (!findUser) {
@@ -314,7 +313,7 @@ const login = async (req, res) => {
     }
 
     const passwordMatch = await bcrypt.compare(password, findUser.password);
-    // console.log("password",passwordMatch)
+    
     if (!passwordMatch) {
       return res.render("login", { message: "Incorrect Password" })
     }
