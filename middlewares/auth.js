@@ -2,15 +2,12 @@ const User = require("../models/userSchema");
 
 const userAuth = async (req, res, next) => {
   try {
-    // ⭐ Accept BOTH session login and passport login
     if (!req.session.user && !req.isAuthenticated()) {
       if (req.originalUrl.startsWith("/cart")) {
         return res.status(401).json({ message: "Please login first" });
       }
       return res.redirect("/login");
     }
-
-    // ⭐ Get user id from whichever system logged in
     const userId =
       req.session?.user?._id ||
       req.user?._id;
@@ -18,7 +15,6 @@ const userAuth = async (req, res, next) => {
     if (!userId) {
       return res.redirect("/login");
     }
-
     const user = await User.findById(userId);
 
     if (!user || user.isBlocked) {
@@ -28,8 +24,6 @@ const userAuth = async (req, res, next) => {
       }
       return res.redirect("/login");
     }
-
-    // ⭐ Sync both auth systems so rest of app is consistent
     req.user = user;
     req.session.user = user;
     res.locals.user = user;

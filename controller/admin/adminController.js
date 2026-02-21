@@ -51,11 +51,11 @@ const logout = async (req, res) => {
       
         return res.redirect("/pageerror")
       }
-      res.redirect("/admin/login")
+     return res.redirect("/admin/login")
     })
   } catch (error) {
    
-    res.redirect("/pageerror")
+   return res.redirect("/pageerror")
   }
 }
 const loadOrders = async (req, res) => {
@@ -429,6 +429,8 @@ const rejectReturn = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+
 
 
 module.exports = {

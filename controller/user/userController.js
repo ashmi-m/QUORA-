@@ -535,6 +535,8 @@ const addAddress = async (req, res) => {
       altPhone: mobile,
       city,
       state,
+      locality,   
+  address,  
       landMark: landmark,
       pincode
     };
