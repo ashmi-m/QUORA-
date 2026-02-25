@@ -109,16 +109,21 @@ const loadOrders = async (req, res) => {
     ];
 
     const rawOrders = await Order.aggregate(pipeline);
-    const orders = rawOrders.map(order => {
-      return {
-        ...order,
-        userId: order.user,
-        products: order.products.map((p, index) => ({
-          ...p,
-          productId: order.productsData[index] || null
-        }))
-      };
-    });
+  const orders = rawOrders.map(order => {
+  const mappedProducts = order.products.map((p, index) => ({
+    ...p,
+    productId: order.productsData[index] || null
+  }));
+
+  const hasReturnRequest = mappedProducts.some(p => p.returnRequested === true);
+
+  return {
+    ...order,
+    userId: order.user,
+    products: mappedProducts,
+    hasReturnRequest
+  };
+});
     const countPipeline = pipeline.filter(
       stage => !("$skip" in stage) && !("$limit" in stage)
     );

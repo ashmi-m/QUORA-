@@ -192,7 +192,7 @@
       .search-bar {
         display: flex;
         align-items: center;
-        background: #9ac1f5;
+        background: #6c757d;
         border-radius: 25px;
         padding: 4px 6px;
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
@@ -555,7 +555,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!productId) return;
 
       try {
-        const res = await fetch("/wishlist/add", {
+        const res = await fetch("/wishlist/toggle", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ productId })
@@ -563,7 +563,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const data = await res.json();
 
-        if (res.ok && data.success) {
+     if (!res.ok || !data.success) {
+          Swal.fire("Error", data.message || "Action failed", "error");
+          return;
+        }
+         if (data.action === "added") {
           btn.classList.add("active");
 
           Swal.fire({
@@ -572,12 +576,24 @@ document.addEventListener("DOMContentLoaded", () => {
             timer: 1200,
             showConfirmButton: false
           });
-        } else {
-          Swal.fire("Error", data.message || "Failed", "error");
         }
-      } catch (err) {
+        if (data.action === "removed") {
+          btn.classList.remove("active");
+           Swal.fire({
+            icon: "success",
+            title: "Removed from Wishlist",
+            timer: 1000,
+            showConfirmButton: false
+          });
+        }
+         } catch (err) {
+        console.error(err);
         Swal.fire("Error", "Server error", "error");
       }
+
+
+
+        
     });
   });
 

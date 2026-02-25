@@ -30,44 +30,86 @@ const loadShopPage = async(req,res)=>{
     res.status(500).send("Server Error");
   }
 };
+
+// const getProductsData = async (req, res) => {
+//   try {
+//    const page = parseInt(req.query.page) || 1;
+//    const limit = parseInt(req.query.limit) || 10;
+//    const skip = (page-1)*limit;
+//    const search = req.query.search?.trim()||"";
+//    const filter ={};
+//    if(search){
+//     filter.productName = {$regex:search,$options:"i"};
+//    }
+
+//    const total = await Product.countDocuments(filter);
+
+//    const products = await Product.find(filter)
+//    .populate("category","name")
+//    .populate("brand","brandName")
+//     .sort({ createdAt: -1 })
+    
+//    .skip(skip)
+//    .limit(limit)
+//    .lean();
+
+
+//    res.json({
+//      success: true,
+//       products,
+//       total,
+//       page,
+//       totalPages: Math.ceil(total / limit),
+//       total
+//    });
+
+//   } catch (err) {
+//     console.error("Error fetching products:", err);
+//     res.json({ success: false, message: "Error fetching products" });
+//   }
+// };
 const getProductsData = async (req, res) => {
   try {
-   const page = parseInt(req.query.page) || 1;
-   const limit = parseInt(req.query.limit) || 10;
-   const skip = (page-1)*limit;
-   const search = req.query.search?.trim()||"";
-   const filter ={};
-   if(search){
-    filter.productName = {$regex:search,$options:"i"};
-   }
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
 
-   const total = await Product.countDocuments(filter);
+    const search = req.query.search?.trim() || "";
+    const brand = req.query.brand || "";
 
-   const products = await Product.find(filter)
-   .populate("category","name")
-   .populate("brand","brandName")
-    .sort({ createdAt: -1 })
-    
-   .skip(skip)
-   .limit(limit)
-   .lean();
+    const filter = {};
 
+    if (search) {
+      filter.productName = { $regex: search, $options: "i" };
+    }
 
-   res.json({
-     success: true,
+    if (brand) {
+      filter.brand = brand;
+    }
+
+    const total = await Product.countDocuments(filter);
+
+    const products = await Product.find(filter)
+      .populate("category", "name")
+      .populate("brand", "brandName")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    res.json({
+      success: true,
       products,
       total,
       page,
-      totalPages: Math.ceil(total / limit),
-      total
-   });
+      totalPages: Math.ceil(total / limit)
+    });
 
   } catch (err) {
     console.error("Error fetching products:", err);
     res.json({ success: false, message: "Error fetching products" });
   }
 };
-
 const deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
@@ -353,6 +395,30 @@ const getProductDetails = async (req, res) => {
     res.redirect("/pageerror");
   }
 };
+const toggleProductBlock = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const product = await Product.findById(id);
+    if (!product) {
+      return res.json({ success: false, message: "Product not found" });
+    }
+
+    product.isBlocked = !product.isBlocked;
+    await product.save();
+
+    res.json({
+      success: true,
+      isBlocked: product.isBlocked,
+      message: product.isBlocked ? "Product blocked" : "Product unblocked"
+    });
+
+  } catch (error) {
+    console.error("Error toggling product block:", error);
+    res.json({ success: false, message: "Server error" });
+  }
+};
+
 
 
 module.exports = {
@@ -367,6 +433,7 @@ module.exports = {
     deleteImage,
     getProductsByBrand,
      getAllBrands,
-     getProductDetails
+     getProductDetails,
+     toggleProductBlock,
 };
  

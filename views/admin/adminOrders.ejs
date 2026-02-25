@@ -72,11 +72,15 @@
                       <td>
                         <%= order.userId?.name || "N/A" %>
                       </td>
-                      <td>
-                        <span class="status <%= order.status.toLowerCase().replace(/\s/g,'-') %>">
-                          <%= order.status %>
-                        </span>
-                      </td>
+                     <td>
+  <span class="status <%= order.status.toLowerCase().replace(/\s/g,'-') %>">
+    <%= order.status %>
+  </span>
+
+  <% if (order.hasReturnRequest) { %>
+    <div class="return-badge">Return Requested</div>
+  <% } %>
+</td>
                       <td>₹ <%= order.totalAmount %>
                       </td>
                       <td>

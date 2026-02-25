@@ -328,8 +328,24 @@ thead th {
   cursor: pointer;
 }
 
-.returned-actions p {
+.return-actions p {
   margin-bottom: 6px;
   font-size: 13px;
   color: #dc2626;
+}
+.return-badge {
+  margin-top: 4px;
+  display: inline-block;
+  padding: 3px 8px;
+  font-size: 12px;
+  border-radius: 6px;
+  background: #ffe5e5;
+  color: #d11a2a;
+  font-weight: 600;
+}
+.return-actions {
+  margin-top: 6px;
+  padding: 6px 8px;
+  background: #fff1f2;
+  border-radius: 6px;
 }

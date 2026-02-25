@@ -50,20 +50,15 @@ router.get("/orders", adminAuth, adminController.loadOrders);
 router.get('/orders/:id', adminAuth, adminController.viewOrderDetails);
 router.post("/orders/status/:id", adminAuth, adminController.updateOrderStatus);
 
-router.post(
-  "/orders/:id/product/:index/status",
-  adminAuth,  
-  adminController.updateProductStatus
-);
+router.post( "/orders/:id/product/:index/status",  adminAuth,   adminController.updateProductStatus);
 
 
 router.get("/orders/:id/json", adminAuth, adminController.getOrderDetailsJson);
 
 router.post("/orders/:id/product/:index/return", adminAuth, adminController.requestReturn);
 router.post("/orders/:id/product/:index/return-approve", adminAuth, adminController.approveReturn);
-router.post(
-  "/orders/:id/product/:index/return-reject",adminAuth,adminController.rejectReturn);
-
+router.post("/orders/:id/product/:index/return-reject",adminAuth,adminController.rejectReturn);
+router.patch("/products/toggle-block/:id", productController.toggleProductBlock);
 
 module.exports = router;
 
