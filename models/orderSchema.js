@@ -66,13 +66,14 @@ const orderSchema = new mongoose.Schema({
 
   paymentMethod: {
     type: String,
-    enum: ["COD", "ONLINE", 'Wallet'],
+    enum: ["COD", "ONLINE", 'Wallet','Razorpay'],
     required: true
   },
 
   status: {
     type: String,
      enum: [ "Placed",
+       "Paid",
       "Processing",
       "Shipped",
       "Out for Delivery",

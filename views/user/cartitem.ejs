@@ -19,7 +19,7 @@
           const total = price * qty;
           subtotal += total;
 
-          const outOfStock = item.productId.stock <= 0;
+          const outOfStock = item.productId.quantity<= 0;
         %>
 
         <div class="cart-item <%= outOfStock ? 'out-stock' : '' %>" data-id="<%= item._id %>">
@@ -62,7 +62,7 @@
       <% 
         let hasOutOfStock = false;
         for (let i = 0; i < cart.items.length; i++) {
-          if (cart.items[i].productId.stock <= 0) {
+          if (cart.items[i].productId.quantity <= 0) {
             hasOutOfStock = true;
             break;
           }

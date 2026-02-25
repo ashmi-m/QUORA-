@@ -1,0 +1,29 @@
+<h2>Complete Payment</h2>
+<button id="pay-btn">Pay Now</button>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+const options = {
+  key: "<%= razorpayKey %>",
+  amount: "<%= total * 100 %>",
+  currency: "INR",
+  order_id: "<%= razorpayOrderId %>",
+
+  handler: function (response) {
+    fetch("/checkout/payment/place", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...response,
+        paymentMethod: "Razorpay"
+      })
+    }).then(() => {
+      window.location.href = "/order-success";
+    });
+  }
+};
+
+const rzp = new Razorpay(options);
+document.getElementById("pay-btn").onclick = () => rzp.open();
+</script>

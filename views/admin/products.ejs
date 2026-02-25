@@ -256,7 +256,7 @@ tr.innerHTML = `
   <td>${item.productName}</td>
   <td>${item.regularPrice}</td>
   <td>${item.category?.name || "No Category"}</td>
-  <td>${item.stock ?? 0}</td>
+  <td>${item.quantity ?? 0}</td>
   <td>${item.createdAt ? new Date(item.createdAt).toLocaleDateString() : "-"}</td>
 
   <td class="actions">
