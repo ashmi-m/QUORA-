@@ -17,7 +17,7 @@
     </div>
 
     <div class="profile-container">
-      <div class="profile-sidebar">
+      <!-- <div class="profile-sidebar">
         <div class="profile-image-box">
           <img src="<%= user.profileImage %>" alt="Profile Image" id="profilePreview">
           <input type="file" id="profileImageInput" hidden>
@@ -47,62 +47,71 @@
 
 
         </div>
-      </div>
+      </div> -->
+
+      <%- include("../partials/user/profile-sidebar", { user, activePage: 'profile' }) %>
 
 
-      <div class="profile-content">
+        <div class="profile-content">
 
-        <div id="profileSection" class="profile-section">
+          <div id="profileSection" class="profile-section">
 
-          <form id="profileForm">
-            <h2>Personal Information</h2>
+            <form id="profileForm">
+              <h2>Personal Information</h2>
 
-            <label>Name</label>
-            <input type="text" name="name" value="<%= user.name %>" disabled>
+              <label>Name</label>
+              <input type="text" name="name" value="<%= user.name %>" disabled>
 
-            <div class="row">
-              <div>
-                <label>Email</label>
-                <input type="email" value="<%= user.email %>" disabled>
+              <div class="row">
+                <div>
+                  <label>Email</label>
+                  <input type="email" value="<%= user.email %>" disabled>
+                </div>
+
+                <div>
+                  <label>Mobile Number</label>
+                  <input type="text" name="phone" value="<%= user.phone %>" disabled>
+                </div>
               </div>
+              <label>Gender</label>
+              <select name="gender" id="genderSelect" disabled>
+                <option value="">Select</option>
+                <option value="Male" <%=user.gender==="Male" ? "selected" : "" %>>Male</option>
+                <option value="Female" <%=user.gender==="Female" ? "selected" : "" %>>Female</option>
+                <option value="Other" <%=user.gender==="Other" ? "selected" : "" %>>Other</option>
+                <option value="Prefer not to say" <%=user.gender==="Prefer not to say" ? "selected" : "" %>>Prefer not
+                  to say</option>
+              </select>
 
-              <div>
-                <label>Mobile Number</label>
-                <input type="text" name="phone" value="<%= user.phone %>" disabled>
+
+              <div class="profile-actions">
+                <button type="button" id="editProfileBtn">Edit Profile</button>
+                <button type="button" id="saveProfileBtn" class="hidden">Save Changes</button>
               </div>
-            </div>
-             <label>Gender</label>
-<select name="gender" id="genderSelect" disabled>
-  <option value="">Select</option>
-  <option value="Male" <%= user.gender==="Male" ? "selected" : "" %>>Male</option>
-  <option value="Female" <%= user.gender==="Female" ? "selected" : "" %>>Female</option>
-  <option value="Other" <%= user.gender==="Other" ? "selected" : "" %>>Other</option>
-  <option value="Prefer not to say" <%= user.gender==="Prefer not to say" ? "selected" : "" %>>Prefer not to say</option>
-</select>
-            
+            </form>
+          </div>
+          <div id="ordersSection" class="profile-section hidden">
+            <%- include("./orders", { orders: orders }) %>
 
-            <div class="profile-actions">
-              <button type="button" id="editProfileBtn">Edit Profile</button>
-              <button type="button" id="saveProfileBtn" class="hidden">Save Changes</button>
-            </div>
-          </form>
-        </div>
-        <div id="ordersSection" class="profile-section hidden">
-          <%- include("./orders", { orders: orders }) %>
+          </div>
+          <div id="addressSection" class="profile-section hidden">
+
+            <%- include("./manageAddress", { addresses: addresses }) %>
+          </div>
 
         </div>
-        <div id="addressSection" class="profile-section hidden">
-
-          <%- include("./manageAddress", { addresses: addresses }) %>
-        </div>
-
-      </div>
     </div>
 
     <footer>© 2025 Quora - All Rights Reserved</footer>
 
     <script>
       document.addEventListener("DOMContentLoaded", () => {
+
+        /* ===============================
+           PROFILE SECTION SWITCHING
+           (keep this — page specific)
+        =============================== */
+
         const menuButtons = document.querySelectorAll(".profile-menu button[data-target]");
         const sections = document.querySelectorAll(".profile-section");
 
@@ -116,104 +125,70 @@
           });
         });
 
-       
-const hash = window.location.hash;
 
-if (hash) {
-  const targetId = hash.replace("#", "");
-  const targetSection = document.getElementById(targetId);
-  const targetBtn = document.querySelector(
-    `.profile-menu button[data-target="${targetId}"]`
-  );
+        /* ===============================
+           HASH BASED NAVIGATION
+           (keep this — page specific)
+        =============================== */
 
-  if (targetSection && targetBtn) {
-    sections.forEach(sec => sec.classList.add("hidden"));
-    targetSection.classList.remove("hidden");
+        const hash = window.location.hash;
 
-    menuButtons.forEach(b => b.classList.remove("active"));
-    targetBtn.classList.add("active");
-  }
-}
+        if (hash) {
+          const targetId = hash.replace("#", "");
+          const targetSection = document.getElementById(targetId);
+          const targetBtn = document.querySelector(
+            `.profile-menu button[data-target="${targetId}"]`
+          );
+
+          if (targetSection && targetBtn) {
+            sections.forEach(sec => sec.classList.add("hidden"));
+            targetSection.classList.remove("hidden");
+
+            menuButtons.forEach(b => b.classList.remove("active"));
+            targetBtn.classList.add("active");
+          }
+        }
 
 
-     const editBtn = document.getElementById("editProfileBtn");
-const saveBtn = document.getElementById("saveProfileBtn");
+        /* ===============================
+           PROFILE EDIT + SAVE
+           (keep this — page specific)
+        =============================== */
 
-editBtn.addEventListener("click", () => {
-  document.querySelector("input[name='name']").disabled = false;
-  document.querySelector("input[name='phone']").disabled = false;
-  document.getElementById("genderSelect").disabled = false;
+        const editBtn = document.getElementById("editProfileBtn");
+        const saveBtn = document.getElementById("saveProfileBtn");
 
-  editBtn.classList.add("hidden");
-  saveBtn.classList.remove("hidden");
-});
-       saveBtn.addEventListener("click", async () => {
-  const data = {
-    name: document.querySelector("input[name='name']").value,
-    phone: document.querySelector("input[name='phone']").value,
-    gender: document.getElementById("genderSelect").value
-  };
+        editBtn.addEventListener("click", () => {
+          document.querySelector("input[name='name']").disabled = false;
+          document.querySelector("input[name='phone']").disabled = false;
+          document.getElementById("genderSelect").disabled = false;
 
-  const res = await fetch("/profile/update", {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  });
+          editBtn.classList.add("hidden");
+          saveBtn.classList.remove("hidden");
+        });
 
-  const result = await res.json();
+        saveBtn.addEventListener("click", async () => {
+          const data = {
+            name: document.querySelector("input[name='name']").value,
+            phone: document.querySelector("input[name='phone']").value,
+            gender: document.getElementById("genderSelect").value
+          };
 
-  if (result.success) {
-    Swal.fire("Success", "Profile updated", "success")
-      .then(() => location.reload());
-  } else {
-    Swal.fire("Error", result.message || "Update failed", "error");
-  }
-});
-        const changeBtn = document.getElementById("changeImageBtn");
-        const imageInput = document.getElementById("profileImageInput");
-        const preview = document.getElementById("profilePreview");
-
-        changeBtn.addEventListener("click", () => imageInput.click());
-
-        imageInput.addEventListener("change", async () => {
-          const file = imageInput.files[0];
-          if (!file) return;
-
-          const formData = new FormData();
-          formData.append("profileImage", file);
-
-          const res = await fetch("/profile/upload-image", {
+          const res = await fetch("/profile/update", {
             method: "PUT",
-            body: formData
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
           });
 
           const result = await res.json();
 
           if (result.success) {
-            preview.src = result.image;
-            Swal.fire("Success", "Profile image updated", "success");
+            Swal.fire("Success", "Profile updated", "success")
+              .then(() => location.reload());
           } else {
-            Swal.fire("Error", "Upload failed", "error");
+            Swal.fire("Error", result.message || "Update failed", "error");
           }
         });
-        const logoutBtn = document.getElementById("logoutBtn");
-
-        logoutBtn.addEventListener("click", () => {
-          Swal.fire({
-            title: "Are you sure?",
-            text: "You will be logged out of your account",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#3085d6",
-            confirmButtonText: "Yes, Logout",
-            cancelButtonText: "Cancel"
-          }).then((result) => {
-            if (result.isConfirmed) {
-              window.location.href = "/logout";
-            }
-          });
-        })
 
       });
     </script>

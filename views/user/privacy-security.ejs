@@ -14,29 +14,7 @@
 
     <div class="profile-container">
 
-      <aside class="profile-sidebar">
-
-        <div class="profile-image-box">
-          <% if (user && user.profileImage) { %>
-            <img src="<%= user.profileImage %>" alt="Profile Image" id="profilePreview" />
-            <% } else { %>
-              <img src="/images/default-avatar.png" alt="Profile Image" id="profilePreview" />
-              <% } %>
-                <button type="button" id="changeImageBtn">Change Photo</button>
-        </div>
-
-        <h3>Hello 👋 <%= user?.name || "User" %>
-        </h3>
-
-        <div class="profile-menu">
-          <a href="/userprofile"><button type="button">Profile Information</button></a>
-          <a href="/orders"><button type="button">My Orders</button></a>
-          <a href="/manage-address"><button type="button">Manage Addresses</button></a>
-
-          <a href="/logout"><button type="button">Logout</button></a>
-          <a href="/userprofile/privacy-security"><button type="button" class="active">Privacy & Security</button></a>
-        </div>
-      </aside>
+     <%- include("../partials/user/profile-sidebar", { user, activePage: 'security' }) %>
 
       <main class="profile-content">
 

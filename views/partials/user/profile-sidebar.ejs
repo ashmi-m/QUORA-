@@ -1,0 +1,89 @@
+<div class="profile-sidebar">
+    <div class="profile-image-box">
+        <img src="<%= user.profileImage %>" alt="Profile Image" id="profilePreview">
+        <input type="file" id="profileImageInput" hidden>
+        <button type="button" id="changeImageBtn">Change Photo</button>
+    </div>
+
+    <h3>Hello 👋 <%= user?.name %>
+    </h3>
+
+    <div class="profile-menu">
+        <a href="/userprofile">
+            <button class="<%= activePage === 'profile' ? 'active' : '' %>" data-target="profileSection">
+                Profile Information
+            </button>
+        </a>
+
+        <a href="/orders">
+            <button type="button" class="<%= activePage === 'orders' ? 'active' : '' %>">
+                My Orders
+            </button>
+        </a>
+
+        <a href="/manage-address">
+            <button type="button" class="<%= activePage === 'address' ? 'active' : '' %>">
+                Manage Address
+            </button>
+        </a>
+
+        <a>
+            <button type="button" id="logoutBtn">Logout</button>
+        </a>
+
+        <a href="/userprofile/privacy-security">
+            <button type="button" class="<%= activePage === 'security' ? 'active' : '' %>">
+                Privacy & Security
+            </button>
+        </a>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const changeBtn = document.getElementById("changeImageBtn");
+        const imageInput = document.getElementById("profileImageInput");
+        const preview = document.getElementById("profilePreview");
+        const logoutBtn = document.getElementById("logoutBtn");
+
+        if (changeBtn && imageInput) {
+            changeBtn.addEventListener("click", () => imageInput.click());
+
+            imageInput.addEventListener("change", async () => {
+                const file = imageInput.files[0];
+                if (!file) return;
+
+                const formData = new FormData();
+                formData.append("profileImage", file);
+
+                const res = await fetch("/profile/upload-image", {
+                    method: "PUT",
+                    body: formData
+                });
+
+                const result = await res.json();
+
+                if (result.success) {
+                    preview.src = result.image;
+                    Swal.fire("Success", "Profile image updated", "success");
+                } else {
+                    Swal.fire("Error", "Upload failed", "error");
+                }
+            });
+        }
+
+        if (logoutBtn) {
+            logoutBtn.addEventListener("click", () => {
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "You will be logged out of your account",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, Logout"
+                }).then((result) => {
+                    if (result.isConfirmed) window.location.href = "/logout";
+                });
+            });
+        }
+    });
+</script>

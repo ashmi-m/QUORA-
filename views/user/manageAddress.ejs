@@ -17,35 +17,7 @@
 
   <div class="profile-container">
 
-    <div class="profile-sidebar">
-        <div class="profile-image-box">
-          <img src="<%= user.profileImage %>" alt="Profile Image" id="profilePreview">
-          <input type="file" id="profileImageInput" hidden>
-          <button type="button" id="changeImageBtn">Change Photo</button>
-        </div>
-        <h3>Hello 👋 <%= user?.name %>
-        </h3>
-   
-     <div class="profile-menu">
-          <a href="/userprofile">
-            <button type="button">Profile Information</button>
-          </a>
-           <a href="/orders">
-            <button type="button">My Orders</button>
-          </a>
-           <a href="/manage-address">
-            <button class="active" type="button">Manage Address</button>
-          </a>
-
-          <a ><button type="button" id="logoutBtn" >Logout</button></a>
-          <a href="/userprofile/privacy-security">
-            <button type="button">Privacy & Security</button>
-          </a>
-
-
-
-        </div>
-        </div>
+       <%- include("../partials/user/profile-sidebar", { user, activePage: 'address' }) %>
     <div class="profile-content">
       <div class="address-wrapper">
         <div class="address-header">

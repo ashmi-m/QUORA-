@@ -4,31 +4,8 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <div class="profile-container">
-  <div class="profile-sidebar">
-    <div class="profile-image-box">
-      <img src="<%= user.profileImage %>" alt="Profile Image" id="profilePreview">
-      <input type="file" id="profileImageInput" hidden>
-      <button type="button" id="changeImageBtn">Change Photo</button>
-    </div>
-    <h3>Hello 👋 <%= user?.name %></h3>
-
-    <div class="profile-menu">
-      <a href="/userprofile">
-        <button type="button">Profile Information</button>
-      </a>
-      <a href="/orders">
-        <button class="active" type="button">My Orders</button>
-      </a>
-      <a href="/manage-address">
-        <button type="button">Manage Address</button>
-      </a>
-      
-      <button type="button" id="logoutBtn">Logout</button>
-      <a href="/userprofile/privacy-security">
-        <button type="button">Privacy & Security</button>
-      </a>
-    </div>
-  </div>
+   <%- include("../partials/user/profile-sidebar", { user, activePage: 'orders' }) %>
+  
 
   <div class="profile-content">
     <div class="orders-wrapper">
@@ -73,7 +50,7 @@
                   Payment: <%= order.paymentMethod %>
                 </p>
 
-                <!-- Products list inside this order -->
+               
                 <div class="order-products-list">
                   <% order.products.forEach(item => { %>
                     <div class="order-product-row">
@@ -109,6 +86,7 @@
             </div>
           <% }) %>
         </div>
+             
 
         <div class="pagination" id="pagination"></div>
       </section>
@@ -159,7 +137,7 @@
   const searchBtn = document.getElementById("searchBtn");
   const clearBtn = document.getElementById("clearBtn");
 
-  /* ---------------- PAGINATION ---------------- */
+ 
 
   function getVisibleCards() {
     return Array.from(

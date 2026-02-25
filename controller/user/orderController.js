@@ -502,7 +502,7 @@ const viewOrderDetails = async (req, res) => {
   }
 };
 module.exports = {
-  loadOrders,
+  loadOrders, 
   placeOrder,
   cancelOrder,
   loadOrderDetails,
