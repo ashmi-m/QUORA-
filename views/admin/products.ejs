@@ -198,7 +198,7 @@
       <thead>
         <tr>
           <th>Product</th>
-          <th>Product ID</th>
+         
           <th>Price</th>
           <th>Category</th>
           <!-- <th>Discount</th> -->
@@ -231,80 +231,78 @@
      <div class="pagination-controls" id="paginationControls"></div>
   </div>
 </div>
-
 <script>
-  let currentPage = 1;
-  let totalPages = 1;
-  let itemsPerPage = 10;
-  let totalItems = 0;
-   let searchQuery = "";
-     let selectedBrand = "";
+let currentPage = 1;
+let totalPages = 1;
+let itemsPerPage = 10;
+let totalItems = 0;
+let searchQuery = "";
+let selectedBrand = "";
 
-  async function loadProducts(page = 1) {
-    try {
-      const res = await fetch(`/admin/products/data?page=${page}&limit=${itemsPerPage}&search=${encodeURIComponent(searchQuery)}`);
-      const data = await res.json();
-      const tbody = document.getElementById("productTableBody");
-      tbody.innerHTML = "";
+async function loadProducts(page = 1) {
+  try {
+    const res = await fetch(
+      `/admin/products/data?page=${page}&limit=${itemsPerPage}&search=${encodeURIComponent(searchQuery)}&brand=${selectedBrand}`
+    );
 
-      if (data.success && data.products.length > 0) {
-        data.products.forEach(item => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${item.productName}</td>
-            <td>${item._id}</td>
-            <td>${item.regularPrice}</td>
-            <td>${item.category?.name || "No Category"}</td>
-           
-           
-           <td><%= new Date(products.createdAt).toLocaleDateString() %></td>
+    const data = await res.json();
+    const tbody = document.getElementById("productTableBody");
+    tbody.innerHTML = "";
 
+    if (data.success && data.products.length > 0) {
+      data.products.forEach((item) => {
+        const tr = document.createElement("tr");
 
-            <td class="actions">
-              <span class="edit-icon" onclick="editProduct('${item._id}')">✏️</span>
-              <span class="delete-icon" onclick="deleteProduct('${item._id}')">🗑️</span>
+        tr.innerHTML = `
+          <td>${item.productName}</td>
+          <td>${item.regularPrice}</td>
+          <td>${item.category?.name || "No Category"}</td>
+          <td>${item.stock ?? 0}</td>
+          <td>${item.createdAt ? new Date(item.createdAt).toLocaleDateString() : "-"}</td>
+          <td class="actions">
+            <span class="edit-icon" onclick="editProduct('${item._id}')">✏️</span>
+            <span class="delete-icon" onclick="deleteProduct('${item._id}')">🗑️</span>
+          </td>
+        `;
 
-            </td>
-          `;
-          tbody.appendChild(tr);
-        });
+        tbody.appendChild(tr);
+      });
 
-        currentPage = data.page;
-        totalPages = data.totalPages;
-        totalItems = data.total;
+      currentPage = data.page;
+      totalPages = data.totalPages;
+      totalItems = data.total;
 
-        const start =(currentPage-1)*itemsPerPage+1;
-        const end = Math.min(currentPage*itemsPerPage,totalItems);
-         document.getElementById("entriesInfo").innerText = 
+      const start = (currentPage - 1) * itemsPerPage + 1;
+      const end = Math.min(currentPage * itemsPerPage, totalItems);
+
+      document.getElementById("entriesInfo").innerText =
         `Showing ${start} to ${end} of ${totalItems} entries`;
 
-        renderPagination();
-      } else {
-        tbody.innerHTML = "<tr><td colspan='8'>No Products Found</td></tr>";
-        document.getElementById("entriesInfo").innerText = "Showing 0 entries";
-        document.getElementById("paginationControls").innerHTML = "";
-      }
-    } catch (err) {
-      console.error("Error fetching products:", err);
-      Swal.fire("Error", "Could not load products", "error");
+      renderPagination();
+    } else {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No Products Found</td></tr>`;
+      document.getElementById("entriesInfo").innerText = "Showing 0 entries";
+      document.getElementById("paginationControls").innerHTML = "";
     }
+  } catch (err) {
+    console.error("Error fetching products:", err);
+    Swal.fire("Error", "Could not load products", "error");
   }
+}
 
-  function renderPagination() {
+function renderPagination() {
   const container = document.getElementById("paginationControls");
   container.innerHTML = "";
 
-    if(totalPages <= 1) return;
+  if (totalPages <= 1) return;
 
-    const  prev =  document.createElement("button");
-    prev.innerText = "Prev";
-    prev.disabled = currentPage === 1;
-    prev.onclick = ()=>loadProducts(currentPage - 1);
-    container.appendChild(prev);
+  const prev = document.createElement("button");
+  prev.innerText = "Prev";
+  prev.disabled = currentPage === 1;
+  prev.onclick = () => loadProducts(currentPage - 1);
+  container.appendChild(prev);
 
-
-
-  for(let i=1; i<=totalPages; i++){
+  for (let i = 1; i <= totalPages; i++) {
     const btn = document.createElement("button");
     btn.innerText = i;
     btn.className = i === currentPage ? "active-page" : "";
@@ -314,72 +312,64 @@
 
   const next = document.createElement("button");
   next.innerText = "Next";
-  next.disabled = currentPage===totalPages;
-  next.onclick = ()=> loadProducts(currentPage + 1);
+  next.disabled = currentPage === totalPages;
+  next.onclick = () => loadProducts(currentPage + 1);
   container.appendChild(next);
-
-}
-  async function editProduct(id) {
-    const result = await Swal.fire({
-      title:"Edit Product?",
-       text: "Do you want to edit this product?",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, Edit it!"
-    });
-
-    if(result.isConfirmed){
-  window.location.href = `/admin/editproduct/${id}`
-  }
 }
 
-  async function deleteProduct(id) {
-    const result = await Swal.fire({
-      title: "Are you sure?",
-      text: "This product will be deleted permanently!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, delete it!"
-    });
-
-    if (!result.isConfirmed) return;
-
-    try {
-      const res = await fetch(`/admin/products/${id}`, { method: "DELETE" });
-      const data = await res.json();
-      if (data.success) {
-        Swal.fire("Deleted!", "Product has been deleted.", "success");
-        loadProducts();
-      } else {
-        Swal.fire("Error", data.message || "Failed to delete product", "error");
-      }
-    } catch (err) {
-      console.error("Error deleting product:", err);
-      Swal.fire("Error", "Could not delete product", "error");
-    }
-  }
-  
-    function searchProducts(e) {
-    searchQuery = e.target.value.trim();
-    loadProducts(1); 
-  }
- function filterByBrand() {
-    selectedBrand = document.getElementById("brandFilter").value;
-    loadProducts(1);
-  }
-  
-
-  
-  
-  
-  document.addEventListener("DOMContentLoaded", () => {
-    loadProducts();
-    document.getElementById("searchInput").addEventListener("keyup", searchProducts);
+async function editProduct(id) {
+  const result = await Swal.fire({
+    title: "Edit Product?",
+    text: "Do you want to edit this product?",
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonText: "Yes, Edit it!"
   });
-</script>
 
-           
+  if (result.isConfirmed) {
+    window.location.href = `/admin/editproduct/${id}`;
+  }
+}
+
+async function deleteProduct(id) {
+  const result = await Swal.fire({
+    title: "Are you sure?",
+    text: "This product will be deleted permanently!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Yes, delete it!"
+  });
+
+  if (!result.isConfirmed) return;
+
+  try {
+    const res = await fetch(`/admin/products/${id}`, { method: "DELETE" });
+    const data = await res.json();
+
+    if (data.success) {
+      Swal.fire("Deleted!", "Product has been deleted.", "success");
+      loadProducts(currentPage);
+    } else {
+      Swal.fire("Error", data.message || "Failed to delete", "error");
+    }
+  } catch (err) {
+    console.error(err);
+    Swal.fire("Error", "Could not delete product", "error");
+  }
+}
+
+function searchProducts(e) {
+  searchQuery = e.target.value.trim();
+  loadProducts(1);
+}
+
+function filterByBrand() {
+  selectedBrand = document.getElementById("brandFilter").value;
+  loadProducts(1);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadProducts();
+  document.getElementById("searchInput").addEventListener("keyup", searchProducts);
+});
+</script>

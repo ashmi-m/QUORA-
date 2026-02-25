@@ -78,6 +78,7 @@ const orderSchema = new mongoose.Schema({
       "Out for Delivery",
       "Delivered",
       "Cancelled",
+         "Returned", 
       "Payment Failed"],
     default: "Placed"
   }

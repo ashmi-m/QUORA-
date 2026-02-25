@@ -92,8 +92,6 @@ const loadShopPage = async (req, res) => {
         .limit(limit)
         .lean(),
       Product.countDocuments(query),
-      // Category.find().lean(),
-      // Brand.find().lean(),
       Category.find({ isListed: true }).lean(),
       Brand.find({ isBlocked: false }).lean(),
     ]);

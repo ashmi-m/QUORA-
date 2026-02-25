@@ -33,7 +33,6 @@ const loadHomepage = async (req, res) => {
         cartCount = cart.items.length;
       }
     }
-
     res.render("home", {
       products,
       user: req.session.user || null,
@@ -318,16 +317,6 @@ const login = async (req, res) => {
       return res.render("login", { message: "Incorrect Password" })
     }
 
-    // req.session.user = findUser;
-
-    // if (req.session.user) {
-    //   console.log(req.session.user)
-    //   // console.log("redirect is working")
-    //   return res.redirect("/")//home page
-    // } else {
-    //   res.redirect('/login')
-    // }
-
     req.session.user = {
       _id: findUser._id,
       name: findUser.name,
@@ -603,12 +592,6 @@ const addAddressFromProfile = async (req, res) => {
 
     return res.json({ success: true, redirect: redirectUrl });
 
-
-    // return res.json({
-    //   success: true,
-    //   redirect: "/manage-address"
-    // });
-
   } catch (error) {
     console.error("Add address from profile error:", error);
     return res.status(500).json({
@@ -670,7 +653,6 @@ const updateAddress = async (req, res) => {
   try {
     const userId = req.session.user._id;
     const addressId = req.params.id;
-
     const {
       name,
       phone,

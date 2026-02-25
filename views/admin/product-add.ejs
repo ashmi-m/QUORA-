@@ -188,8 +188,8 @@
                     <div class="card-body">
                         <div id="message-container"></div>
 
-                      
-<form id="productForm" enctype="multipart/form-data" novalidate>
+
+                        <form id="productForm" enctype="multipart/form-data" novalidate>
 
 
                             <div class="mb-4">
@@ -259,7 +259,7 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
-                                  
+
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="mb-4">
@@ -315,7 +315,7 @@
                                                             <img id="imgView<%= i %>" class="image-preview"
                                                                 alt="Preview <%= i %>">
                                                             <button type="button" class="btn-delete"
-                                                                onclick="removeImage(<% i %>)" 
+                                                                onclick="removeImage(<% i %>)"
                                                                 title="Remove Image">❌</button>
                                                         </div>
 
@@ -333,9 +333,7 @@
                                         <button class="btn btn-primary btn-lg me-3" type="submit" id="submitBtn">
                                             <i class="fa fa-plus me-2"></i>Add Product
                                         </button>
-                                        <!-- <button class="btn btn-secondary btn-lg" type="button" onclick="resetForm()">
-                                            <i class="fa fa-refresh me-2"></i>Reset Form
-                                        </button> -->
+                                      
                                     </div>
 
                         </form>
@@ -343,18 +341,7 @@
 
 
 
-                        <!-- <div class="col-lg-4">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5>Product Preview</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div id="productPreview">
-                                        <p class="text-muted">Fill the form to see live preview</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> -->
+                       
                     </div>
     </section>
 
@@ -375,168 +362,168 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
     <script>
 
-const croppedImages = {};
-let cropper = null;
-let currentIndex = null;
+        const croppedImages = {};
+        let cropper = null;
+        let currentIndex = null;
 
-function showError(id, msg) {
-  document.getElementById(id).innerText = msg;
-}
+        function showError(id, msg) {
+            document.getElementById(id).innerText = msg;
+        }
 
-function clearErrors() {
-  document.querySelectorAll('.error-message').forEach(e => e.innerText = '');
-}
-
-
-function validateForm() {
-  clearErrors();
-  let valid = true;
-
-  const name = document.getElementById('product_name').value.trim();
-  const brand = document.getElementById('brand').value;
-  const category = document.getElementById('category').value;
-  const desc = document.querySelector('[name=description]').value.trim();
-  const price = document.querySelector('[name=regularPrice]').value;
-  const qty = document.querySelector('[name=quantity]').value;
-
-  if (name.length < 3) {
-    showError('productName-error', 'Product name must be at least 3 characters');
-    valid = false;
-  }
-
-  if (!brand) {
-    showError('brand-error', 'Please select a brand');
-    valid = false;
-  }
-
-  if (!category) {
-    showError('category-error', 'Please select a category');
-    valid = false;
-  }
-
-  if (desc.length < 10) {
-    showError('description-error', 'Description must be at least 10 characters');
-    valid = false;
-  }
-
-  if (!price || price <= 0) {
-    showError('regularPrice-error', 'Enter a valid price');
-    valid = false;
-  }
-
-  if (qty < 0) {
-    showError('quantity-error', 'Quantity cannot be negative');
-    valid = false;
-  }
-
-  if (Object.keys(croppedImages).length === 0) {
-    showError('images-error', 'At least one image is required');
-    valid = false;
-  }
-
-  return valid;
-}
+        function clearErrors() {
+            document.querySelectorAll('.error-message').forEach(e => e.innerText = '');
+        }
 
 
-function openCropper(event, index) {
-  currentIndex = index;
+        function validateForm() {
+            clearErrors();
+            let valid = true;
 
-  if (cropper) {
-    cropper.destroy();
-    cropper = null;
-  }
+            const name = document.getElementById('product_name').value.trim();
+            const brand = document.getElementById('brand').value;
+            const category = document.getElementById('category').value;
+            const desc = document.querySelector('[name=description]').value.trim();
+            const price = document.querySelector('[name=regularPrice]').value;
+            const qty = document.querySelector('[name=quantity]').value;
 
-  const reader = new FileReader();
-  reader.onload = e => {
-    cropperImage.src = e.target.result;
-    cropperModal.style.display = 'flex';
-    cropper = new Cropper(cropperImage, { aspectRatio: 1 });
-  };
-  reader.readAsDataURL(event.target.files[0]);
-}
+            if (name.length < 3) {
+                showError('productName-error', 'Product name must be at least 3 characters');
+                valid = false;
+            }
 
-function cropImage() {
-  cropper.getCroppedCanvas().toBlob(blob => {
-    croppedImages[currentIndex] = blob;
+            if (!brand) {
+                showError('brand-error', 'Please select a brand');
+                valid = false;
+            }
 
-    const img = document.getElementById(`imgView${currentIndex}`);
-    img.src = URL.createObjectURL(blob);
-    img.style.display = 'block';
+            if (!category) {
+                showError('category-error', 'Please select a category');
+                valid = false;
+            }
 
-    closeCropper();
-  }, 'image/jpeg');
-}
+            if (desc.length < 10) {
+                showError('description-error', 'Description must be at least 10 characters');
+                valid = false;
+            }
 
-function closeCropper() {
-  if (cropper) {
-    cropper.destroy();
-    cropper = null;
-  }
-  cropperModal.style.display = 'none';
-}
+            if (!price || price <= 0) {
+                showError('regularPrice-error', 'Enter a valid price');
+                valid = false;
+            }
 
+            if (qty < 0) {
+                showError('quantity-error', 'Quantity cannot be negative');
+                valid = false;
+            }
 
-document.getElementById('productForm').addEventListener('submit', async e => {
-  e.preventDefault();
-  if (!validateForm()) return;
+            if (Object.keys(croppedImages).length === 0) {
+                showError('images-error', 'At least one image is required');
+                valid = false;
+            }
 
-  const formData = new FormData();
-
-  
-  formData.append('productName', document.getElementById('product_name').value);
-  formData.append('brand', document.getElementById('brand').value);
-  formData.append('category', document.getElementById('category').value);
-  formData.append('description', document.querySelector('[name=description]').value);
-  formData.append('regularPrice', document.querySelector('[name=regularPrice]').value);
-  formData.append('quantity', document.querySelector('[name=quantity]').value);
-  formData.append('color', document.querySelector('[name=color]').value);
-
-  
-  Object.keys(croppedImages).forEach(index => {
-    formData.append('images', croppedImages[index], `image${index}.jpg`);
-  });
-
-  try {
-    const res = await fetch('/admin/addProduct', {
-      method: 'POST',
-      body: formData
-    });
-
-    const data = await res.json();
-
-    if (data.ok) {
-      Swal.fire('Success', data.message, 'success').then(() => {
-        resetProductForm();
-      });
-    } else {
-      Swal.fire('Error', data.error, 'error');
-    }
-  } catch (err) {
-    Swal.fire('Error', 'Server error', 'error');
-  }
-});
+            return valid;
+        }
 
 
-function resetProductForm() {
-  
-  document.getElementById('productForm').reset();
+        function openCropper(event, index) {
+            currentIndex = index;
 
-  Object.keys(croppedImages).forEach(k => delete croppedImages[k]);
-  for (let i = 1; i <= 4; i++) {
-    const input = document.getElementById(`input${i}`);
-    if (input) input.value = "";
-  }
-  document.querySelectorAll('.image-preview').forEach(img => {
-    img.src = "";
-    img.style.display = "none";
-  });
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
 
-  const container = document.getElementById('addedImagesContainer');
-  if (container) {
-    container.innerHTML = `<span class="text-muted">Selected images will appear here</span>`;
-  }
+            const reader = new FileReader();
+            reader.onload = e => {
+                cropperImage.src = e.target.result;
+                cropperModal.style.display = 'flex';
+                cropper = new Cropper(cropperImage, { aspectRatio: 1 });
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
 
-  clearErrors();
-}
+        function cropImage() {
+            cropper.getCroppedCanvas().toBlob(blob => {
+                croppedImages[currentIndex] = blob;
 
-</script>
+                const img = document.getElementById(`imgView${currentIndex}`);
+                img.src = URL.createObjectURL(blob);
+                img.style.display = 'block';
+
+                closeCropper();
+            }, 'image/jpeg');
+        }
+
+        function closeCropper() {
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+            cropperModal.style.display = 'none';
+        }
+
+
+        document.getElementById('productForm').addEventListener('submit', async e => {
+            e.preventDefault();
+            if (!validateForm()) return;
+
+            const formData = new FormData();
+
+
+            formData.append('productName', document.getElementById('product_name').value);
+            formData.append('brand', document.getElementById('brand').value);
+            formData.append('category', document.getElementById('category').value);
+            formData.append('description', document.querySelector('[name=description]').value);
+            formData.append('regularPrice', document.querySelector('[name=regularPrice]').value);
+            formData.append('quantity', document.querySelector('[name=quantity]').value);
+            formData.append('color', document.querySelector('[name=color]').value);
+
+
+            Object.keys(croppedImages).forEach(index => {
+                formData.append('images', croppedImages[index], `image${index}.jpg`);
+            });
+
+            try {
+                const res = await fetch('/admin/addProduct', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await res.json();
+
+                if (data.ok) {
+                    Swal.fire('Success', data.message, 'success').then(() => {
+                        resetProductForm();
+                    });
+                } else {
+                    Swal.fire('Error', data.error, 'error');
+                }
+            } catch (err) {
+                Swal.fire('Error', 'Server error', 'error');
+            }
+        });
+
+
+        function resetProductForm() {
+
+            document.getElementById('productForm').reset();
+
+            Object.keys(croppedImages).forEach(k => delete croppedImages[k]);
+            for (let i = 1; i <= 4; i++) {
+                const input = document.getElementById(`input${i}`);
+                if (input) input.value = "";
+            }
+            document.querySelectorAll('.image-preview').forEach(img => {
+                img.src = "";
+                img.style.display = "none";
+            });
+
+            const container = document.getElementById('addedImagesContainer');
+            if (container) {
+                container.innerHTML = `<span class="text-muted">Selected images will appear here</span>`;
+            }
+
+            clearErrors();
+        }
+
+    </script>

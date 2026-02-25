@@ -37,7 +37,7 @@
             <button type="button">Manage Address</button>
           </a>
         
-          <a href="/forgot-password"><button type="button">Forgot Password</button></a>
+
           <a ><button type="button" id="logoutBtn" >Logout</button></a>
           
           <a href="/userprofile/privacy-security">
@@ -71,19 +71,15 @@
                 <input type="text" name="phone" value="<%= user.phone %>" disabled>
               </div>
             </div>
-
-            <label>Gender</label>
-            <div class="gender">
-              <label>
-                <input type="radio" name="gender" value="Male" disabled <%=user.gender==="Male" ? "checked" : "" %>>
-                Male
-              </label>
-
-              <label>
-                <input type="radio" name="gender" value="Female" disabled <%=user.gender==="Female" ? "checked" : "" %>>
-                Female
-              </label>
-            </div>
+             <label>Gender</label>
+<select name="gender" id="genderSelect" disabled>
+  <option value="">Select</option>
+  <option value="Male" <%= user.gender==="Male" ? "selected" : "" %>>Male</option>
+  <option value="Female" <%= user.gender==="Female" ? "selected" : "" %>>Female</option>
+  <option value="Other" <%= user.gender==="Other" ? "selected" : "" %>>Other</option>
+  <option value="Prefer not to say" <%= user.gender==="Prefer not to say" ? "selected" : "" %>>Prefer not to say</option>
+</select>
+            
 
             <div class="profile-actions">
               <button type="button" id="editProfileBtn">Edit Profile</button>
@@ -140,42 +136,39 @@ if (hash) {
 }
 
 
-        const editBtn = document.getElementById("editProfileBtn");
-        const saveBtn = document.getElementById("saveProfileBtn");
-        const inputs = document.querySelectorAll(
-          "#profileSection input[name='name'], #profileSection input[name='phone'], #profileSection input[name='gender']"
-        );
+     const editBtn = document.getElementById("editProfileBtn");
+const saveBtn = document.getElementById("saveProfileBtn");
 
-        editBtn.addEventListener("click", () => {
-          inputs.forEach(i => i.disabled = false);
-          editBtn.classList.add("hidden");
-          saveBtn.classList.remove("hidden");
-        });
+editBtn.addEventListener("click", () => {
+  document.querySelector("input[name='name']").disabled = false;
+  document.querySelector("input[name='phone']").disabled = false;
+  document.getElementById("genderSelect").disabled = false;
 
-        saveBtn.addEventListener("click", async () => {
-          const gender = document.querySelector("input[name='gender']:checked")?.value;
+  editBtn.classList.add("hidden");
+  saveBtn.classList.remove("hidden");
+});
+       saveBtn.addEventListener("click", async () => {
+  const data = {
+    name: document.querySelector("input[name='name']").value,
+    phone: document.querySelector("input[name='phone']").value,
+    gender: document.getElementById("genderSelect").value
+  };
 
-          const data = {
-            name: document.querySelector("input[name='name']").value,
-            phone: document.querySelector("input[name='phone']").value,
-            gender
-          };
+  const res = await fetch("/profile/update", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
 
-          const res = await fetch("/profile/update", {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
-          });
+  const result = await res.json();
 
-          const result = await res.json();
-
-          if (result.success) {
-            Swal.fire("Success", "Profile updated", "success")
-              .then(() => location.reload());
-          } else {
-            Swal.fire("Error", "Update failed", "error");
-          }
-        });
+  if (result.success) {
+    Swal.fire("Success", "Profile updated", "success")
+      .then(() => location.reload());
+  } else {
+    Swal.fire("Error", result.message || "Update failed", "error");
+  }
+});
         const changeBtn = document.getElementById("changeImageBtn");
         const imageInput = document.getElementById("profileImageInput");
         const preview = document.getElementById("profilePreview");

@@ -21,6 +21,12 @@ const userSchema=new Schema({
         sparse:true,
         default:null
     },
+    gender: {
+    type: String,
+    enum: ["Male", "Female", "Other", "Prefer not to say", ""],
+    default: ""
+  },
+
     googleId:{
         type:String,
         unique:true,

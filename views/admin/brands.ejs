@@ -1,4 +1,4 @@
-<%- include("../partials/admin/header",{active : 'categories'}) %>
+<%- include("../partials/admin/header",{active : 'categories' }) %>
 
   <title>Brands</title>
   <style>
@@ -230,7 +230,7 @@
           </tbody>
         </table>
 
-       =
+        =
         <div class="pagination">
           <% for (let i=1; i <=totalPages; i++) { %>
             <a href="/admin/brands?page=<%= i %>" class="<%= i === currentPage ? 'active' : '' %>">
@@ -244,7 +244,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <script>
-  
+
     document.getElementById("addBrandForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const brandName = document.getElementById("brandName").value.trim();
@@ -263,10 +263,10 @@
           Swal.fire("✅ Success", "Brand added successfully!", "success").then(() => {
             location.reload();
           });
-          
-        document.getElementById("addBrandForm").reset()
+
+          document.getElementById("addBrandForm").reset()
         } else {
-         Swal.fire("❌ Error", data.error, "error");
+          Swal.fire("❌ Error", data.error, "error");
         }
       } catch (err) {
         console.error("Upload failed:", err);
@@ -282,35 +282,35 @@
           credentials: "same-origin"
         });
 
-       const data = await res.json();
-      if (data.success) {
-        Swal.fire("✅ Blocked", "Brand has been blocked.", "success").then(() => {
-          location.reload();
-        });
-      } else {
-        Swal.fire("❌ Error", data.error || "Block failed", "error");
+        const data = await res.json();
+        if (data.success) {
+          Swal.fire("✅ Blocked", "Brand has been blocked.", "success").then(() => {
+            location.reload();
+          });
+        } else {
+          Swal.fire("❌ Error", data.error || "Block failed", "error");
+        }
+      } catch (err) {
+        console.error("Block error:", err);
+        Swal.fire("❌ Error", err.message, "error");
       }
-    } catch (err) {
-      console.error("Block error:", err);
-      Swal.fire("❌ Error", err.message, "error");
     }
-  }
 
 
-      async function unblockBrand(id) {
-    try {
-      const res = await fetch(`/admin/unblockBrand/${id}`, { method: "PATCH", credentials: "same-origin" });
-      const data = await res.json();
-      if (data.success) {
-        Swal.fire("✅ Unblocked", "Brand has been unblocked.", "success").then(() => {
-          location.reload();
-        });
-      } else {
-        Swal.fire("❌ Error", data.error || "Unblock failed", "error");
-      }
-    } catch (err) {
-      console.error("Unblock error:", err);
-      Swal.fire("❌ Error", err.message, "error");
+    async function unblockBrand(id) {
+      try {
+        const res = await fetch(`/admin/unblockBrand/${id}`, { method: "PATCH", credentials: "same-origin" });
+        const data = await res.json();
+        if (data.success) {
+          Swal.fire("✅ Unblocked", "Brand has been unblocked.", "success").then(() => {
+            location.reload();
+          });
+        } else {
+          Swal.fire("❌ Error", data.error || "Unblock failed", "error");
+        }
+      } catch (err) {
+        console.error("Unblock error:", err);
+        Swal.fire("❌ Error", err.message, "error");
       }
     }
   </script>

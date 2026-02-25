@@ -180,6 +180,29 @@ const updateOrderStatus = async (req, res) => {
     res.status(500).send("Server Error");
   }
 };
+function recalculateOrderStatus(order) {
+  const statuses = order.products.map(p => p.status);
+
+  if (statuses.every(s => s === "Cancelled")) {
+    order.status = "Cancelled";
+  } 
+  else if (statuses.every(s => s === "Delivered")) {
+    order.status = "Delivered";
+  } 
+  else if (statuses.every(s => s === "Returned")) {
+    order.status = "Returned";
+  } 
+  else if (statuses.some(s =>
+    s === "Processing" ||
+    s === "Shipped" ||
+    s === "Out for Delivery"
+  )) {
+    order.status = "Processing";
+  } 
+  else {
+    order.status = "Placed";
+  }
+}
 const updateProductStatus = async (req, res) => {
   try {
     if (!req.session || !req.session.admin) {
@@ -200,7 +223,7 @@ const updateProductStatus = async (req, res) => {
       return res.json({ success: false, message: "Order not found" });
     }
 
-
+     const productIndex = Number(index);
      const product = order.products [index];
 
      console.log("product is ",product)
@@ -223,7 +246,8 @@ const updateProductStatus = async (req, res) => {
       "Shipped": ["Out for Delivery"],
       "Out for Delivery": ["Delivered"],
       "Delivered": [],
-      "Cancelled": []
+      "Cancelled": [],
+       "Returned": []
     };
      if (!allowedTransitions[currentStatus]?.includes(status)) {
       return res.json({
@@ -231,30 +255,18 @@ const updateProductStatus = async (req, res) => {
         message: `Cannot change status from ${currentStatus} to ${status}`
       });
     }
+    product.status = status;
 
-    // product.status = status;//
-    order.products[index].set({ status }); 
-   
-  const allStatuses = order.products.map(p => p.status);
+    recalculateOrderStatus(order);
 
-    if (allStatuses.every(s => s === "Cancelled")) {
-      order.status = "Cancelled";
-    } else if (allStatuses.every(s => s === "Delivered")) {
-      order.status = "Delivered";
-    } else {
-      order.status = "Processing";
-    }
-   
     await order.save();
-
-    return res.json({ success: true });
+      return res.json({ success: true });
 
   } catch (err) {
-    console.error(err);
+    console.error("Update product status error:", err);
     res.status(500).json({ success: false });
   }
 };
-
 const getOrderDetailsJson = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id)
@@ -393,6 +405,7 @@ const approveReturn = async (req, res) => {
 
     product.status = "Returned";
     product.returnRequested = false;
+     recalculateOrderStatus(order);
     await order.save();
     const User = require("../../models/userSchema");
     const user = await User.findById(order.userId._id);

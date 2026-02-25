@@ -107,8 +107,70 @@ const removeFromWishlist = async (req, res) => {
   }
 };
 
+const toggleWishlist = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { productId } = req.body;
+
+    if (!productId) {
+      return res.status(400).json({
+        success: false,
+        message: "Product ID required"
+      });
+    }
+
+    let wishlist = await Wishlist.findOne({ userId });
+
+    // create wishlist if not exists
+    if (!wishlist) {
+      wishlist = new Wishlist({
+        userId,
+        items: [{ productId }]
+      });
+      await wishlist.save();
+
+      return res.json({
+        success: true,
+        action: "added"
+      });
+    }
+
+    const itemIndex = wishlist.items.findIndex(
+      item => item.productId.toString() === productId
+    );
+
+    // 🔥 IF EXISTS → REMOVE
+    if (itemIndex > -1) {
+      wishlist.items.splice(itemIndex, 1);
+      await wishlist.save();
+
+      return res.json({
+        success: true,
+        action: "removed"
+      });
+    }
+
+    // 🔥 IF NOT EXISTS → ADD
+    wishlist.items.push({ productId });
+    await wishlist.save();
+
+    res.json({
+      success: true,
+      action: "added"
+    });
+
+  } catch (err) {
+    console.error("Toggle Wishlist Error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
+  }
+};
+
 module.exports = {
   getWishlist,
   addToWishlist,
+   toggleWishlist,
   removeFromWishlist
 };

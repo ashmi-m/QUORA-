@@ -185,7 +185,9 @@ thead th {
 .status.cancelled { background: #dc2626; }
 .status.payment-failed { background: #6b7280; }
 .status.paid { background: #16a34a; }
-.status.shipped {background: #6f42c1; 
+.status.shipped {background: #6f42c1}
+.status.returned {background: #f3ca18; 
+
 }
 
 .btn-view {
@@ -326,7 +328,7 @@ thead th {
   cursor: pointer;
 }
 
-.return-actions p {
+.returned-actions p {
   margin-bottom: 6px;
   font-size: 13px;
   color: #dc2626;

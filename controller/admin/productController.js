@@ -168,9 +168,6 @@ if (req.files && req.files.length > 0) {
     }
 
     const regularPrice = parseFloat(products.regularPrice) || 0;
-    // const salePrice = products.salePrice
-    //   ? parseFloat(products.salePrice)
-    //   : null;
     const  quantity= parseInt(products.quantity, 10) || 0;
     const stock = quantity;
 

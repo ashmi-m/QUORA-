@@ -57,5 +57,8 @@ app.listen(PORT, () => {
     
 })
 
-module.exports = app;
+app.use((req,res,next)=>{
+    res.status(404).render("error","Page not found")
+})
 
+module.exports = app;

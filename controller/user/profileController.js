@@ -23,10 +23,8 @@ console.log("MAIL PASS LENGTH:", process.env.NODEMAILER_PASSWORD?.length);
         pass: process.env.NODEMAILER_PASSWORD,
       },
     });
-
-    // 🔥 This line exposes auth errors
     await transporter.verify();
-    console.log("✅ Nodemailer transporter verified");
+    console.log("Nodemailer transporter verified");
 
     const mailOptions = {
       from: `"Quora" <${process.env.NODEMAILER_EMAIL}>`,
@@ -43,7 +41,7 @@ console.log("MAIL PASS LENGTH:", process.env.NODEMAILER_PASSWORD?.length);
     };
 
     await transporter.sendMail(mailOptions);
-    console.log("✅ Verification email sent to:", email);
+    console.log("Verification email sent to:", email);
   } catch (err) {
     console.error("❌ Email send failed:", err.message);
     throw err;
@@ -166,7 +164,7 @@ const changeEmail = async (req, res) => {
 
     const verificationCode = crypto.randomInt(100000, 999999).toString();
 
-    console.log("✅ VERIFICATION CODE:", verificationCode);
+    console.log(" VERIFICATION CODE:", verificationCode);
 
     emailVerificationCodes.set(user._id.toString(), {
       code: verificationCode,
@@ -218,7 +216,24 @@ const verifyEmail = async (req, res) => {
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
-
+const updateProfile = async(req,res)=>{
+  try{
+    const userId = req.session.user._id;
+    const{name,phone,gender}=req.body
+    await User.findByIdAndUpdate(userId,{
+      name,
+      phone,
+      gender
+    });
+       req.session.user.name = name;
+    req.session.user.phone = phone;
+    req.session.user.gender = gender;
+     res.json({ success: true });
+  }catch(err){
+     console.error(err);
+    res.json({ success: false });
+  }
+}
 
 
 module.exports = {
@@ -226,5 +241,6 @@ module.exports = {
   changePassword,
   changeEmail,
   verifyEmail,
+    updateProfile
 };
 

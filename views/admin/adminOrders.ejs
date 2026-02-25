@@ -27,7 +27,7 @@
           </form>
         </div>
         <div class="status-tabs">
-          <% const statuses=["All","Placed","Processing","Out for Delivery","Delivered","Cancelled","Payment Failed"];
+          <% const statuses=["All","Placed","Processing","Out for Delivery","Delivered", "Returned", "Cancelled","Payment Failed"];
             %>
             <% statuses.forEach(s=> { %>
               <a href="?status=<%= s %>" class="tab <%= status === s ? 'active' : '' %>">
