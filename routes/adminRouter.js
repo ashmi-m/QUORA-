@@ -9,6 +9,7 @@ const brandController = require("../controller/admin/brandController");
 const upload = require("../middlewares/imageUppload.js");
 const productController = require("../controller/admin/productController");
 const orderController = require("../controller/user/orderController");
+const couponController = require("../controller/admin/couponController");
 
 router.get("/pageerror", adminController.pageerror);
 router.get("/login", adminController.loadLogin);
@@ -59,6 +60,22 @@ router.post("/orders/:id/product/:index/return", adminAuth, adminController.requ
 router.post("/orders/:id/product/:index/return-approve", adminAuth, adminController.approveReturn);
 router.post("/orders/:id/product/:index/return-reject",adminAuth,adminController.rejectReturn);
 router.patch("/products/toggle-block/:id", productController.toggleProductBlock);
+
+
+
+// Coupon Management
+
+
+
+router.get("/coupons", adminAuth, couponController.getCouponPage);
+
+router.post("/coupons/add", adminAuth, couponController.addCoupon);
+
+router.post("/coupons/toggle/:id", adminAuth, couponController.toggleCoupon);
+
+router.post("/coupons/edit/:id", adminAuth, couponController.updateCoupon);
+
+router.delete("/coupons/:id", adminAuth, couponController.deleteCoupon);
 
 module.exports = router;
 
