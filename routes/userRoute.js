@@ -90,7 +90,8 @@ router.get("/checkout", userAuth, checkoutController.loadCheckoutPage);
 router.post("/checkout/select-address", checkoutController.selectAddress);
 
 
-router.get("/checkout/payment", paymentController.loadPayment);
+// router.get("/checkout/payment", paymentController.loadPayment);
+router.get("/checkout/payment", userAuth, paymentController.loadPayment);
 router.post("/checkout/payment/place", orderController.placeOrder);
 router.get("/order-success", paymentController.loadOrderSuccess);
 
@@ -119,5 +120,7 @@ router.post( "/userprofile/verify-email", userAuth, profileController.verifyEmai
 router.put("/profile/update", profileController.updateProfile);
 router.post("/wishlist/toggle", userAuth, wishlistController.toggleWishlist);
 router.post('/wishlist/remove', userAuth, wishlistController.removeFromWishlist);
+router.get("/order-failed",paymentController.loadOrderFailed)
+
 module.exports = router;
 

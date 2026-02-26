@@ -27,24 +27,28 @@ const loadPayment = async (req, res) => {
 
     if (!address) return res.redirect("/checkout");
 
-    let total = 0;
-    cart.items.forEach(item => {
-      total += Number(item.productId.regularPrice) * Number(item.quantity);
-    });
-    
-    const options ={
-      amount:Math.round(total * 100),
-      currency:"INR",
-      receipt:"order_" + Date.now()
-    };
-    const razorpayOrder = await razorpay.orders.create(options);
-    res.render("payment", {
-      cartItems: cart.items,
-      address,
-      total,
-      razorpayKey: process.env.RAZORPAY_KEY_ID,
-      razorpayOrderId: razorpayOrder.id
-    });
+  let total = 0;
+cart.items.forEach(item => {
+  total += Number(item.productId.regularPrice) * Number(item.quantity);
+});
+
+const amountInPaise = Math.round(total * 100);
+
+const razorpayOrder = await razorpay.orders.create({
+  amount: amountInPaise,
+  currency: "INR",
+  receipt: "order_" + Date.now()
+});
+
+res.render("payment", {
+  cartItems: cart.items,
+  address,
+  total,
+  user: req.session.user,
+  razorpayKey: process.env.RAZORPAY_KEY_ID,
+  razorpayOrderId: razorpayOrder.id,
+  razorpayAmount: amountInPaise
+});
 
   } catch (err) {
     console.error("PAYMENT PAGE ERROR ", err);
@@ -103,32 +107,29 @@ const placeOrder = async (req, res) => {
     const selectedAddress = addressDoc.addresses.find(
       a => a._id.toString() === addressId.toString()
     );
-    if(paymentMethod==="Razorpay"){
-      const {
-        razorpay_order_id,
-        razorpay_payment_id,
-        razorpay_signature
-      } = req.body;
-        if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
-        return res.status(400).json({
-          success: false,
-          message: "Payment verification data missing"
-        });
-      }
-       const body = razorpay_order_id + "|" + razorpay_payment_id;
+   if (paymentMethod === "Razorpay") {
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
-      const expectedSignature = crypto
-        .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-        .update(body)
-        .digest("hex");
+  if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+    return res.status(400).json({
+      success: false,
+      message: "Payment details missing"
+    });
+  }
 
-      if (expectedSignature !== razorpay_signature) {
-        return res.status(400).json({
-          success: false,
-          message: "Payment verification failed"
-        });
-      }
-    }
+  const generated_signature = crypto
+    .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+    .update(razorpay_order_id + "|" + razorpay_payment_id)
+    .digest("hex");
+
+  if (generated_signature !== razorpay_signature) {
+    console.error("Expected signature:", generated_signature, "Received:", razorpay_signature);
+    return res.status(400).json({
+      success: false,
+      message: "Payment verification failed"
+    });
+  }
+}
     await Order.create({
       userId,
        address: selectedAddress,
@@ -151,9 +152,16 @@ const placeOrder = async (req, res) => {
     });
   }
 };
+const loadOrderFailed = (req, res) => {
+ res.render("user/order-failed", {
+  retryUrl: "/checkout/payment",
+  ordersPage: "/orders"
+});
+};
 
 module.exports = {
   loadPayment,
   placeOrder,
-  loadOrderSuccess
+  loadOrderSuccess,
+  loadOrderFailed
 };

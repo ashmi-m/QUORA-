@@ -1,42 +1,25 @@
-
-
 <%- include("../partials/user/header") %>
 <link rel="stylesheet" href="/css/payment.css">
-
-
 
 <div class="breadcrumb">
   Home / <strong>Products</strong>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<form id="paymentForm" action="/checkout/payment/place" method="POST">
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<form id="paymentForm">
 
   <input type="hidden" name="addressId" value="<%= address._id %>">
 
   <div class="payment-container">
 
-   
     <div class="payment-methods">
       <h3>Select payment method</h3>
 
       <label class="payment-option">
         <input type="radio" name="paymentMethod" value="Razorpay" checked>
-        <span>Razorpay - <%= address.name %></span>
-      </label>
-
-      <label class="payment-option">
-        <input type="radio" name="paymentMethod" value="UPI">
-        <span>UPI Payment</span>
-      </label>
-
-      <label class="payment-option">
-        <input type="radio" name="paymentMethod" value="Card">
-        <span>Credit / Debit Card</span>
-      </label>
-
-      <label class="payment-option">
-        <input type="radio" name="paymentMethod" value="Wallet">
-        <span>Wallets</span>
+        <span>Razorpay</span>
       </label>
 
       <label class="payment-option">
@@ -50,10 +33,7 @@
       <% cartItems.forEach(item => { %>
         <div class="summary-row">
           <span><%= item.productId.productName %> × <%= item.quantity %></span>
-<span>
-  ₹ <%= Number(item.productId.regularPrice) * Number(item.quantity) %>
-</span>
-
+          <span>₹ <%= item.productId.regularPrice * item.quantity %></span>
         </div>
       <% }) %>
 
@@ -63,13 +43,12 @@
         <strong>Total</strong>
         <strong>₹ <%= total %></strong>
       </div>
-
-      <button type="submit" class="place-order-btn">
+      <button type="button" id="placeOrderBtn" class="place-order-btn">
         Place Order
       </button>
 
       <p class="secure-text">
-        🔒 Safe and secure payments. 100% Authentic products
+        🔒 Safe and secure payments
       </p>
     </div>
 
@@ -77,57 +56,89 @@
 </form>
 
 <script>
-  const form = document.getElementById("paymentForm");
+const paymentData = {
+  key: "<%= razorpayKey %>",
+  orderId: "<%= razorpayOrderId %>",
+  amount: <%- JSON.stringify(razorpayAmount) %>,
+  addressId: "<%= address._id %>",
+  name: "<%= user?.name || '' %>",
+  email: "<%= user?.email || '' %>",
+  phone: "<%= user?.phone || '' %>"
+};
 
-  form.addEventListener("submit", async function (e) {
-    e.preventDefault();
+document.getElementById("placeOrderBtn").addEventListener("click", async function () {
 
-    const formData = new FormData(form);
+  const selectedMethod = document.querySelector("input[name='paymentMethod']:checked").value;
 
-    try {
-      const res = await fetch(form.action, {
+  if (selectedMethod === "COD") {
+    const res = await fetch("/checkout/payment/place", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        addressId: paymentData.addressId,
+        paymentMethod: "COD"
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      Swal.fire("Success", "Order placed successfully", "success")
+        .then(() => window.location.href = "/order-success");
+    } else {
+      Swal.fire("Error", data.message || "Order failed", "error");
+    }
+
+    return;
+  }
+  const options = {
+    key: paymentData.key,
+    amount: Number(paymentData.amount),
+    currency: "INR",
+    order_id: paymentData.orderId,
+    name: "Your Store",
+    description: "Order Payment",
+
+    prefill: {
+      name: paymentData.name,
+      email: paymentData.email,
+      contact: paymentData.phone
+    },
+
+    handler: async function (response) {
+
+      const res = await fetch("/checkout/payment/place", {
         method: "POST",
-        headers: {
-          "Accept": "application/json"
-        },
-        body: new URLSearchParams(formData)
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_signature: response.razorpay_signature,
+          addressId: paymentData.addressId,
+          paymentMethod: "Razorpay"
+        })
       });
-
-      const contentType = res.headers.get("content-type");
-
-      if (!contentType || !contentType.includes("application/json")) {
-        throw new Error("Response is not JSON");
-      }
 
       const data = await res.json();
 
       if (data.success) {
-        Swal.fire({
-          icon: "success",
-          title: "Order placed successfully",
-          text: "Order placed using Cash on Delivery successfully",
-          confirmButtonText: "OK"
-        }).then(() => {
-          window.location.href = "/order-success";
-        });
+        window.location.href = "/order-success?method=Razorpay";
       } else {
-        Swal.fire({
-          icon: "error",
-          title: "Order Failed",
-          text: data.message || "Something went wrong"
-        });
+        Swal.fire("Error", "Payment verification failed", "error");
       }
+    },
 
-    } catch (err) {
-      console.error("FETCH ERROR 👉", err);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Server error. Please try again."
-      });
-    }
-  });
+    theme: { color: "#3399cc" }
+  };
+
+  const rzp = new Razorpay(options);
+
+ rzp.on("payment.failed", function () {
+  window.location.href = "/order-failed";
+});
+
+  rzp.open();
+});
 </script>
-
 
 <%- include("../partials/user/footer") %>

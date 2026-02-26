@@ -70,6 +70,22 @@ const orderSchema = new mongoose.Schema({
     required: true
   },
 
+    razorpayOrderId: {
+    type: String,
+    default: null
+  },
+
+  razorpayPaymentId: {
+    type: String,
+    default: null
+  },
+
+  paymentSignature: {
+    type: String,
+    default: null
+  },
+
+
   status: {
     type: String,
      enum: [ "Placed",
