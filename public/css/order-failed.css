@@ -1,0 +1,61 @@
+
+.order-failed-page {
+  min-height: 70vh; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.order-failed-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.order-failed-box {
+  text-align: center;
+  padding: 40px 50px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.icon-failed i {
+  color: red;
+  font-size: 60px;
+  margin-bottom: 10px;
+}
+
+
+.order-failed-buttons {
+  margin-top: 20px;
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+
+.order-failed-buttons a {
+  padding: 10px 20px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.btn-retry {
+  background: #007bff;
+  color: white;
+}
+
+.btn-orders {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-home {
+  background: #28a745;
+  color: white;
+}

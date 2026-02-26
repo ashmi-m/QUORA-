@@ -8,7 +8,7 @@ const PDFDocument = require("pdfkit");
 const loadOrders = async (req, res) => {
   try {
     if (!req.session.user) return res.redirect("/login");
- const user= await User.findById(req.session.user._id)
+    const user = await User.findById(req.session.user._id)
 
     const orders = await Order.find({
       userId: req.session.user._id
@@ -19,14 +19,14 @@ const loadOrders = async (req, res) => {
       })
       .sort({ createdAt: -1 });
 
-    res.render("orders", { orders ,user});
+    res.render("orders", { orders, user });
 
   } catch (error) {
     console.error(error);
     res.redirect("/pageNotFound");
   }
 };
-  const loadOrderDetails = async (req, res) => {
+const loadOrderDetails = async (req, res) => {
   try {
     if (!req.session.user) return res.redirect("/login");
     const userId = req.session.user
@@ -35,15 +35,15 @@ const loadOrders = async (req, res) => {
       _id: req.params.id,
       userId: req.session.user._id,
     }).populate("products.productId");
-   
-    console.log("order issss",order)
+
+    console.log("order issss", order)
     if (!order) {
       return res.redirect('/userprofile');
     }
     const user = await User.findById(req.session.user._id);
     res.render("orderDetails", {
       order,
-      user,   
+      user,
     });
 
   } catch (error) {
@@ -135,10 +135,10 @@ const placeOrder = async (req, res) => {
       const updatedProduct = await Product.findOneAndUpdate(
         {
           _id: item.productId._id,
-          stock: { $gte: item.quantity }
+          quantity: { $gte: item.quantity }
         },
         {
-          $inc: { stock: -item.quantity }
+          $inc: { quantity: -item.quantity }
         },
         { new: true }
       );
@@ -150,7 +150,7 @@ const placeOrder = async (req, res) => {
           message: `${item.productId.productName} is out of stock`
         });
       }
-      if (updatedProduct.stock === 0) {
+      if (updatedProduct.quantity === 0) {
         updatedProduct.status = "out of stock";
         await updatedProduct.save();
       }
@@ -384,95 +384,95 @@ const downloadInvoice = async (req, res) => {
       "Content-Disposition",
       `attachment; filename=invoice-${order._id}.pdf`
     );
-   const doc = new PDFDocument({ margin: 50 });
-doc.pipe(res);
+    const doc = new PDFDocument({ margin: 50 });
+    doc.pipe(res);
 
-const pageWidth = doc.page.width;
-const margin = 50;
-const contentW = pageWidth - margin * 2;
-const PRIMARY   = "#1a1a2e";
-const ACCENT    = "#e94560";
-const LIGHT_BG  = "#f0f0f0";
-const WHITE     = "#ffffff";
-const GRAY_TEXT = "#888888";
-doc.rect(0, 0, pageWidth, 100).fill(PRIMARY);
-doc.fillColor(WHITE).fontSize(28).font("Helvetica-Bold")
-   .text("INVOICE", margin, 28, { align: "center" });
-doc.fillColor(ACCENT).fontSize(10).font("Helvetica")
-   .text("Thank you for your purchase!", margin, 65, { align: "center" });
-let y = 120;
+    const pageWidth = doc.page.width;
+    const margin = 50;
+    const contentW = pageWidth - margin * 2;
+    const PRIMARY = "#1a1a2e";
+    const ACCENT = "#e94560";
+    const LIGHT_BG = "#f0f0f0";
+    const WHITE = "#ffffff";
+    const GRAY_TEXT = "#888888";
+    doc.rect(0, 0, pageWidth, 100).fill(PRIMARY);
+    doc.fillColor(WHITE).fontSize(28).font("Helvetica-Bold")
+      .text("INVOICE", margin, 28, { align: "center" });
+    doc.fillColor(ACCENT).fontSize(10).font("Helvetica")
+      .text("Thank you for your purchase!", margin, 65, { align: "center" });
+    let y = 120;
 
-const drawLabel = (label, value, x, ty) => {
-  doc.fillColor(GRAY_TEXT).fontSize(8).font("Helvetica")
-     .text(label.toUpperCase(), x, ty);
-  doc.fillColor(PRIMARY).fontSize(10).font("Helvetica-Bold")
-     .text(value, x, ty + 11);
-};
+    const drawLabel = (label, value, x, ty) => {
+      doc.fillColor(GRAY_TEXT).fontSize(8).font("Helvetica")
+        .text(label.toUpperCase(), x, ty);
+      doc.fillColor(PRIMARY).fontSize(10).font("Helvetica-Bold")
+        .text(value, x, ty + 11);
+    };
 
-drawLabel("Order ID",       `${order._id}`,                           margin,              y);
-drawLabel("Order Date",     new Date(order.createdAt).toDateString(), margin,              y + 36);
-drawLabel("Payment Method", order.paymentMethod,                      margin + contentW / 2, y);
-drawLabel("Order Status",   order.status,                             margin + contentW / 2, y + 36);
-y = 210;
-doc.moveTo(margin, y).lineTo(margin + contentW, y)
-   .strokeColor(ACCENT).lineWidth(1.5).stroke();
-y += 16;
-const cols = [
-  { header: "#",        x: margin,       w: 30,  align: "left"   },
-  { header: "Product",  x: margin + 30,  w: 230, align: "left"   },
-  { header: "Price",    x: margin + 260, w: 80,  align: "right"  },
-  { header: "Qty",      x: margin + 340, w: 45,  align: "center" },
-  { header: "Subtotal", x: margin + 385, w: 80,  align: "right"  },
-];
-const ROW_H = 26;
-doc.rect(margin, y, contentW, ROW_H).fill(PRIMARY);
-cols.forEach(col => {
-  doc.fillColor(WHITE).fontSize(9).font("Helvetica-Bold")
-     .text(col.header, col.x + 4, y + 8, { width: col.w - 8, align: col.align });
-});
-y += ROW_H;
-let total = 0;
-let rowNum = 0;
+    drawLabel("Order ID", `${order._id}`, margin, y);
+    drawLabel("Order Date", new Date(order.createdAt).toDateString(), margin, y + 36);
+    drawLabel("Payment Method", order.paymentMethod, margin + contentW / 2, y);
+    drawLabel("Order Status", order.status, margin + contentW / 2, y + 36);
+    y = 210;
+    doc.moveTo(margin, y).lineTo(margin + contentW, y)
+      .strokeColor(ACCENT).lineWidth(1.5).stroke();
+    y += 16;
+    const cols = [
+      { header: "#", x: margin, w: 30, align: "left" },
+      { header: "Product", x: margin + 30, w: 230, align: "left" },
+      { header: "Price", x: margin + 260, w: 80, align: "right" },
+      { header: "Qty", x: margin + 340, w: 45, align: "center" },
+      { header: "Subtotal", x: margin + 385, w: 80, align: "right" },
+    ];
+    const ROW_H = 26;
+    doc.rect(margin, y, contentW, ROW_H).fill(PRIMARY);
+    cols.forEach(col => {
+      doc.fillColor(WHITE).fontSize(9).font("Helvetica-Bold")
+        .text(col.header, col.x + 4, y + 8, { width: col.w - 8, align: col.align });
+    });
+    y += ROW_H;
+    let total = 0;
+    let rowNum = 0;
 
-order.products.forEach((item, index) => {
-  if (item.status === "Cancelled") return;
+    order.products.forEach((item, index) => {
+      if (item.status === "Cancelled") return;
 
-  const name     = item.productId?.productName || "Product";
-  const price    = item.price;
-  const qty      = item.quantity;
-  const subtotal = price * qty;
-  total += subtotal;
-  doc.rect(margin, y, contentW, ROW_H).fill(rowNum % 2 === 0 ? LIGHT_BG : WHITE);
-  doc.rect(margin, y, contentW, ROW_H).strokeColor("#dddddd").lineWidth(0.5).stroke();
+      const name = item.productId?.productName || "Product";
+      const price = item.price;
+      const qty = item.quantity;
+      const subtotal = price * qty;
+      total += subtotal;
+      doc.rect(margin, y, contentW, ROW_H).fill(rowNum % 2 === 0 ? LIGHT_BG : WHITE);
+      doc.rect(margin, y, contentW, ROW_H).strokeColor("#dddddd").lineWidth(0.5).stroke();
 
-  const cells = [
-    { val: `${index + 1}`,           col: cols[0] },
-    { val: name,                      col: cols[1] },
-    { val: `Rs.${price.toFixed(2)}`,  col: cols[2] },
-    { val: `${qty}`,                  col: cols[3] },
-    { val: `Rs.${subtotal.toFixed(2)}`, col: cols[4] },
-  ];
+      const cells = [
+        { val: `${index + 1}`, col: cols[0] },
+        { val: name, col: cols[1] },
+        { val: `Rs.${price.toFixed(2)}`, col: cols[2] },
+        { val: `${qty}`, col: cols[3] },
+        { val: `Rs.${subtotal.toFixed(2)}`, col: cols[4] },
+      ];
 
-  cells.forEach(({ val, col }) => {
-    doc.fillColor(PRIMARY).fontSize(9).font("Helvetica")
-       .text(val, col.x + 4, y + 8, { width: col.w - 8, align: col.align });
-  });
+      cells.forEach(({ val, col }) => {
+        doc.fillColor(PRIMARY).fontSize(9).font("Helvetica")
+          .text(val, col.x + 4, y + 8, { width: col.w - 8, align: col.align });
+      });
 
-  y += ROW_H;
-  rowNum++;
-});
-doc.rect(margin, y, contentW, ROW_H + 2).fill(PRIMARY);
-doc.fillColor(WHITE).fontSize(10).font("Helvetica-Bold")
-   .text("TOTAL", margin + 4, y + 9, { width: contentW - cols[4].w - 60, align: "right" });
-doc.fillColor(ACCENT).fontSize(10).font("Helvetica-Bold")
-   .text(`Rs.${total.toFixed(2)}`, cols[4].x + 4, y + 9, { width: cols[4].w - 8, align: "right" });
-const footerY = doc.page.height - 55;
-doc.moveTo(margin, footerY - 10).lineTo(margin + contentW, footerY - 10)
-   .strokeColor("#dddddd").lineWidth(1).stroke();
-doc.fillColor(GRAY_TEXT).fontSize(9).font("Helvetica")
-   .text("Thank you for shopping with us!", margin, footerY, { align: "center", width: contentW });
+      y += ROW_H;
+      rowNum++;
+    });
+    doc.rect(margin, y, contentW, ROW_H + 2).fill(PRIMARY);
+    doc.fillColor(WHITE).fontSize(10).font("Helvetica-Bold")
+      .text("TOTAL", margin + 4, y + 9, { width: contentW - cols[4].w - 60, align: "right" });
+    doc.fillColor(ACCENT).fontSize(10).font("Helvetica-Bold")
+      .text(`Rs.${total.toFixed(2)}`, cols[4].x + 4, y + 9, { width: cols[4].w - 8, align: "right" });
+    const footerY = doc.page.height - 55;
+    doc.moveTo(margin, footerY - 10).lineTo(margin + contentW, footerY - 10)
+      .strokeColor("#dddddd").lineWidth(1).stroke();
+    doc.fillColor(GRAY_TEXT).fontSize(9).font("Helvetica")
+      .text("Thank you for shopping with us!", margin, footerY, { align: "center", width: contentW });
 
-doc.end();
+    doc.end();
 
   } catch (error) {
     console.error("Invoice download error:", error);
@@ -502,14 +502,14 @@ const viewOrderDetails = async (req, res) => {
   }
 };
 module.exports = {
-  loadOrders, 
+  loadOrders,
   placeOrder,
   cancelOrder,
   loadOrderDetails,
-  cancelSingleProduct ,
+  cancelSingleProduct,
   returnSingleProduct,
-   returnOrder ,
-    downloadInvoice ,
- viewOrderDetails 
+  returnOrder,
+  downloadInvoice,
+  viewOrderDetails
 
 };

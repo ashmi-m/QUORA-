@@ -7,7 +7,7 @@ const crypto = require("crypto");
 
 const loadPayment = async (req, res) => {
   try {
-   
+
     const userId = req.session.user._id;
     const addressId = req.session.selectedAddress;
 
@@ -27,28 +27,28 @@ const loadPayment = async (req, res) => {
 
     if (!address) return res.redirect("/checkout");
 
-  let total = 0;
-cart.items.forEach(item => {
-  total += Number(item.productId.regularPrice) * Number(item.quantity);
-});
+    let total = 0;
+    cart.items.forEach(item => {
+      total += Number(item.productId.regularPrice) * Number(item.quantity);
+    });
 
-const amountInPaise = Math.round(total * 100);
+    const amountInPaise = Math.round(total * 100);
 
-const razorpayOrder = await razorpay.orders.create({
-  amount: amountInPaise,
-  currency: "INR",
-  receipt: "order_" + Date.now()
-});
+    const razorpayOrder = await razorpay.orders.create({
+      amount: amountInPaise,
+      currency: "INR",
+      receipt: "order_" + Date.now()
+    });
 
-res.render("payment", {
-  cartItems: cart.items,
-  address,
-  total,
-  user: req.session.user,
-  razorpayKey: process.env.RAZORPAY_KEY_ID,
-  razorpayOrderId: razorpayOrder.id,
-  razorpayAmount: amountInPaise
-});
+    res.render("payment", {
+      cartItems: cart.items,
+      address,
+      total,
+      user: req.session.user,
+      razorpayKey: process.env.RAZORPAY_KEY_ID,
+      razorpayOrderId: razorpayOrder.id,
+      razorpayAmount: amountInPaise
+    });
 
   } catch (err) {
     console.error("PAYMENT PAGE ERROR ", err);
@@ -57,7 +57,7 @@ res.render("payment", {
 };
 
 const loadOrderSuccess = (req, res) => {
-   const method = req.query.method || "COD";
+  const method = req.query.method || "COD";
   req.session.cart = null;
   req.session.selectedAddress = null;
   res.render("order-success", {
@@ -76,7 +76,7 @@ const placeOrder = async (req, res) => {
     }
 
     const userId = req.session.user._id;
-    const { addressId,paymentMethod } = req.body;
+    const { addressId, paymentMethod } = req.body;
 
     if (!paymentMethod || !addressId) {
       return res.status(400).json({
@@ -107,32 +107,32 @@ const placeOrder = async (req, res) => {
     const selectedAddress = addressDoc.addresses.find(
       a => a._id.toString() === addressId.toString()
     );
-   if (paymentMethod === "Razorpay") {
-  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+    if (paymentMethod === "Razorpay") {
+      const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
-  if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
-    return res.status(400).json({
-      success: false,
-      message: "Payment details missing"
-    });
-  }
+      if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+        return res.status(400).json({
+          success: false,
+          message: "Payment details missing"
+        });
+      }
 
-  const generated_signature = crypto
-    .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-    .update(razorpay_order_id + "|" + razorpay_payment_id)
-    .digest("hex");
+      const generated_signature = crypto
+        .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+        .update(razorpay_order_id + "|" + razorpay_payment_id)
+        .digest("hex");
 
-  if (generated_signature !== razorpay_signature) {
-    console.error("Expected signature:", generated_signature, "Received:", razorpay_signature);
-    return res.status(400).json({
-      success: false,
-      message: "Payment verification failed"
-    });
-  }
-}
+      if (generated_signature !== razorpay_signature) {
+        console.error("Expected signature:", generated_signature, "Received:", razorpay_signature);
+        return res.status(400).json({
+          success: false,
+          message: "Payment verification failed"
+        });
+      }
+    }
     await Order.create({
       userId,
-       address: selectedAddress,
+      address: selectedAddress,
       products,
       totalAmount: total,
       paymentMethod,
@@ -153,10 +153,10 @@ const placeOrder = async (req, res) => {
   }
 };
 const loadOrderFailed = (req, res) => {
- res.render("user/order-failed", {
-  retryUrl: "/checkout/payment",
-  ordersPage: "/orders"
-});
+  res.render("order-failed", {
+    retryUrl: "/checkout/payment",
+    ordersPage: "/orders"
+  });
 };
 
 module.exports = {

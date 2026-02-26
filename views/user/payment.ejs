@@ -120,6 +120,7 @@ document.getElementById("placeOrderBtn").addEventListener("click", async functio
       });
 
       const data = await res.json();
+      console.log(data)
 
       if (data.success) {
         window.location.href = "/order-success?method=Razorpay";

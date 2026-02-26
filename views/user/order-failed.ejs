@@ -1,0 +1,23 @@
+<%- include("../partials/user/header") %>
+<link rel="stylesheet" href="/css/order-failed.css">
+
+<div class="order-failed-page">
+  <div class="order-failed-container">
+    <div class="order-failed-box">
+      <div class="icon-failed">
+        <i class="fa fa-times-circle"></i>
+      </div>
+
+      <h2>Payment Failed</h2>
+      <p>Unfortunately, your payment could not be processed.</p>
+
+      <div class="order-failed-buttons">
+        <a href="<%= retryUrl %>" class="btn-retry">Try Again</a>
+        <a href="<%= ordersPage %>" class="btn-orders">View Orders</a>
+        <a href="/" class="btn-home">Home</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include("../partials/user/footer") %>
