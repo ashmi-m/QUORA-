@@ -1,6 +1,6 @@
 
 const Coupon = require("../../models/couponSchema");
-/* ================= GET PAGE ================= */
+
 const getCouponPage = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -23,7 +23,7 @@ const getCouponPage = async (req, res) => {
   }
 };
 
-/* ================= ADD ================= */
+
 const addCoupon = async (req, res) => {
   try {
     const {
@@ -75,7 +75,6 @@ const addCoupon = async (req, res) => {
   }
 };
 
-/* ================= TOGGLE ================= */
 const toggleCoupon = async (req, res) => {
   try {
     const coupon = await Coupon.findById(req.params.id);
@@ -89,31 +88,70 @@ const toggleCoupon = async (req, res) => {
   }
 };
 
-/* ================= UPDATE ================= */
+
 const updateCoupon = async (req, res) => {
   try {
+    const {
+      code,
+      discountValue,
+      maxDiscount,
+      limit,
+      expiryDate,
+      minimumPurchase,
+      description
+    } = req.body;
+
+    if (!code || !discountValue || !limit || !expiryDate) {
+      return res.status(400).json({
+        success: false,
+        message: "Required fields missing"
+      });
+    }
+
     const updated = await Coupon.findByIdAndUpdate(
       req.params.id,
       {
-        code: req.body.code.toUpperCase(),
-        discountValue: Number(req.body.discountValue),
-        maxDiscount: Number(req.body.maxDiscount),
-        limit: Number(req.body.limit),
-        expiryDate: new Date(req.body.expiryDate),
-        minimumPurchase: Number(req.body.minimumPurchase),
-        description: req.body.description
+        code: code.toUpperCase(),
+        discountValue: Number(discountValue),
+        maxDiscount: maxDiscount ? Number(maxDiscount) : undefined,
+        limit: Number(limit),
+        expiryDate: new Date(expiryDate),
+        minimumPurchase: minimumPurchase ? Number(minimumPurchase) : 0,
+        description
       },
-      { new: true }
+      {
+        new: true,
+        runValidators: true   
+      }
     );
+
+    if (!updated) {
+      return res.status(404).json({
+        success: false,
+        message: "Coupon not found"
+      });
+    }
 
     res.json({ success: true, coupon: updated });
 
   } catch (err) {
-    res.status(500).json({ success: false });
+    console.log("UPDATE ERROR:", err);
+
+    if (err.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: "Coupon code already exists"
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: "Server error while updating coupon"
+    });
   }
 };
 
-/* ================= DELETE ================= */
+
 const deleteCoupon = async (req, res) => {
   await Coupon.findByIdAndDelete(req.params.id);
   res.json({ success: true });

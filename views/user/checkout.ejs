@@ -1,5 +1,6 @@
 <%- include("../partials/user/header") %>
 <link rel="stylesheet" href="/css/checkout.css">
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 <form action="/checkout/select-address" method="POST">
   <section class="checkout-container">
@@ -8,9 +9,7 @@
     <div class="address-section">
       <div class="section-header">
         <h3>Delivery Address</h3>
-        <a href="/add-address?from=checkout" class="btn-primary">
-          + Add New Address
-        </a>
+        <a href="/add-address?from=checkout" class="btn-primary">+ Add New Address</a>
       </div>
 
       <% if (addresses.length === 0) { %>
@@ -28,13 +27,10 @@
               value="<%= addr._id %>" 
               <%= index === 0 ? "checked" : "" %>
             >
-
             <div class="address-info">
               <strong><%= addr.name %></strong>
               <p><%= addr.phone %></p>
-              <p class="muted">
-                <%= addr.landMark %>, <%= addr.city %>, <%= addr.state %> - <%= addr.pincode %>
-              </p>
+              <p class="muted"><%= addr.landMark %>, <%= addr.city %>, <%= addr.state %> - <%= addr.pincode %></p>
             </div>
           </label>
         <% }) %>
@@ -45,69 +41,129 @@
           <% if (currentPage > 1) { %>
             <a href="/checkout?page=<%= currentPage - 1 %>">&laquo;</a>
           <% } %>
-
           <% for (let i = 1; i <= totalPages; i++) { %>
-            <a href="/checkout?page=<%= i %>" 
-               class="<%= currentPage === i ? 'active' : '' %>">
-              <%= i %>
-            </a>
+            <a href="/checkout?page=<%= i %>" class="<%= currentPage === i ? 'active' : '' %>"><%= i %></a>
           <% } %>
-
           <% if (currentPage < totalPages) { %>
             <a href="/checkout?page=<%= currentPage + 1 %>">&raquo;</a>
           <% } %>
         </div>
       <% } %>
-
     </div>
 
-    <!-- RIGHT: SUMMARY -->
+   
     <div class="summary-section">
       <h3>Order Summary</h3>
 
-      <div class="summary-items">
-        <% cart.items.forEach(item => { %>
-          <div class="summary-item">
-            <span class="item-name">
-              <%= item.productName %>
-              <span class="qty">× <%= item.quantity %></span>
-            </span>
-            <span>₹ <%= item.itemTotal.toFixed(2) %></span>
-          </div>
-        <% }) %>
-      </div>
+    
+<div class="coupon-section">
+  <input type="text" id="couponCode" placeholder="Enter coupon code" 
+         value="<%= appliedCoupon ? appliedCoupon.code : '' %>" 
+         <%= appliedCoupon ? 'disabled' : '' %>>
+  <button type="button" id="applyCouponBtn" class="btn-secondary" 
+          style="<%= appliedCoupon ? 'display:none;' : '' %>">Apply</button>
+  <button type="button" id="removeCouponBtn" class="btn-secondary" 
+          style="<%= appliedCoupon ? 'display:inline-block;' : 'display:none;' %>">Remove</button>
+  <p id="couponMessage" class="muted">
+    <%= appliedCoupon ? 'Coupon applied successfully' : '' %>
+  </p>
+</div>
 
-      <hr>
+<div class="summary-row">
+  <span>Discount</span>
+  <span id="discount">₹ <%= appliedCoupon ? appliedCoupon.discountAmount.toFixed(2) : '0.00' %></span>
+</div>
 
-      <div class="summary-row">
-        <span>Subtotal</span>
-        <span>₹ <%= subtotal.toFixed(2) %></span>
-      </div>
+<div class="summary-row total">
+  <span>Total</span>
+  <span id="total">₹ <%= appliedCoupon ? (total - appliedCoupon.discountAmount).toFixed(2) : total.toFixed(2) %></span>
+</div>
 
       <div class="summary-row">
         <span>Delivery</span>
-        <span>₹ <%= deliveryCharge.toFixed(2) %></span>
+        <span id="deliveryCharge">₹ <%= deliveryCharge.toFixed(2) %></span>
+      </div>
+
+      <div class="summary-row">
+        <span>Discount</span>
+        <span id="discount">₹ 0.00</span>
       </div>
 
       <div class="summary-row total">
         <span>Total</span>
-        <span>₹ <%= total.toFixed(2) %></span>
+        <span id="total">₹ <%= total.toFixed(2) %></span>
       </div>
 
-      <button type="submit" class="pay-btn">
-        Proceed to Payment
-      </button>
+      <button type="submit" class="pay-btn">Proceed to Payment</button>
     </div>
 
   </section>
 </form>
 
 <script>
-  const form = document.querySelector("form");
+ 
+  const applyBtn = document.getElementById("applyCouponBtn");
+  const removeBtn = document.getElementById("removeCouponBtn");
+  const couponInput = document.getElementById("couponCode");
+  const messageEl = document.getElementById("couponMessage");
 
+  const subtotalEl = document.getElementById("subtotal");
+  const deliveryEl = document.getElementById("deliveryCharge");
+  const discountEl = document.getElementById("discount");
+  const totalEl = document.getElementById("total");
+
+  const subtotal = parseFloat(<%= subtotal.toFixed(2) %>);
+  const deliveryCharge = parseFloat(<%= deliveryCharge.toFixed(2) %>);
+  let discountAmount = 0;
+
+  applyBtn.addEventListener("click", async () => {
+    const code = couponInput.value.trim();
+    if (!code) {
+      messageEl.textContent = "Enter coupon code!";
+      return;
+    }
+
+    try {
+      const res = await axios.post("/apply-coupon", { code });
+      if (res.data.success) {
+        discountAmount = res.data.discount;
+        discountEl.textContent = `₹ ${discountAmount.toFixed(2)}`;
+        totalEl.textContent = `₹ ${(subtotal + deliveryCharge - discountAmount).toFixed(2)}`;
+        messageEl.textContent = res.data.message;
+        applyBtn.style.display = "none";
+        removeBtn.style.display = "inline-block";
+        couponInput.disabled = true;
+      } else {
+        messageEl.textContent = res.data.message;
+      }
+    } catch (err) {
+      console.error(err);
+      messageEl.textContent = "Server error!";
+    }
+  });
+
+  removeBtn.addEventListener("click", async () => {
+    try {
+      const res = await axios.post("/remove-coupon");
+      if (res.data.success) {
+        discountAmount = 0;
+        discountEl.textContent = `₹ 0.00`;
+        totalEl.textContent = `₹ ${(subtotal + deliveryCharge).toFixed(2)}`;
+        messageEl.textContent = res.data.message;
+        applyBtn.style.display = "inline-block";
+        removeBtn.style.display = "none";
+        couponInput.disabled = false;
+        couponInput.value = "";
+      }
+    } catch (err) {
+      console.error(err);
+      messageEl.textContent = "Server error!";
+    }
+  });
+
+  const form = document.querySelector("form");
   form.addEventListener("submit", function (e) {
     const selectedAddress = document.querySelector('input[name="addressId"]:checked');
-
     if (!selectedAddress) {
       e.preventDefault();
       alert("Please select an address!");

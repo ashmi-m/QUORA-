@@ -14,6 +14,9 @@ const checkoutController = require("../controller/user/checkoutController");
 const paymentController = require("../controller/user/paymentController");
 
 const profileController = require("../controller/user/profileController")
+const userCouponController = require('../controller/user/userCouponController');
+
+
 const upload = require("../middlewares/imageUppload");
 
 const passport = require("../config/passport.js");
@@ -122,5 +125,8 @@ router.post("/wishlist/toggle", userAuth, wishlistController.toggleWishlist);
 router.post('/wishlist/remove', userAuth, wishlistController.removeFromWishlist);
 router.get("/order-failed",paymentController.loadOrderFailed)
 
+
+router.post("/apply-coupon", userAuth, userCouponController.applyCoupon);
+router.post("/remove-coupon", userAuth, userCouponController.removeCoupon);
 module.exports = router;
 

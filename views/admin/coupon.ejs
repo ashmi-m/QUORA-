@@ -4,14 +4,12 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <div class="coupon-wrapper">
-
-  <!-- PAGE HEADER -->
   <div class="page-header">
     <h1>Coupons</h1>
     <span class="breadcrumb">Admin / <span>Coupons</span></span>
   </div>
 
-  <!-- ADD COUPON FORM -->
+ 
   <div class="form-card">
     <h2 class="form-title">Add Coupon</h2>
     <form id="couponForm">
@@ -60,7 +58,7 @@
     </form>
   </div>
 
-  <!-- COUPON TABLE -->
+
   <div class="table-card">
     <div class="table-header">
       <h3>All Coupons</h3>
@@ -99,14 +97,14 @@
               </td>
               <td><%= coupon.description %></td>
               <td class="action-cell">
-                <!-- Toggle -->
+              
 <button onclick="toggleCoupon('<%= coupon._id %>')" class="btn-block">
                   <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="#9e9e9e" viewBox="0 0 24 24">
                     <circle cx="12" cy="12" r="10" stroke="#9e9e9e" stroke-width="2" fill="none"/>
                     <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" stroke="#9e9e9e" stroke-width="2"/>
                   </svg>
                 </a>
-                <!-- Edit — opens modal -->
+               
                 <button
                   class="btn-edit"
                   title="Edit"
@@ -139,7 +137,7 @@
       </tbody>
     </table>
 
-    <!-- PAGINATION -->
+   
     <% if (totalPages >= 1) { %>
       <div class="pagination">
         <% if (currentPage > 1) { %>
@@ -159,7 +157,7 @@
 
 </div>
 
-<!-- ===================== EDIT MODAL ===================== -->
+
 <div id="editModal" class="modal-overlay" style="display:none;">
   <div class="modal-box">
 
@@ -211,7 +209,7 @@
 
   </div>
 </div>
-<!-- ====================================================== -->
+
 
 <script>
     async function toggleCoupon(id) {
@@ -297,7 +295,6 @@ function addCouponToTable(c) {
   `);
 }
 
-/* ---- EDIT MODAL ---- */
 function openEditModal(id, code, discountValue, maxDiscount, limit, expiryDate, minimumPurchase, description) {
   document.getElementById("editId").value             = id;
   document.getElementById("editCode").value           = code;
@@ -317,33 +314,45 @@ function closeEditModal() {
   document.body.style.overflow = "";
 }
 
-// Close modal if clicking outside the box
 document.getElementById("editModal").addEventListener("click", function(e) {
   if (e.target === this) closeEditModal();
 });
 
-/* ---- SAVE EDIT ---- */
 document.getElementById("editCouponForm").addEventListener("submit", async function(e) {
   e.preventDefault();
   const id = document.getElementById("editId").value;
 
   const data = {
-    code:            document.getElementById("editCode").value,
-    discountValue:   document.getElementById("editDiscountValue").value,
-    maxDiscount:     document.getElementById("editMaxDiscount").value,
-    limit:           document.getElementById("editLimit").value,
+    code:            document.getElementById("editCode").value.trim(),
+    discountValue:   Number(document.getElementById("editDiscountValue").value),
+    maxDiscount:     Number(document.getElementById("editMaxDiscount").value),
+    limit:           Number(document.getElementById("editLimit").value),
     expiryDate:      document.getElementById("editExpiryDate").value,
-    minimumPurchase: document.getElementById("editMinimumPurchase").value,
-    description:     document.getElementById("editDescription").value,
+    minimumPurchase: Number(document.getElementById("editMinimumPurchase").value),
+    description:     document.getElementById("editDescription").value.trim(),
   };
+  if (!data.code || data.code.length < 3)
+    return Swal.fire({ icon:"warning", title:"Invalid Code", text:"Coupon code must be at least 3 characters" });
+  if (!data.discountValue || data.discountValue <= 0)
+    return Swal.fire({ icon:"warning", title:"Invalid Discount", text:"Discount must be greater than 0" });
+  if (!data.limit || data.limit < 1)
+    return Swal.fire({ icon:"warning", title:"Invalid Limit", text:"Usage limit must be at least 1" });
+  if (!data.expiryDate)
+    return Swal.fire({ icon:"warning", title:"Missing Date", text:"Please select an expiry date" });
 
   try {
-    const res = await fetch(`/admin/coupon/edit/${id}`, {
+const res = await fetch(`/admin/coupons/edit/${id}`, {
       method: "POST",
-      headers: {"Content-Type":"application/json"},
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data)
     });
-    const result = await res.json();
+
+    let result;
+    try {
+      result = await res.json();
+    } catch(parseErr) {
+      return Swal.fire({ icon:"error", title:"Server Error", text:`Server returned status ${res.status}. Check your backend route.` });
+    }
 
     if (!res.ok || !result.success)
       return Swal.fire({ icon:"error", title:"Failed", text: result.message || "Update failed" });
@@ -351,7 +360,6 @@ document.getElementById("editCouponForm").addEventListener("submit", async funct
     Swal.fire({ icon:"success", title:"Updated! ✅", timer:1800, showConfirmButton:false });
     closeEditModal();
 
-    // Update the row in the table without page reload
     const row = document.getElementById(`row-${id}`);
     if (row) {
       row.cells[0].textContent = data.code;
@@ -362,7 +370,8 @@ document.getElementById("editCouponForm").addEventListener("submit", async funct
     }
 
   } catch(err) {
-    Swal.fire({ icon:"error", title:"Server Error", text:"Something went wrong" });
+    console.error("Edit coupon error:", err);
+    Swal.fire({ icon:"error", title:"Server Error", text: err.message || "Something went wrong. Check the console." });
   }
 });
 </script>

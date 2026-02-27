@@ -146,6 +146,44 @@
   color: #6c757d;
 }
 
+
+.coupon-section {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  align-items: center;
+}
+
+.coupon-section input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.coupon-section button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  background: #0d6efd;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.coupon-section button:hover {
+  background: #0b5ed7;
+}
+
+#couponMessage {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #198754; 
+}
+
+
 @media (max-width: 900px) {
   .checkout-container {
     flex-direction: column;

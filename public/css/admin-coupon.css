@@ -1,6 +1,4 @@
-/* ======================
-   COUPON PAGE
-====================== */
+
 
 .coupon-wrapper {
   padding: 30px 36px;
@@ -15,7 +13,18 @@
   justify-content: space-between;
   margin-bottom: 24px;
 }
+.form-group input.error,
+.form-group select.error {
+  border-color: #e74c3c !important;
+  background: #fff5f5 !important;
+}
 
+.error-msg {
+  color: #e74c3c;
+  font-size: 11px;
+  font-weight: 600;
+  height: 12px;
+}
 .page-header h1 {
   font-size: 22px !important;
   font-weight: 700 !important;
@@ -33,7 +42,7 @@
 .page-header .breadcrumb { font-size: 13px; color: #8a7060; }
 .page-header .breadcrumb span { color: #5c3d1e !important; font-weight: 600; }
 
-/* FORM CARD */
+
 .form-card {
   background: #ffffff !important;
   border-radius: 14px;
@@ -140,7 +149,7 @@
   box-shadow: 0 6px 18px rgba(60,40,20,0.4) !important;
 }
 
-/* TABLE CARD */
+
 .table-card {
   background: #ffffff !important;
   border-radius: 14px;
@@ -206,7 +215,6 @@ td { padding: 14px 16px; font-size: 13.5px !important; color: #4a3728 !important
 .no-data { text-align: center !important; color: #a08060 !important; font-size: 14px; padding: 60px; }
 .no-data-icon { font-size: 40px; display: block; margin-bottom: 10px; }
 
-/* ACTION BUTTONS */
 .action-cell { display: flex; align-items: center; gap: 8px; }
 
 .btn-block {
@@ -237,7 +245,7 @@ td { padding: 14px 16px; font-size: 13.5px !important; color: #4a3728 !important
 
 .btn-edit:hover { background: #e67e00 !important; border-color: #e67e00 !important; }
 
-/* PAGINATION */
+
 .pagination { display: flex; justify-content: center; align-items: center; gap: 6px; padding: 22px 16px; flex-wrap: wrap; }
 
 .page-btn {
@@ -260,9 +268,7 @@ td { padding: 14px 16px; font-size: 13.5px !important; color: #4a3728 !important
   box-shadow: 0 3px 10px rgba(92,64,51,0.35);
 }
 
-/* ======================
-   EDIT MODAL
-====================== */
+
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -270,7 +276,7 @@ td { padding: 14px 16px; font-size: 13.5px !important; color: #4a3728 !important
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: 10;
   backdrop-filter: blur(2px);
 }
 
@@ -322,7 +328,7 @@ td { padding: 14px 16px; font-size: 13.5px !important; color: #4a3728 !important
 
 .modal-close:hover { background: #f0e8d8; color: #3b2a1a; }
 
-/* modal form body */
+
 .modal-box form {
   padding: 24px;
 }
@@ -370,7 +376,6 @@ td { padding: 14px 16px; font-size: 13.5px !important; color: #4a3728 !important
 
 .modal-group input::placeholder { color: #c0aa8a; font-size: 13px; }
 
-/* modal footer buttons */
 .modal-footer {
   display: flex;
   justify-content: flex-end;
@@ -412,7 +417,7 @@ td { padding: 14px 16px; font-size: 13.5px !important; color: #4a3728 !important
   box-shadow: 0 6px 18px rgba(30,111,199,0.4);
 }
 
-/* RESPONSIVE */
+
 @media (max-width: 1100px) { .form-row { grid-template-columns: repeat(2, 1fr); } }
 
 @media (max-width: 768px) {
