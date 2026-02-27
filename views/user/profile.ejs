@@ -107,10 +107,7 @@
     <script>
       document.addEventListener("DOMContentLoaded", () => {
 
-        /* ===============================
-           PROFILE SECTION SWITCHING
-           (keep this — page specific)
-        =============================== */
+       
 
         const menuButtons = document.querySelectorAll(".profile-menu button[data-target]");
         const sections = document.querySelectorAll(".profile-section");
@@ -126,10 +123,6 @@
         });
 
 
-        /* ===============================
-           HASH BASED NAVIGATION
-           (keep this — page specific)
-        =============================== */
 
         const hash = window.location.hash;
 
@@ -148,12 +141,6 @@
             targetBtn.classList.add("active");
           }
         }
-
-
-        /* ===============================
-           PROFILE EDIT + SAVE
-           (keep this — page specific)
-        =============================== */
 
         const editBtn = document.getElementById("editProfileBtn");
         const saveBtn = document.getElementById("saveProfileBtn");

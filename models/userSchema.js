@@ -48,10 +48,7 @@ const userSchema=new Schema({
         type:Schema.Types.ObjectId,
         ref:"Cart",
     }],
-    wallet:{
-        type:Number,
-        default:0,
-    },
+    
     wishlist:[{
         type:Schema.Types.ObjectId,
         ref:"Wishlist"
@@ -87,7 +84,36 @@ const userSchema=new Schema({
             default:Date.now
         }
     }],
-    
+    wallet: {
+  type: Number,
+  default: 0,
+},
+
+walletTransactions: [{
+  type: {
+    type: String,
+    enum: ["credit", "debit"],
+    required: true
+  },
+  amount: {
+    type: Number,
+    required: true
+  },
+  paymentMethod: {
+    type: String,
+    default: "Wallet"
+  },
+  orderId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Order",
+    default: null
+  },
+  reason: String,
+  date: {
+    type: Date,
+    default: Date.now
+  }
+}],
 })
 
 const User=mongoose.model("User",userSchema);

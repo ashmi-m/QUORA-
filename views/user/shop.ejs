@@ -312,9 +312,10 @@
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
+
 .wishlist-overlay .heart {
-  color: #ff4d6d;
   font-size: 18px;
+  color: #888; 
 }
 
 .wishlist-overlay .tick {
@@ -324,7 +325,7 @@
   font-weight: bold;
 }
 
-/* when added */
+
 .wishlist-overlay.active {
   background: #e6ffe6;
 }
@@ -449,10 +450,10 @@
 <button class="add-to-cart-btn" data-id="<%= product._id %>">
   Add to Cart
 </button>
-   <div class="wishlist-overlay <%= product.isWishlisted ? 'active' : '' %>" 
+  <div class="wishlist-overlay <%= product.isWishlisted ? 'active' : '' %>" 
      data-id="<%= product._id %>">
-  <span class="heart">❤</span>
-  <span class="tick">✔</span>
+  <span class="heart">♡</span> 
+  <span class="tick">✔</span> 
 </div>
 
 

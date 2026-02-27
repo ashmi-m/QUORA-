@@ -3,6 +3,7 @@ const Cart = require("../../models/cartSchema");
 const User = require("../../models/userSchema");
 const Product = require("../../models/productSchema");
 const Address = require("../../models/addressSchema");
+const walletController = require("../user/walletController");
 const PDFDocument = require("pdfkit");
 
 const loadOrders = async (req, res) => {
@@ -164,6 +165,13 @@ const placeOrder = async (req, res) => {
         status: "Placed"
       });
     }
+if (paymentMethod === "Wallet") {
+  await walletController.debitWallet(
+    userId,
+    total,
+    "Order payment"
+  );
+}
     await Order.create({
       userId,
       address: {
@@ -220,7 +228,7 @@ const cancelOrder = async (req, res) => {
 
       await Product.findByIdAndUpdate(
         item.productId._id,
-        { $inc: { stock: item.quantity } }
+        { $inc: { quantity: item.quantity } }
       );
 
       item.status = "Cancelled";
@@ -231,6 +239,16 @@ const cancelOrder = async (req, res) => {
     order.cancelReason = reason;
 
     await order.save();
+
+    if (order.paymentMethod !== "COD") {
+      await walletController.creditWallet(
+        order.userId,
+        order.totalAmount,
+        "Refund for cancelled order",
+        order._id
+      );
+    }
+
 
     res.json({ success: true });
 
@@ -264,7 +282,7 @@ const cancelSingleProduct = async (req, res) => {
 
     if (product.productId) {
       await Product.findByIdAndUpdate(product.productId._id, {
-        $inc: { stock: product.quantity }
+        $inc: { quantity: product.quantity }
       });
     }
 
@@ -274,6 +292,17 @@ const cancelSingleProduct = async (req, res) => {
     }
 
     await order.save();
+    // 💰 partial refund
+if (order.paymentMethod !== "COD") {
+  const refundAmount = product.price * product.quantity;
+
+  await walletController.creditWallet(
+    order.userId,
+    refundAmount,
+    "Refund for cancelled product",
+    order._id
+  );
+}
 
     res.json({ success: true });
   } catch (error) {

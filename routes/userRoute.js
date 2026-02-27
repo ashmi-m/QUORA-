@@ -13,6 +13,7 @@ const wishlistController = require('../controller/user/wishlistController');
 const checkoutController = require("../controller/user/checkoutController");
 const paymentController = require("../controller/user/paymentController");
 
+const walletController = require("../controller/user/walletController");
 const profileController = require("../controller/user/profileController")
 const userCouponController = require('../controller/user/userCouponController');
 
@@ -67,11 +68,7 @@ router.get("/add-address", userAuth, userController.loadAddAddressPage);
 router.get("/add-address-profile", userAuth, userController.loadAddAddressPageProfile);
 
 
-router.post(
-  "/profile/address/add",
-  userAuth,
-  addressController.addAddressFromProfile
-);
+router.post( "/profile/address/add", userAuth, addressController.addAddressFromProfile);
 
 router.get("/edit-address/:id", userAuth, userController.loadEditAddressPage);
 router.post("/address/edit/:id", userAuth, userController.updateAddress);
@@ -128,5 +125,10 @@ router.get("/order-failed",paymentController.loadOrderFailed)
 
 router.post("/apply-coupon", userAuth, userCouponController.applyCoupon);
 router.post("/remove-coupon", userAuth, userCouponController.removeCoupon);
+
+
+router.get("/wallet", userAuth, walletController.loadWallet);
+router.post("/wallet/add", userAuth, walletController.addMoneyToWallet);
+
 module.exports = router;
 

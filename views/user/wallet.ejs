@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Wallet | QUORA</title>
+  <link rel="stylesheet" href="/css/wallet.css">
+  <link rel="stylesheet" href="/css/profile.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <%- include("../partials/user/header", { user }) %>
+
+  <main class="layout">
+    <aside class="sidebar">
+      <%- include("../partials/user/profile-sidebar", { user, activePage: 'wallet' }) %>
+    </aside>
+
+    <section class="wallet-section">
+
+      <h2 class="wallet-title">
+        <span class="wallet-icon">💳</span> My QUORA Wallet
+      </h2>
+
+      <div class="wallet-grid">
+        <div class="card balance-card">
+          <div class="balance-top">
+            <div>
+              <div class="balance-header">Current Balance</div>
+              <div class="balance-amount">₹ <%= (walletBalance.total || 0).toFixed(2) %></div>
+            </div>
+            <div class="balance-badge">Active</div>
+          </div>
+
+          <div class="balance-breakdown">
+            <div class="balance-row">
+              <span>💰 Wallet Balance</span>
+              <span class="amt-green">₹ <%= (walletBalance.total || 0).toFixed(2) %></span>
+            </div>
+          </div>
+
+          <div class="add-money">
+            <label>Add Money to Wallet</label>
+            <div class="amount-input">
+              <span class="rupee">₹</span>
+              <input type="number" id="addAmount" placeholder="Enter amount" min="1">
+            </div>
+            <div class="quick-amounts">
+              <% [500, 1000, 1500, 2000].forEach(amount => { %>
+                <button type="button" onclick="setAmount(<%= amount %>)">+<%= amount %></button>
+              <% }) %>
+            </div>
+            <button class="btn-add" onclick="addMoney()">
+              <span id="addBtnText">Add Money to Wallet</span>
+              <span id="addBtnLoader" style="display:none">Adding...</span>
+            </button>
+          </div>
+        </div>
+
+      
+        <div class="right-panel">
+          <div class="card stats-card">
+            <div class="stats-heading">Wallet Overview</div>
+
+            <div class="stat-item">
+              <div class="stat-icon-label">
+                <span class="stat-icon">🔢</span>
+                <span class="stat-label">Total Transactions</span>
+              </div>
+              <span class="stat-value neutral-stat">
+                <%= user.walletTransactions ? user.walletTransactions.length : 0 %>
+              </span>
+            </div>
+
+            <div class="stat-item">
+              <div class="stat-icon-label">
+                <span class="stat-icon">⬆️</span>
+                <span class="stat-label">Total Credited</span>
+              </div>
+              <span class="stat-value credit-stat">
+                <%
+                  const credits = user.walletTransactions
+                    ? user.walletTransactions.filter(t => t.type === 'credit')
+                    : [];
+                  const totalCredit = credits.reduce((sum, t) => sum + t.amount, 0);
+                %>
+                +₹<%= totalCredit.toFixed(2) %>
+              </span>
+            </div>
+
+            <div class="stat-item">
+              <div class="stat-icon-label">
+                <span class="stat-icon">⬇️</span>
+                <span class="stat-label">Total Debited</span>
+              </div>
+              <span class="stat-value debit-stat">
+                <%
+                  const debits = user.walletTransactions
+                    ? user.walletTransactions.filter(t => t.type === 'debit')
+                    : [];
+                  const totalDebit = debits.reduce((sum, t) => sum + t.amount, 0);
+                %>
+                ₹<%= totalDebit.toFixed(2) %>
+              </span>
+            </div>
+
+            <div class="stat-item">
+              <div class="stat-icon-label">
+                <span class="stat-icon">🕒</span>
+                <span class="stat-label">Last Credited</span>
+              </div>
+              <span class="stat-value credit-stat">
+                <% if (credits.length > 0) {
+                    const last = credits[credits.length - 1]; %>
+                  +₹<%= last.amount.toFixed(2) %>
+                <% } else { %>
+                  —
+                <% } %>
+              </span>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    
+      <div class="transaction-section">
+        <div class="transaction-header">
+          <h3>💳 Wallet Transaction History</h3>
+          <% if(user.walletTransactions && user.walletTransactions.length > 0) { %>
+            <span class="txn-count"><%= user.walletTransactions.length %> Transactions</span>
+          <% } %>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="txn-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Order ID</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Payment Method</th>
+                <th>Description</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if(user.walletTransactions && user.walletTransactions.length > 0) { %>
+                <% user.walletTransactions.slice().reverse().forEach((txn, index) => { %>
+                  <tr class="txn-row">
+                    <td class="txn-num"><%= index + 1 %></td>
+                    <td class="txn-orderid">
+                      <%= txn.orderId ? '#' + txn.orderId.toString().slice(-6).toUpperCase() : '—' %>
+                    </td>
+                    <td>
+                      <span class="badge badge-<%= txn.type === 'credit' ? 'credit' : 'debit' %>">
+                        <%= txn.type === 'credit' ? '⬆ Credit' : '⬇ Debit' %>
+                      </span>
+                    </td>
+                    <td class="txn-amount <%= txn.type === 'credit' ? 'credit-amt' : 'debit-amt' %>">
+                      <%= txn.type === 'credit' ? '+' : '-' %>₹<%= txn.amount.toFixed(2) %>
+                    </td>
+                    <td><%= txn.paymentMethod || 'Wallet' %></td>
+                    <td class="txn-desc"><%= txn.reason || txn.description || 'Wallet Transaction' %></td>
+                    <td class="txn-date">
+                      <%= new Date(txn.date).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) %>
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } else { %>
+                <tr>
+                  <td colspan="7" class="no-txn">
+                    <div class="no-txn-inner">
+                      <span class="no-txn-icon">📭</span>
+                      <p>No transactions found</p>
+                      <small>Your transaction history will appear here</small>
+                    </div>
+                  </td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="wallet-footer">
+        <a href="/help">Help &amp; FAQs</a>
+        <span>|</span>
+        <a href="/terms">Conditions of Use</a>
+      </div>
+
+    </section>
+  </main>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="/js/wallet.js"></script>
+</body>
+<script>
+function setAmount(value) {
+  document.getElementById("addAmount").value = value;
+}
+
+function showToast(message, type = "success") {
+  const toast = document.getElementById("toast");
+  toast.innerText = message;
+  toast.className = "toast " + type;
+  toast.style.display = "block";
+
+  setTimeout(() => {
+    toast.style.display = "none";
+  }, 3000);
+}
+
+
+async function addMoney() {
+  const amount = Number(document.getElementById("addAmount").value);
+
+  if (!amount || amount < 1) {
+    showToast("Enter valid amount", "error");
+    return;
+  }
+  if (amount > 50000) {
+  showToast("Maximum add limit ₹50,000", "error");
+  return;
+}
+
+  try {
+    const res = await fetch("/wallet/add", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ amount })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      showToast("Money added successfully");
+      setTimeout(() => location.reload(), 1000);
+    } else {
+      showToast(data.message || "Failed", "error");
+    }
+
+  } catch (err) {
+    console.error(err);
+    showToast("Server error", "error");
+  }
+}
+</script>
+</html>
