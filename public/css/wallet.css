@@ -50,6 +50,46 @@ body {
   gap: 20px;
   margin-bottom: 32px;
 }
+.txn-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.txn-pagination button {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1.5px solid var(--light-border);
+  background: #fff;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-family: var(--font-body);
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--primary);
+  transition: all 0.2s;
+}
+
+.txn-pagination button:hover {
+  border-color: var(--accent-dark);
+  color: var(--accent-dark);
+  background: #fdf4ec;
+}
+
+.txn-pagination button.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.txn-pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
 
 .card {
   background: var(--card-bg);
