@@ -6,31 +6,31 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
 
 <form id="paymentForm">
 
   <input type="hidden" name="addressId" value="<%= address._id %>">
 
   <div class="payment-container">
+<div class="payment-methods">
+  <h3>Select payment method</h3>
 
-    <div class="payment-methods">
-      <h3>Select payment method</h3>
+  <label class="payment-option">
+    <input type="radio" name="paymentMethod" value="Razorpay" checked>
+    <span>Razorpay</span>
+  </label>
 
-      <label class="payment-option">
-        <input type="radio" name="paymentMethod" value="Razorpay" checked>
-        <span>Razorpay</span>
-      </label>
-      <label class="payment-option">
-        <input type="radio" name="paymentMethod" value="Razorpay" checked>
-        <span>Wallet</span>
-      </label>
+  <label class="payment-option">
+    <input type="radio" name="paymentMethod" value="Wallet">
+    <span>Wallet (Balance: ₹<%= user.wallet ? user.wallet.toFixed(2) : '0.00' %>)</span>
+  </label>
 
-      <label class="payment-option">
-        <input type="radio" name="paymentMethod" value="COD">
-        <span>Cash on Delivery</span>
-      </label>
-    </div>
+  <label class="payment-option">
+    <input type="radio" name="paymentMethod" value="COD">
+    <span>Cash on Delivery</span>
+  </label>
+</div>
     <div class="order-summary">
       <h3>Order summary</h3>
 
@@ -58,7 +58,7 @@
 
   </div>
 </form>
-
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
 const paymentData = {
   key: "<%= razorpayKey %>",
@@ -73,6 +73,7 @@ const paymentData = {
 document.getElementById("placeOrderBtn").addEventListener("click", async function () {
 
   const selectedMethod = document.querySelector("input[name='paymentMethod']:checked").value;
+
 
   if (selectedMethod === "COD") {
     const res = await fetch("/checkout/payment/place", {
@@ -92,9 +93,65 @@ document.getElementById("placeOrderBtn").addEventListener("click", async functio
     } else {
       Swal.fire("Error", data.message || "Order failed", "error");
     }
-
     return;
   }
+
+
+  if (selectedMethod === "Wallet") {
+    const walletBalance = <%= user.wallet || 0 %>;
+
+    if (walletBalance <= 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "Wallet Empty",
+        text: "Your wallet balance is ₹0.00. Please add money to your wallet first.",
+        confirmButtonText: "Add Money",
+        showCancelButton: true,
+        cancelButtonText: "Cancel"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = "/wallet";
+        }
+      });
+      return;
+    }
+
+    if (walletBalance < (paymentData.amount / 100)) {
+      Swal.fire({
+        icon: "warning",
+        title: "Insufficient Balance",
+        text: `Your wallet balance is ₹${walletBalance.toFixed(2)}, but order total is ₹${(paymentData.amount / 100).toFixed(2)}. Please add money to continue.`,
+        confirmButtonText: "Add Money",
+        showCancelButton: true,
+        cancelButtonText: "Cancel"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = "/wallet";
+        }
+      });
+      return;
+    }
+
+    const res = await fetch("/checkout/payment/place", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        addressId: paymentData.addressId,
+        paymentMethod: "Wallet"
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      Swal.fire("Success", "Order placed using Wallet", "success")
+        .then(() => window.location.href = "/order-success?method=Wallet");
+    } else {
+      Swal.fire("Error", data.message || "Order failed", "error");
+    }
+    return;
+  }
+
   const options = {
     key: paymentData.key,
     amount: Number(paymentData.amount),
@@ -110,7 +167,6 @@ document.getElementById("placeOrderBtn").addEventListener("click", async functio
     },
 
     handler: async function (response) {
-
       const res = await fetch("/checkout/payment/place", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -124,7 +180,6 @@ document.getElementById("placeOrderBtn").addEventListener("click", async functio
       });
 
       const data = await res.json();
-      console.log(data)
 
       if (data.success) {
         window.location.href = "/order-success?method=Razorpay";
@@ -138,9 +193,9 @@ document.getElementById("placeOrderBtn").addEventListener("click", async functio
 
   const rzp = new Razorpay(options);
 
- rzp.on("payment.failed", function () {
-  window.location.href = "/order-failed";
-});
+  rzp.on("payment.failed", function () {
+    window.location.href = "/order-failed";
+  });
 
   rzp.open();
 });

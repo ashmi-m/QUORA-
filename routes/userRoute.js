@@ -127,8 +127,9 @@ router.post("/apply-coupon", userAuth, userCouponController.applyCoupon);
 router.post("/remove-coupon", userAuth, userCouponController.removeCoupon);
 
 
-router.get("/wallet", userAuth, walletController.loadWallet);
-router.post("/wallet/add", userAuth, walletController.addMoneyToWallet);
+router.get("/wallet", walletController.loadWallet);
+router.post("/wallet/create-order", walletController.createWalletOrder);
+router.post("/wallet/add", walletController.addMoneyToWallet);
 
 module.exports = router;
 

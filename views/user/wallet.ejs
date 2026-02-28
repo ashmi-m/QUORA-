@@ -198,6 +198,9 @@
   <div id="toast" class="toast hidden"></div>
   <script src="/js/wallet.js"></script>
 </body>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
 <script>
 function setAmount(value) {
   document.getElementById("addAmount").value = value;
@@ -214,7 +217,6 @@ function showToast(message, type = "success") {
   }, 3000);
 }
 
-
 async function addMoney() {
   const amount = Number(document.getElementById("addAmount").value);
 
@@ -222,32 +224,92 @@ async function addMoney() {
     showToast("Enter valid amount", "error");
     return;
   }
+
   if (amount > 50000) {
-  showToast("Maximum add limit ₹50,000", "error");
-  return;
-}
+    showToast("Maximum add limit ₹50,000", "error");
+    return;
+  }
+
+  const btn = document.getElementById("addBtnText");
+  const loader = document.getElementById("addBtnLoader");
+  btn.style.display = "none";
+  loader.style.display = "inline";
 
   try {
-    const res = await fetch("/wallet/add", {
+  
+    const orderRes = await fetch("/wallet/create-order", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ amount })
     });
 
-    const data = await res.json();
+    const orderData = await orderRes.json();
 
-    if (data.success) {
-      showToast("Money added successfully");
-      setTimeout(() => location.reload(), 1000);
-    } else {
-      showToast(data.message || "Failed", "error");
+    if (!orderData.success) {
+      showToast(orderData.message || "Failed to initiate payment", "error");
+      btn.style.display = "inline";
+      loader.style.display = "none";
+      return;
     }
+
+    // Step 2: Open Razorpay checkout
+    const options = {
+      key: orderData.key,
+      amount: orderData.amount,
+      currency: "INR",
+      order_id: orderData.orderId,
+      name: "QUORA Wallet",
+      description: "Add money to wallet",
+
+      handler: async function (response) {
+        // Step 3: Verify and credit wallet
+        const verifyRes = await fetch("/wallet/add", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+            amount: orderData.amount   // in paise
+          })
+        });
+
+        const verifyData = await verifyRes.json();
+
+        if (verifyData.success) {
+          showToast("Money added successfully! ✅");
+          setTimeout(() => location.reload(), 1500);
+        } else {
+          showToast(verifyData.message || "Payment verification failed", "error");
+        }
+      },
+
+      modal: {
+        ondismiss: function () {
+          showToast("Payment cancelled", "error");
+          btn.style.display = "inline";
+          loader.style.display = "none";
+        }
+      },
+
+      theme: { color: "#2d2d2d" }
+    };
+
+    const rzp = new Razorpay(options);
+
+    rzp.on("payment.failed", function (response) {
+      showToast("Payment failed: " + response.error.description, "error");
+      btn.style.display = "inline";
+      loader.style.display = "none";
+    });
+
+    rzp.open();
 
   } catch (err) {
     console.error(err);
     showToast("Server error", "error");
+    btn.style.display = "inline";
+    loader.style.display = "none";
   }
 }
 </script>
