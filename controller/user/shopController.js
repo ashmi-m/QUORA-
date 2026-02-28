@@ -3,11 +3,8 @@ const Product = require("../../models/productSchema");
 const Category = require("../../models/categorySchema");
 const Brand = require("../../models/brandSchema");
 const Wishlist = require("../../models/wishlistSchema");
-
-
 const loadShopPage = async (req, res) => {
   try {
-
     const categoriesParam = req.query.category || [];
     const brandsParam = req.query.brand || [];
     const sortOption = req.query.sort || "";
@@ -17,6 +14,7 @@ const loadShopPage = async (req, res) => {
     const limit = 12;
     const skip = (page - 1) * limit;
 
+    // ── Build query ──────────────────────────────────────
     let query = { isBlocked: false };
     let selectedCategories = [];
 
@@ -35,54 +33,34 @@ const loadShopPage = async (req, res) => {
     }
 
     let selectedBrands = [];
-
     if (brandsParam.length) {
-      const brandArray = Array.isArray(brandsParam)
-        ? brandsParam
-        : [brandsParam];
+      const brandArray = Array.isArray(brandsParam) ? brandsParam : [brandsParam];
 
-      selectedBrands = brandArray.filter(id =>
-        mongoose.Types.ObjectId.isValid(id)
-      );
+      selectedBrands = brandArray.filter(id => mongoose.Types.ObjectId.isValid(id));
 
       if (selectedBrands.length) {
         query.brand = { $in: selectedBrands };
       }
     }
+
     if (searchQuery && searchQuery.trim().length > 0) {
-      query.productName = {
-        $regex: searchQuery.trim(),
-        $options: "i"
-      };
+      query.productName = { $regex: searchQuery.trim(), $options: "i" };
     }
 
-    if (priceRange === "under500") {
-      query.regularPrice = { $lt: 500 };
-    } else if (priceRange === "500-1000") {
-      query.regularPrice = { $gte: 500, $lte: 1000 };
-    } else if (priceRange === "1000-5000") {
-      query.regularPrice = { $gte: 1000, $lte: 5000 };
-    } else if (priceRange === "5000-15000") {
-      query.regularPrice = { $gte: 5000, $lte: 15000 };
-    } else if (priceRange === "above15000") {
-      query.regularPrice = { $gt: 15000 };
-    }
+    if (priceRange === "under500") query.regularPrice = { $lt: 500 };
+    else if (priceRange === "500-1000") query.regularPrice = { $gte: 500, $lte: 1000 };
+    else if (priceRange === "1000-5000") query.regularPrice = { $gte: 1000, $lte: 5000 };
+    else if (priceRange === "5000-15000") query.regularPrice = { $gte: 5000, $lte: 15000 };
+    else if (priceRange === "above15000") query.regularPrice = { $gt: 15000 };
 
+    // ── Build sort ──────────────────────────────────────
     let sortQuery = {};
-    if (sortOption === "low-high") {
-      sortQuery.regularPrice = 1;
-    } else if (sortOption === "high-low") {
-      sortQuery.regularPrice = -1;
-    } else if (sortOption === "a-z") {
-      sortQuery.productName = 1;
-    } else if (sortOption === "z-a") {
-      sortQuery.productName = -1;
-    }
+    if (sortOption === "low-high") sortQuery.regularPrice = 1;
+    else if (sortOption === "high-low") sortQuery.regularPrice = -1;
+    else if (sortOption === "a-z") sortQuery.productName = 1;
+    else if (sortOption === "z-a") sortQuery.productName = -1;
 
-    console.log("Query:", query);
-    console.log("Sort:", sortQuery);
-    console.log("Category ID:", selectedCategories);
-    console.log("Brand ID:", selectedBrands);
+    // ── Fetch products, categories, brands ──────────────
     const [products, totalProducts, categories, brands] = await Promise.all([
       Product.find(query)
         .populate("category")
@@ -96,28 +74,40 @@ const loadShopPage = async (req, res) => {
       Brand.find({ isBlocked: false }).lean(),
     ]);
 
-    const totalPages = Math.ceil(totalProducts / limit);
-    console.log("Products found:", products.length);
-    console.log("Total Products:", totalProducts);
+    // ── Mark wishlist status for logged-in user ──────────
+    if (req.user) {
+      const wishlist = await Wishlist.findOne({ userId: req.user._id }).lean();
+      const wishlistedIds = wishlist ? wishlist.items.map(i => i.productId.toString()) : [];
+      products.forEach(p => {
+        p.isWishlisted = wishlistedIds.includes(p._id.toString());
+      });
+    } else {
+      products.forEach(p => (p.isWishlisted = false));
+    }
 
+    // ── Pagination ──────────────────────────────────────
+    const totalPages = Math.ceil(totalProducts / limit);
+
+    // ── Render shop page ───────────────────────────────
     res.render("shop", {
       products,
       categories,
       brands,
       selectedCategory: selectedCategories,
       selectedBrand: selectedBrands,
-      sortOption: sortOption,
-      priceRange: priceRange,
-      searchQuery: searchQuery,
+      sortOption,
+      priceRange,
+      searchQuery,
       totalPages,
       currentPage: page,
-
     });
+
   } catch (error) {
     console.error("Error loading shop page", error);
     res.status(500).send("Internal Server Error");
   }
 };
+
 
 
 const loadProductDetails = async (req, res) => {

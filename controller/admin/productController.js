@@ -419,7 +419,48 @@ const toggleProductBlock = async (req, res) => {
   }
 };
 
+const addProductOffer = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { percentage } = req.body;
 
+    if (!percentage || percentage < 1 || percentage > 99) {
+      return res.json({ success: false, message: "Enter valid percentage (1-99)" });
+    }
+
+    const product = await Product.findById(id);
+    if (!product) return res.json({ success: false, message: "Product not found" });
+
+    product.productOffer = parseInt(percentage);
+    product.salePrice = Math.round(product.regularPrice - (product.regularPrice * percentage / 100));
+    await product.save();
+
+    res.json({ success: true, message: `${percentage}% offer added successfully` });
+
+  } catch (error) {
+    console.error("Error adding product offer:", error);
+    res.json({ success: false, message: "Server error" });
+  }
+};
+
+const removeProductOffer = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const product = await Product.findById(id);
+    if (!product) return res.json({ success: false, message: "Product not found" });
+
+    product.productOffer = 0;
+    product.salePrice = null;
+    await product.save();
+
+    res.json({ success: true, message: "Offer removed successfully" });
+
+  } catch (error) {
+    console.error("Error removing product offer:", error);
+    res.json({ success: false, message: "Server error" });
+  }
+};
 
 module.exports = {
   getProductAddPage,
@@ -435,5 +476,8 @@ module.exports = {
      getAllBrands,
      getProductDetails,
      toggleProductBlock,
+     addProductOffer,
+     removeProductOffer
+
 };
  

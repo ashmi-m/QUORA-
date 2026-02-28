@@ -106,7 +106,6 @@ const removeFromWishlist = async (req, res) => {
     res.status(500).json({ success: false });
   }
 };
-
 const toggleWishlist = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -119,9 +118,21 @@ const toggleWishlist = async (req, res) => {
       });
     }
 
+    // 🔹 Check if product is already in cart
+    const cartItem = await Cart.findOne({
+      userId,
+      "items.productId": productId
+    });
+    if (cartItem) {
+      return res.status(409).json({
+        success: false,
+        message: "Product already in cart"
+      });
+    }
+
     let wishlist = await Wishlist.findOne({ userId });
 
-    // create wishlist if not exists
+    // 🔹 Create wishlist if it doesn't exist
     if (!wishlist) {
       wishlist = new Wishlist({
         userId,
@@ -135,6 +146,7 @@ const toggleWishlist = async (req, res) => {
       });
     }
 
+    // 🔹 Check if product already in wishlist
     const itemIndex = wishlist.items.findIndex(
       item => item.productId.toString() === productId
     );
@@ -154,14 +166,14 @@ const toggleWishlist = async (req, res) => {
     wishlist.items.push({ productId });
     await wishlist.save();
 
-    res.json({
+    return res.json({
       success: true,
       action: "added"
     });
 
   } catch (err) {
     console.error("Toggle Wishlist Error:", err);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Server error"
     });

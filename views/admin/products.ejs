@@ -201,7 +201,7 @@
          
           <th>Price</th>
           <th>Category</th>
-          <!-- <th>Discount</th> -->
+          <th>Offer</th> 
           <th>Stock</th>
           <th>Added on</th>
           <th>Actions</th>
@@ -232,6 +232,82 @@
   </div>
 </div>
 <script>
+  async function addOffer(id) {
+  const { value: percentage, isConfirmed } = await Swal.fire({
+    title: "Add Product Offer",
+    html: `
+      <label style="font-size:14px;color:#555;">Offer Percentage</label>
+      <input type="number" id="offerInput" min="1" max="99"
+        placeholder="Enter percentage"
+        class="swal2-input"
+        style="width:80%;margin-top:8px;">
+    `,
+    showCancelButton: true,
+    confirmButtonText: "Add Offer",
+    cancelButtonText: "Cancel",
+    confirmButtonColor: "#17a2b8",
+    preConfirm: () => {
+      const val = parseInt(document.getElementById("offerInput").value);
+      if (!val || val < 1 || val > 99) {
+        Swal.showValidationMessage("Please enter a valid percentage between 1 and 99");
+        return false;
+      }
+      return val;
+    }
+  });
+
+  if (!isConfirmed || !percentage) return;
+
+  try {
+    const res = await fetch(`/admin/products/offer/${id}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ percentage })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      Swal.fire("Success!", data.message, "success");
+      loadProducts(currentPage);
+    } else {
+      Swal.fire("Error", data.message, "error");
+    }
+  } catch (err) {
+    Swal.fire("Error", "Server error", "error");
+  }
+}
+
+async function removeOffer(id) {
+  const result = await Swal.fire({
+    title: "Remove Offer?",
+    text: "This will remove the current offer from this product.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Yes, Remove",
+    cancelButtonText: "Cancel",
+    confirmButtonColor: "#ff9800"
+  });
+
+  if (!result.isConfirmed) return;
+
+  try {
+    const res = await fetch(`/admin/products/offer/${id}`, {
+      method: "DELETE"
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      Swal.fire("Removed!", data.message, "success");
+      loadProducts(currentPage);
+    } else {
+      Swal.fire("Error", data.message, "error");
+    }
+  } catch (err) {
+    Swal.fire("Error", "Server error", "error");
+  }
+}
 let currentPage = 1;
 let totalPages = 1;
 let itemsPerPage = 10;
@@ -254,29 +330,48 @@ async function loadProducts(page = 1) {
         const tr = document.createElement("tr");
 tr.innerHTML = `
   <td>${item.productName}</td>
-  <td>${item.regularPrice}</td>
+  <td>
+    ₹${item.regularPrice}
+    ${item.productOffer > 0 
+      ? `<br><small style="color:#28a745;font-weight:600;">Sale: ₹${item.salePrice || Math.round(item.regularPrice - (item.regularPrice * item.productOffer / 100))}</small>` 
+      : ''}
+  </td>
+  <td>
+    ${item.productOffer > 0
+      ? `<span style="
+            background:#e8f5e9;
+            color:#28a745;
+            padding:3px 10px;
+            border-radius:20px;
+            font-size:12px;
+            font-weight:600;
+          ">${item.productOffer}% OFF</span>`
+      : `<span style="color:#aaa;font-size:12px;">No offer</span>`
+    }
+  </td>
   <td>${item.category?.name || "No Category"}</td>
   <td>${item.quantity ?? 0}</td>
   <td>${item.createdAt ? new Date(item.createdAt).toLocaleDateString() : "-"}</td>
-
   <td class="actions">
+    ${item.productOffer > 0
+      ? `<button onclick="removeOffer('${item._id}')"
+           style="padding:5px 10px;border:none;border-radius:5px;cursor:pointer;background:#ff9800;color:white;font-size:12px;">
+           REMOVE OFFER
+         </button>`
+      : `<button onclick="addOffer('${item._id}')"
+           style="padding:5px 10px;border:none;border-radius:5px;cursor:pointer;background:#17a2b8;color:white;font-size:12px;">
+           ADD OFFER
+         </button>`
+    }
     <button onclick="toggleBlock('${item._id}')"
-      style="
-        padding:5px 10px;
-        border:none;
-        border-radius:5px;
-        cursor:pointer;
-        background:${item.isBlocked ? '#28a745' : '#dc3545'};
-        color:white;
-      ">
+      style="padding:5px 10px;border:none;border-radius:5px;cursor:pointer;
+        background:${item.isBlocked ? '#28a745' : '#dc3545'};color:white;">
       ${item.isBlocked ? "UNBLOCK" : "BLOCK"}
     </button>
-
     <span class="edit-icon" onclick="editProduct('${item._id}')">✏️</span>
     <span class="delete-icon" onclick="deleteProduct('${item._id}')">🗑️</span>
   </td>
 `;
-
         tbody.appendChild(tr);
       });
 

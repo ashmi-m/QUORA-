@@ -76,6 +76,8 @@ router.post("/coupons/toggle/:id", adminAuth, couponController.toggleCoupon);
 router.post("/coupons/edit/:id", adminAuth, couponController.updateCoupon);
 
 router.delete("/coupons/:id", adminAuth, couponController.deleteCoupon);
+router.post("/products/offer/:id", adminAuth, productController.addProductOffer);
+router.delete("/products/offer/:id", adminAuth, productController.removeProductOffer);
 
 module.exports = router;
 
