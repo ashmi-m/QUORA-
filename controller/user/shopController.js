@@ -4,7 +4,6 @@ const Category = require("../../models/categorySchema");
 const Brand = require("../../models/brandSchema");
 const Wishlist = require("../../models/wishlistSchema");
 
-
 function applyOffer(product) {
   const categoryOffer = product.category?.categoryOffer || 0;
   const productOffer = product.productOffer || 0;
@@ -16,7 +15,6 @@ function applyOffer(product) {
       ? Math.round(product.regularPrice - (product.regularPrice * effectiveOffer) / 100)
       : null;
 }
-
 const loadShopPage = async (req, res) => {
   try {
     const categoriesParam = req.query.category || [];
@@ -27,8 +25,6 @@ const loadShopPage = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = 12;
     const skip = (page - 1) * limit;
-
-    // ── Build query ──────────────────────────────────────
     let query = { isBlocked: false };
     let selectedCategories = [];
 
@@ -45,7 +41,6 @@ const loadShopPage = async (req, res) => {
         query.category = { $in: selectedCategories };
       }
     }
-
     let selectedBrands = [];
     if (brandsParam.length) {
       const brandArray = Array.isArray(brandsParam) ? brandsParam : [brandsParam];
@@ -56,7 +51,6 @@ const loadShopPage = async (req, res) => {
         query.brand = { $in: selectedBrands };
       }
     }
-
     if (searchQuery && searchQuery.trim().length > 0) {
       query.productName = { $regex: searchQuery.trim(), $options: "i" };
     }
@@ -66,18 +60,14 @@ const loadShopPage = async (req, res) => {
     else if (priceRange === "1000-5000") query.regularPrice = { $gte: 1000, $lte: 5000 };
     else if (priceRange === "5000-15000") query.regularPrice = { $gte: 5000, $lte: 15000 };
     else if (priceRange === "above15000") query.regularPrice = { $gt: 15000 };
-
-    // ── Build sort ──────────────────────────────────────
     let sortQuery = {};
     if (sortOption === "low-high") sortQuery.regularPrice = 1;
     else if (sortOption === "high-low") sortQuery.regularPrice = -1;
     else if (sortOption === "a-z") sortQuery.productName = 1;
     else if (sortOption === "z-a") sortQuery.productName = -1;
-
-    // ── Fetch products, categories, brands ──────────────
     const [products, totalProducts, categories, brands] = await Promise.all([
       Product.find(query)
-        .populate("category")
+        .populate({ path: "category", select: "categoryOffer categoryName" })
         .populate("brand")
         .sort(sortQuery)
         .skip(skip)
@@ -98,11 +88,7 @@ products.forEach(applyOffer);
     } else {
       products.forEach(p => (p.isWishlisted = false));
     }
-
-    // ── Pagination ──────────────────────────────────────
     const totalPages = Math.ceil(totalProducts / limit);
-
-    // ── Render shop page ───────────────────────────────
     res.render("shop", {
       products,
       categories,

@@ -1,21 +1,16 @@
 const Brand = require("../../models/brandSchema");
 const Product = require("../../models/productSchema");
-
-
 const getBrandPage = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = 4;
     const skip = (page - 1) * limit;
-
     const brandData = await Brand.find({})
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
-
     const totalBrands = await Brand.countDocuments();
     const totalPages = Math.ceil(totalBrands / limit);
-
     res.render("brands", {
       data: brandData,
       currentPage: page,
@@ -74,7 +69,6 @@ const unblockBrand = async (req, res) => {
     return res.status(500).json({ success: false, error: "Failed to unblock brand" });
   }
 };
-
 const blockBrand = async (req, res) => {
   try {
     console.log('BLOCK request received - id:', req.params.id, 'by user:', req.session?.admin || req.user);
@@ -85,11 +79,6 @@ const blockBrand = async (req, res) => {
     return res.status(500).json({ success: false, error: "Failed to block brand" });
   }
 };
-
-
-
-
-
 module.exports = {
   getBrandPage,
   addBrand,

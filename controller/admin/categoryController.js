@@ -1,8 +1,6 @@
 
 
 const Category = require("../../models/categorySchema");
-
-
 const categoryInfo = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -13,13 +11,11 @@ const categoryInfo = async (req, res) => {
       const query = search
       ? { name: { $regex: search, $options: "i" } } 
       : {};
-
     const categoryData = await Category.find(query)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .lean();
-
     const totalCategories = await Category.countDocuments(query);
     const totalPages = Math.ceil(totalCategories / limit);
 
@@ -57,10 +53,6 @@ const addCategory = async (req, res) => {
     res.status(500).json({ success: false, error: "Internal server error" });
   }
 };
-
-
-
-
 // const deleteCategory = async (req, res) => {
 //   try {
 //     const { id } = req.params;
@@ -83,9 +75,6 @@ const geteditCategory = async (req, res) => {
     res.redirect("/admin/pageerror");
   }
 }
-
-
-
 const postEditCategory = async (req, res) => {
   try {
     const { id, name, description } = req.body;

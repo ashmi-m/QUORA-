@@ -4,6 +4,7 @@ const Cart = require("../../models/cartSchema");
 const Wishlist = require("../../models/wishlistSchema");
 const Address = require("../../models/addressSchema");
 const mongoose = require("mongoose");
+const { creditWallet } = require("./walletController");
 
 const env = require("dotenv").config();
 const nodemailer = require("nodemailer");
@@ -144,51 +145,93 @@ async function sendVerificationEmail(email, otp) {
     return false;
   }
 }
+function generateRefCode(name) {
+  const prefix = name.substring(0, 3).toUpperCase();
+  const random = Math.random().toString(36).substring(2, 7).toUpperCase();
+  return prefix + random;
+}
+// const signup = async (req, res) => {
+//   try {
+    
+//     const { name, email, password, confirmPassword, phone } = req.body;
+
+
+//     if (password !== confirmPassword) {
+//       return res.render("signup", { message: "Passwords do not match" });
+
+//     }
+
+
+//     const findUser = await User.findOne({ email });
+    
+//     if (findUser) {
+//       console.log("user is already exist", findUser)
+//       return res.render("signup", { message: "User with this email already exists" });
+
+//     }
+
+
+//     const otp = generateOtp();
+
+   
+//     const emailSent = await sendVerificationEmail(email, otp);
+//     console.log("emailSent", emailSent)
+//     if (!emailSent) {
+//       return res.render("signup", { message: "Failed to send OTP. Try again." });
+//     }
+
+
+//     req.session.userOtp = otp;
+//     req.session.userData = { name, phone, email, password };
+
+//     console.log("OTP Sent:", otp);
+
+
+//     return res.render("conformOtp");
+
+//   } catch (error) {
+//     console.error("eerror in post signup", error);
+//     res.render("signup", { message: "Something went wrong. Please try again." });
+//   }
+// }
 const signup = async (req, res) => {
   try {
-    
-    const { name, email, password, confirmPassword, phone } = req.body;
-
+    const { name, email, password, confirmPassword, phone, refCode } = req.body;
 
     if (password !== confirmPassword) {
       return res.render("signup", { message: "Passwords do not match" });
-
     }
-
 
     const findUser = await User.findOne({ email });
-    
     if (findUser) {
-      console.log("user is already exist", findUser)
-      return res.render("signup", { message: "User with this email already exists" });
-
+      return res.render("signup", { message: "User already exists" });
     }
-
 
     const otp = generateOtp();
-
-   
+    console.log("🟢 Generated OTP for", email, "is:", otp);
     const emailSent = await sendVerificationEmail(email, otp);
-    console.log("emailSent", emailSent)
+
     if (!emailSent) {
-      return res.render("signup", { message: "Failed to send OTP. Try again." });
+      return res.render("signup", { message: "Failed to send OTP" });
     }
 
-
     req.session.userOtp = otp;
-    req.session.userData = { name, phone, email, password };
 
-    console.log("OTP Sent:", otp);
+    req.session.userData = {
+      name,
+      email,
+      phone,
+      password,
+      referredBy: refCode || null
+    };
 
-
-    return res.render("conformOtp");
+    res.render("conformOtp");
 
   } catch (error) {
-    console.error("eerror in post signup", error);
-    res.render("signup", { message: "Something went wrong. Please try again." });
+    console.error(error);
+    res.render("signup", { message: "Something went wrong" });
   }
-}
-
+};
 
 
 
@@ -223,19 +266,76 @@ const conformOtp = async (req, res) => {
       }
       const passwordHash = await securePassword(user.password);
 
-      const saveUserData = new User({
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        password: passwordHash,
+      // const saveUserData = new User({
+      //   name: user.name,
+      //   email: user.email,
+      //   phone: user.phone,
+      //   password: passwordHash,
 
-      });
+      // });
+     // generate unique referral code for new user
+let newRefCode;
+let isUnique = false;
 
+while (!isUnique) {
+  newRefCode = generateRefCode(user.name);
+  const exists = await User.findOne({ refCode: newRefCode });
+  if (!exists) isUnique = true;
+}
+
+const saveUserData = new User({
+  name: user.name,
+  email: user.email,
+  phone: user.phone,
+  password: passwordHash,
+  refCode: newRefCode,
+  referredBy: user.referredBy || null,
+  wallet: 0
+});
 
       await saveUserData.save();
+    
+// if (user.referredBy) {
+//   const referrer = await User.findOne({ refCode: user.referredBy });
 
-      console.log("saveUserData is", saveUserData);
+//   if (referrer && referrer._id.toString() !== saveUserData._id.toString()) {
+  
+//     await creditWallet(referrer._id, 50, `Referral bonus for ${user.name} joining`);
+//     console.log(`₹50 added to ${referrer.name}'s wallet for referral`);
+//   }
+// }
+//       console.log("saveUserData is", saveUserData);
+    
+// if (user.referredBy) {
+//   const referrer = await User.findOne({ refCode: user.referredBy });
 
+//   if (referrer && referrer._id.toString() !== saveUserData._id.toString()) {
+//     // add ₹50 to wallet
+//     referrer.wallet += 50;
+//     await referrer.save();
+
+//     // create coupon for referrer
+//     const couponCode = "REF" + Math.random().toString(36).substring(2, 8).toUpperCase();
+
+//     const Coupon = require("../../models/couponSchema");
+
+//     await Coupon.create({
+//       userId: referrer._id,
+//       code: couponCode,
+//       discountAmount: 50,
+//       expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+//       isUsed: false
+//     });
+//   }
+// }
+
+if (user.referredBy) {
+  const referrer = await User.findOne({ refCode: user.referredBy });
+  if (referrer && referrer._id.toString() !== saveUserData._id.toString()) {
+    await creditWallet(referrer._id, 50, `Referral bonus for ${user.name} joining`);
+    console.log(`₹50 added to ${referrer.name}'s wallet for referral`);
+  }
+}
       
       req.session.user = {
         _id: saveUserData._id,
@@ -549,7 +649,7 @@ const addAddressFromProfile = async (req, res) => {
   try {
     console.log("fghjkl");
 
-    const { name, mobile, pincode, locality, address, city, state, type, landmark } = req.body;
+    const { name, mobile, pincode, locality, address, city, state, type, landmark ,from } = req.body;
     const userId = req.session.user._id;
 
     if (!name || !mobile || !pincode || !locality || !address || !city || !state) {

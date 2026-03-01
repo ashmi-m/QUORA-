@@ -43,7 +43,6 @@ const loadDashboard = async (req, res) => {
     res.redirect("/admin/login");
   }
 }
-
 const logout = async (req, res) => {
   try {
     req.session.destroy(err => {
@@ -54,7 +53,6 @@ const logout = async (req, res) => {
      return res.redirect("/admin/login")
     })
   } catch (error) {
-   
    return res.redirect("/pageerror")
   }
 }
@@ -65,7 +63,6 @@ const loadOrders = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
-
     let matchStage = {};
     if (status !== "All") {
       matchStage.status = status;
@@ -83,7 +80,6 @@ const loadOrders = async (req, res) => {
         ];
       }
     }
-
     const pipeline = [
       {
         $lookup: {
@@ -107,14 +103,12 @@ const loadOrders = async (req, res) => {
       { $skip: skip },
       { $limit: limit }
     ];
-
     const rawOrders = await Order.aggregate(pipeline);
   const orders = rawOrders.map(order => {
   const mappedProducts = order.products.map((p, index) => ({
     ...p,
     productId: order.productsData[index] || null
   }));
-
   const hasReturnRequest = mappedProducts.some(p => p.returnRequested === true);
 
   return {
@@ -149,9 +143,6 @@ const loadOrders = async (req, res) => {
     res.status(500).send("Server Error");
   }
 };
-
-
-
 const viewOrderDetails = async (req, res) => {
   try {
     const orderId = req.params.id;
@@ -168,17 +159,13 @@ const viewOrderDetails = async (req, res) => {
     res.status(500).send("Server Error");
   }
 };
-
-
 const updateOrderStatus = async (req, res) => {
   try {
     const { status } = req.body;
     const orderId = req.params.id;
-
     const order = await Order.findByIdAndUpdate(orderId, { status }, { new: true });
 
     if (!order) return res.status(404).send("Order not found");
-
     res.redirect("/admin/orders");
   } catch (err) {
     console.error(err);
@@ -216,7 +203,6 @@ const updateProductStatus = async (req, res) => {
         message: "Session expired"
       });
     }
-
     const { status } = req.body;
    console.log("status is",status)
 
@@ -227,15 +213,12 @@ const updateProductStatus = async (req, res) => {
     if (!order) {
       return res.json({ success: false, message: "Order not found" });
     }
-
      const productIndex = Number(index);
      const product = order.products [index];
-
      console.log("product is ",product)
     if (!product) {
       return res.json({ success: false, message: "Product not found" });
     }
-
       const currentStatus = product.status;
     console.log("currentstatus is",currentStatus)
     if (currentStatus === "Cancelled") {
@@ -244,7 +227,6 @@ const updateProductStatus = async (req, res) => {
         message: "Cancelled product cannot be modified"
       });
     }
-
      const allowedTransitions = {
       "Placed": ["Processing", "Cancelled","Delivered"],
       "Processing": ["Shipped", "Cancelled"],
@@ -335,7 +317,6 @@ const getOrderDetailsJson = async (req, res) => {
         const img = p.productId.productImage[0];
         imagePath = img.startsWith("http") ? img : `/uploads/${img}`;
       }
-
       return {
         index,
         name: p.productId?.productName || "Product",
@@ -407,7 +388,6 @@ const approveReturn = async (req, res) => {
     if (!product || !product.returnRequested) {
       return res.status(400).json({ success: false, message: "No return requested for this product" });
     }
-
     product.status = "Returned";
     product.returnRequested = false;
      recalculateOrderStatus(order);
@@ -423,7 +403,6 @@ const approveReturn = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
-
 const rejectReturn = async (req, res) => {
   try {
     const { id, index } = req.params;
@@ -447,10 +426,6 @@ const rejectReturn = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
-
-
-
-
 module.exports = {
   loadLogin,
   login,

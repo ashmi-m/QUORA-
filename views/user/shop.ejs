@@ -216,38 +216,33 @@
       <% const isOutOfStock = product.quantity <= 0; %>
 
       <div class="product-card">
-
-        <!-- Out of Stock Overlay -->
         <% if (isOutOfStock) { %>
           <div class="out-of-stock-overlay"><span>OUT OF STOCK</span></div>
         <% } %>
-
-        <!-- Offer Badge (only if in stock) -->
-        <% if (product.productOffer > 0 && !isOutOfStock) { %>
-          <div class="offer-badge"><%= product.productOffer %>% OFF</div>
+        <% if (product.effectiveOffer > 0 && !isOutOfStock) { %>
+          <div class="offer-badge"><%= product.effectiveOffer %>% OFF</div>
         <% } %>
 
-        <!-- Wishlist -->
+     
         <div class="wishlist-overlay <%= product.isWishlisted ? 'active' : '' %>"
              data-id="<%= product._id %>">
           <span class="heart" style="color:<%= product.isWishlisted ? '#e53935' : '#bbb' %>;">❤</span>
         </div>
 
-        <!-- Image -->
+        
         <a href="/product/<%= product._id %>">
           <img src="<%= product.productImage?.[0] || '/images/default.jpg' %>"
                alt="<%= product.productName %>">
         </a>
 
-        <!-- Info -->
         <div class="product-info">
           <a href="/product/<%= product._id %>" style="text-decoration:none; color:inherit;">
             <p class="product-brand"><%= product.brand?.brandName || '' %></p>
             <p class="product-name"><%= product.productName %></p>
-            <% if (product.productOffer > 0) { %>
+            <% if (product.effectiveOffer > 0) { %>
               <div class="price-row">
                 <span class="sale-price">
-                  ₹<%= product.salePrice || Math.round(product.regularPrice - (product.regularPrice * product.productOffer / 100)) %>
+                  ₹<%= product.salePrice || Math.round(product.regularPrice - (product.regularPrice * product.effectiveOffer / 100)) %>
                 </span>
                 <span class="original-price">₹<%= product.regularPrice %></span>
               </div>
@@ -304,8 +299,6 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-
-  // ── Smart error handler based on HTTP status ─────────────
   function handleCartError(status, message) {
     if (status === 401) {
       Swal.fire({
@@ -327,7 +320,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
     } else if (status === 400) {
-      // Covers: out of stock, max qty, stock limit
       Swal.fire({
         icon: "warning",
         title: "Cannot Add to Cart",
@@ -344,8 +336,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
   }
-
-  // ── Add to Cart ──────────────────────────────────────────
   document.querySelectorAll(".add-to-cart-btn").forEach(btn => {
     btn.addEventListener("click", async (e) => {
       e.preventDefault();
@@ -414,7 +404,6 @@ document.querySelectorAll(".wishlist-overlay").forEach(btn => {
         return;
       }
 
-      // Check if product is already in cart
       if (res.status === 409 || data.message === "Product already in cart") {
         Swal.fire({
           icon: "info",
@@ -429,8 +418,6 @@ document.querySelectorAll(".wishlist-overlay").forEach(btn => {
         Swal.fire("Error", data.message || "Action failed", "error");
         return;
       }
-
-      // Wishlist toggling
       if (data.action === "added") {
         btn.classList.add("active");
         heart.style.color = "#e53935";

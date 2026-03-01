@@ -15,6 +15,16 @@ const userSchema=new Schema({
     type: String,
     default: "/images/default-profile.png"
 },
+      refCode: {
+    type: String,
+    unique: true,
+     sparse: true 
+  },
+
+  referredBy: {
+    type: String,
+    default: null
+  },
     phone:{
         type:String,
         required:false,
@@ -61,9 +71,9 @@ const userSchema=new Schema({
         type:Date,
         default:Date.now,
     },
-    referalCode:{
-        type:String
-    },
+    // referalCode:{
+    //     type:String
+    // },
     redeemed:{
         type:Boolean
     },

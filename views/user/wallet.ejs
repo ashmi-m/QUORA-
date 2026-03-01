@@ -228,14 +228,12 @@ function renderPagination(totalPages) {
 
   if (totalPages <= 1) return;
 
-  // Prev button
+  
   const prevBtn = document.createElement("button");
   prevBtn.textContent = "← Prev";
   prevBtn.disabled = currentPage === 1;
   prevBtn.addEventListener("click", () => showPage(currentPage - 1));
   pagination.appendChild(prevBtn);
-
-  // Page numbers with ellipsis
   let lastAdded = null;
   for (let i = 1; i <= totalPages; i++) {
     const isVisible =
@@ -244,7 +242,6 @@ function renderPagination(totalPages) {
       (i >= currentPage - 1 && i <= currentPage + 1);
 
     if (isVisible) {
-      // Add ellipsis if there's a gap
       if (lastAdded && i - lastAdded > 1) {
         const dots = document.createElement("button");
         dots.textContent = "...";
@@ -260,16 +257,12 @@ function renderPagination(totalPages) {
       lastAdded = i;
     }
   }
-
-  // Next button
   const nextBtn = document.createElement("button");
   nextBtn.textContent = "Next →";
   nextBtn.disabled = currentPage === totalPages;
   nextBtn.addEventListener("click", () => showPage(currentPage + 1));
   pagination.appendChild(nextBtn);
 }
-
-// Init
 if (allRows.length > 0) {
   showPage(1);
 }
@@ -323,8 +316,6 @@ async function addMoney() {
       loader.style.display = "none";
       return;
     }
-
-    // Step 2: Open Razorpay checkout
     const options = {
       key: orderData.key,
       amount: orderData.amount,
@@ -334,7 +325,6 @@ async function addMoney() {
       description: "Add money to wallet",
 
       handler: async function (response) {
-        // Step 3: Verify and credit wallet
         const verifyRes = await fetch("/wallet/add", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -342,7 +332,7 @@ async function addMoney() {
             razorpay_order_id: response.razorpay_order_id,
             razorpay_payment_id: response.razorpay_payment_id,
             razorpay_signature: response.razorpay_signature,
-            amount: orderData.amount   // in paise
+            amount: orderData.amount   
           })
         });
 

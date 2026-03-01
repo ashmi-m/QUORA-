@@ -10,6 +10,7 @@ const upload = require("../middlewares/imageUppload.js");
 const productController = require("../controller/admin/productController");
 const orderController = require("../controller/user/orderController");
 const couponController = require("../controller/admin/couponController");
+const salesReportController = require("../controller/admin/salesReportController.js");
 
 router.get("/pageerror", adminController.pageerror);
 router.get("/login", adminController.loadLogin);
@@ -81,6 +82,14 @@ router.delete("/products/offer/:id", adminAuth, productController.removeProductO
 
 router.post("/category/offer/:id", adminAuth, categoryController.addCategoryOffer);
 router.delete("/category/offer/:id", adminAuth, categoryController.removeCategoryOffer);
+
+
+
+
+
+router.get("/sales-report", adminAuth, salesReportController.loadSalesReport);
+router.get("/export-pdf", adminAuth, salesReportController.exportPdf);
+router.get("/export-excel", adminAuth, salesReportController.exportExcel);
 
 module.exports = router;
 

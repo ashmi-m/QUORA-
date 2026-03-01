@@ -72,6 +72,11 @@
                   <label>Mobile Number</label>
                   <input type="text" name="phone" value="<%= user.phone %>" disabled>
                 </div>
+
+              <label>Your Referral Code</label>
+<input type="text" value="<%= user.refCode || 'Not generated yet' %>" readonly>
+                 
+              </div>
               </div>
               <label>Gender</label>
               <select name="gender" id="genderSelect" disabled>
@@ -103,8 +108,16 @@
     </div>
 
     <footer>© 2025 Quora - All Rights Reserved</footer>
-
+     <script>
+function copyRefCode() {
+  const input = document.getElementById("refCodeField");
+  input.select();
+  document.execCommand("copy");
+  Swal.fire("Copied!", "Referral code copied to clipboard", "success");
+}
+</script>
     <script>
+      
       document.addEventListener("DOMContentLoaded", () => {
 
        
@@ -178,6 +191,7 @@
         });
 
       });
+      
     </script>
 
   </body>

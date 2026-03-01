@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sales Report</title>
+  <link rel="stylesheet" href="/css/salesReport.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<div class="dashboard">
+
+  <aside class="sidebar">
+    <h2 class="logo">QUORA</h2>
+    <ul>
+      <li>Dashboard</li>
+      <li>Order</li>
+      <li>Products</li>
+      <li class="active">Sales report</li>
+      <li>Customer</li>
+      <li>Coupon</li>
+      <li>Category</li>
+      <li>Banner</li>
+      <li>Refund/Return</li>
+      <li>Sign Out</li>
+    </ul>
+  </aside>
+
+  <main class="main">
+
+    <div class="header">
+      <h2>Sales Report</h2>
+
+      <div class="actions">
+        <a href="/admin/export-pdf" class="btn">Export PDF</a>
+        <a href="/admin/export-excel" class="btn outline">Export Excel</a>
+      </div>
+    </div>
+    <form method="GET" action="/admin/sales-report" class="filterBox">
+      <select name="filter">
+        <option value="daily">Today</option>
+        <option value="weekly">This Week</option>
+        <option value="monthly">This Month</option>
+        <option value="yearly">This Year</option>
+        <option value="custom">Custom</option>
+      </select>
+
+      <input type="date" name="startDate">
+      <input type="date" name="endDate">
+
+      <button type="submit">Apply</button>
+    </form>
+
+    
+    <div class="grid-3">
+
+      <div class="card">
+        <h4>Total Orders</h4>
+        <h2><%= totalOrders %></h2>
+      </div>
+
+      <div class="card">
+        <h4>Total Revenue</h4>
+        <h2>₹<%= totalRevenue %></h2>
+      </div>
+
+      <div class="card">
+        <h4>Total Discount</h4>
+        <h2>₹<%= totalDiscount %></h2>
+      </div>
+
+    </div>
+    <div class="grid-2">
+
+      <div class="card">
+        <h4>Sales Overview</h4>
+        <canvas id="salesChart"></canvas>
+      </div>
+
+      <div class="card">
+        <h4>Orders by Status</h4>
+        <canvas id="statusChart"></canvas>
+      </div>
+
+    </div>
+
+  </main>
+
+</div>
+
+<script>
+const salesData = <%- JSON.stringify(chartData) %>;
+const statusData = <%- JSON.stringify(statusData) %>;
+
+new Chart(document.getElementById("salesChart"), {
+  type: "bar",
+  data: {
+    labels: salesData.labels,
+    datasets: [{ data: salesData.values }]
+  }
+});
+
+new Chart(document.getElementById("statusChart"), {
+  type: "doughnut",
+  data: {
+    labels: statusData.labels,
+    datasets: [{ data: statusData.values }]
+  }
+});
+</script>
+
+</body>
+</html>

@@ -117,8 +117,6 @@ const toggleWishlist = async (req, res) => {
         message: "Product ID required"
       });
     }
-
-    // 🔹 Check if product is already in cart
     const cartItem = await Cart.findOne({
       userId,
       "items.productId": productId
@@ -131,8 +129,6 @@ const toggleWishlist = async (req, res) => {
     }
 
     let wishlist = await Wishlist.findOne({ userId });
-
-    // 🔹 Create wishlist if it doesn't exist
     if (!wishlist) {
       wishlist = new Wishlist({
         userId,
@@ -145,13 +141,9 @@ const toggleWishlist = async (req, res) => {
         action: "added"
       });
     }
-
-    // 🔹 Check if product already in wishlist
     const itemIndex = wishlist.items.findIndex(
       item => item.productId.toString() === productId
     );
-
-    // 🔥 IF EXISTS → REMOVE
     if (itemIndex > -1) {
       wishlist.items.splice(itemIndex, 1);
       await wishlist.save();
@@ -161,8 +153,6 @@ const toggleWishlist = async (req, res) => {
         action: "removed"
       });
     }
-
-    // 🔥 IF NOT EXISTS → ADD
     wishlist.items.push({ productId });
     await wishlist.save();
 

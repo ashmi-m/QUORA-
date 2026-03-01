@@ -187,7 +187,8 @@ const placeOrder = async (req, res) => {
       }
     }
 
-   
+   const couponData = req.session.appliedCoupon || null;
+const discountAmount = couponData ? couponData.discountAmount : 0;
     await Order.create({
       userId,
       address: {
@@ -201,10 +202,12 @@ const placeOrder = async (req, res) => {
         altPhone: selectedAddress.altPhone
       },
       products,
-      totalAmount: total,
-      paymentMethod,
-      status: paymentMethod === "COD" ? "Placed" : "Paid"
-    });
+  totalAmount: total - discountAmount,
+  discount: discountAmount,
+  couponCode: couponData ? couponData.code : null,
+  paymentMethod,
+  status: paymentMethod === "COD" ? "Placed" : "Paid"
+});
 
     await Cart.deleteOne({ userId });
 

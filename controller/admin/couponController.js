@@ -22,8 +22,6 @@ const getCouponPage = async (req, res) => {
     res.status(500).send("Server Error");
   }
 };
-
-
 const addCoupon = async (req, res) => {
   try {
     const {
@@ -74,7 +72,6 @@ const addCoupon = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
-
 const toggleCoupon = async (req, res) => {
   try {
     const coupon = await Coupon.findById(req.params.id);
@@ -87,8 +84,6 @@ const toggleCoupon = async (req, res) => {
     res.status(500).json({ success: false });
   }
 };
-
-
 const updateCoupon = async (req, res) => {
   try {
     const {

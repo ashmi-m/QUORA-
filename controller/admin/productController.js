@@ -31,43 +31,6 @@ const loadShopPage = async(req,res)=>{
   }
 };
 
-// const getProductsData = async (req, res) => {
-//   try {
-//    const page = parseInt(req.query.page) || 1;
-//    const limit = parseInt(req.query.limit) || 10;
-//    const skip = (page-1)*limit;
-//    const search = req.query.search?.trim()||"";
-//    const filter ={};
-//    if(search){
-//     filter.productName = {$regex:search,$options:"i"};
-//    }
-
-//    const total = await Product.countDocuments(filter);
-
-//    const products = await Product.find(filter)
-//    .populate("category","name")
-//    .populate("brand","brandName")
-//     .sort({ createdAt: -1 })
-    
-//    .skip(skip)
-//    .limit(limit)
-//    .lean();
-
-
-//    res.json({
-//      success: true,
-//       products,
-//       total,
-//       page,
-//       totalPages: Math.ceil(total / limit),
-//       total
-//    });
-
-//   } catch (err) {
-//     console.error("Error fetching products:", err);
-//     res.json({ success: false, message: "Error fetching products" });
-//   }
-// };
 const getProductsData = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
