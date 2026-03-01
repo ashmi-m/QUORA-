@@ -3,6 +3,20 @@ const Product = require("../../models/productSchema");
 const Category = require("../../models/categorySchema");
 const Brand = require("../../models/brandSchema");
 const Wishlist = require("../../models/wishlistSchema");
+
+
+function applyOffer(product) {
+  const categoryOffer = product.category?.categoryOffer || 0;
+  const productOffer = product.productOffer || 0;
+  const effectiveOffer = Math.max(productOffer, categoryOffer);
+
+  product.effectiveOffer = effectiveOffer;
+  product.salePrice =
+    effectiveOffer > 0
+      ? Math.round(product.regularPrice - (product.regularPrice * effectiveOffer) / 100)
+      : null;
+}
+
 const loadShopPage = async (req, res) => {
   try {
     const categoriesParam = req.query.category || [];
@@ -74,7 +88,7 @@ const loadShopPage = async (req, res) => {
       Brand.find({ isBlocked: false }).lean(),
     ]);
 
-    // ── Mark wishlist status for logged-in user ──────────
+products.forEach(applyOffer);
     if (req.user) {
       const wishlist = await Wishlist.findOne({ userId: req.user._id }).lean();
       const wishlistedIds = wishlist ? wishlist.items.map(i => i.productId.toString()) : [];
@@ -120,6 +134,18 @@ const loadProductDetails = async (req, res) => {
     if (!product) {
       return res.redirect("/pageNotFound");
     }
+     applyOffer(product);
+
+   const categoryOffer = product.category?.categoryOffer || 0;
+    const productOffer = product.productOffer || 0;
+    const effectiveOffer = Math.max(productOffer, categoryOffer);
+
+  product.effectiveOffer = effectiveOffer;
+    product.salePrice = effectiveOffer > 0
+      ? Math.round(product.regularPrice - (product.regularPrice * effectiveOffer / 100))
+      : null;
+
+
     const categoryId = product.category?._id || product.category;
 
     const relatedProducts = await Product.find({
@@ -127,6 +153,18 @@ const loadProductDetails = async (req, res) => {
       category: product.category?._id,
       isBlocked: false,
     }).limit(4).lean();
+
+       relatedProducts.forEach(rp => {
+      const catOffer = rp.category?.categoryOffer || 0;
+      const prodOffer = rp.productOffer || 0;
+      const effOffer = Math.max(prodOffer, catOffer);
+      rp.effectiveOffer = effOffer;
+      rp.salePrice = effOffer > 0
+        ? Math.round(rp.regularPrice - (rp.regularPrice * effOffer / 100))
+        : null;
+    });
+
+
     console.log("Related Products Found:", relatedProducts.length);
     let isWishlisted = false;
     if (req.user) {

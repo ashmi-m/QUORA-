@@ -79,6 +79,9 @@ router.delete("/coupons/:id", adminAuth, couponController.deleteCoupon);
 router.post("/products/offer/:id", adminAuth, productController.addProductOffer);
 router.delete("/products/offer/:id", adminAuth, productController.removeProductOffer);
 
+router.post("/category/offer/:id", adminAuth, categoryController.addCategoryOffer);
+router.delete("/category/offer/:id", adminAuth, categoryController.removeCategoryOffer);
+
 module.exports = router;
 
 

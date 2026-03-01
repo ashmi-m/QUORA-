@@ -17,7 +17,8 @@ const categoryInfo = async (req, res) => {
     const categoryData = await Category.find(query)
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .lean();
 
     const totalCategories = await Category.countDocuments(query);
     const totalPages = Math.ceil(totalCategories / limit);
@@ -123,7 +124,40 @@ const toggleCategoryStatus = async(req,res)=>{
     res.status(500).json({success:false,error:"Failed to update status"});
   }
 }
+const addCategoryOffer = async (req, res) => {
+  try {
+    const categoryId = req.params.id;
+    const percentage = Number(req.body.percentage);
+    if (isNaN(percentage) || percentage < 1 || percentage > 100) {
+      return res.status(400).json({
+        success: false,
+        error: "Enter a valid percentage between 1 and 100",
+      });
+    }
+    const category = await Category.findById(categoryId);
+    if (!category) {
+      return res.status(404).json({ success: false, error: "Category not found" });
+    }
 
+    await Category.findByIdAndUpdate(categoryId, {
+      categoryOffer: Math.round(percentage),
+    });
+
+    res.status(200).json({ success: true, message: "Category offer added successfully" });
+  } catch (err) {
+    console.error("addCategoryOffer error:", err);
+    res.status(500).json({ success: false, error: "Server error" });
+  }
+};
+const removeCategoryOffer = async (req, res) => {
+  try {
+    await Category.findByIdAndUpdate(req.params.id, { categoryOffer: 0 });
+    res.status(200).json({ success: true, message: "Category offer removed successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: "Server error" });
+  }
+};
 
 module.exports = {
   categoryInfo,
@@ -132,6 +166,8 @@ module.exports = {
   postEditCategory,
   getListCategory,
   getUnlistCategory,
- toggleCategoryStatus
+ toggleCategoryStatus,
+ addCategoryOffer,
+ removeCategoryOffer
 
 };

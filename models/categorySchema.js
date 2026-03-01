@@ -15,6 +15,10 @@ const categorySchema=new mongoose.Schema({
         type:Boolean,
         default:true
     },
+     status: {
+    type: Boolean,
+    default: true,
+  },
     categoryOffer:{
         type:Number,
         default:0

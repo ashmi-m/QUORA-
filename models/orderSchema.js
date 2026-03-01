@@ -42,6 +42,14 @@ const orderSchema = new mongoose.Schema({
         type: Number,
         required: true
       },
+       salePrice: {           
+      type: Number,
+      default: null
+    },
+    offerApplied: {        
+      type: Number,
+      default: 0
+    },
  status: {
         type: String,
         enum: [  "Placed",

@@ -189,21 +189,30 @@
 
     <table>
       <tr>
-        <th>Category</th>
-        <th>Number of products</th>
-        <th>Discounts/Offers</th>
-        <th>Status</th>
-        <th>Actions</th>
-        <th>Listed/Unlisted</th>
+       <th>Category</th>
+<th>Number of products</th>
+<th>Offer</th>
+<th>Status</th>
+<th>Edit</th>
+<th>Offer Actions</th>
+<th>Listed/Unlisted</th>
       </tr>
       <% cat.forEach(c => { %>
       <tr>
         <td><%= c.name %></td>
         <td><%= c.number || 0 %></td>
-        <td><%= c.discount || "0%" %></td>
+        
         <td>
+           <% if(c.categoryOffer && c.categoryOffer > 0) { %>
+      <span class="badge" style="background:#5a4d41;color:#fff;padding:4px 8px;border-radius:10px;"><%= c.categoryOffer %>% OFF</span>
+    <% } else { %>
+      <span>No offer</span>
+    <% } %>
+  </td>
+  <td>
           <label class="status-toggle">
-            <input type="checkbox" <%= c.status ? "checked" : "" %>>
+           <input type="checkbox" <%= c.status ? "checked" : "" %>
+  onchange="toggleStatus('<%= c._id %>', this.checked)">
             <span class="slider"></span>
           </label>
         </td>
@@ -212,6 +221,16 @@
         
         </td>
         <td>
+
+         <% if(c.categoryOffer && c.categoryOffer > 0) { %>
+      <button class="remove-btn" onclick="removeCategoryOffer('<%= c._id %>')">REMOVE OFFER</button>
+    <% } else { %>
+      <button class="add-btn" onclick="openOfferModal('<%= c._id %>')">ADD OFFER</button>
+    <% } %>
+  </td>
+  <td>
+
+
           <% if(c.isListed) { %>
             <a href="/admin/unlistCategory?id=<%= c._id %>" class="btn btn-danger text-white">Unlist</a>
           <% } else { %>
@@ -234,7 +253,19 @@
       <% } %>
     </div>
   </div>
-
+<!-- Category Offer Modal -->
+<div class="modal" id="offerModal">
+  <div class="modal-content" style="max-width:350px;">
+    <h3>Add Category Offer</h3>
+    <p>Offer Percentage</p>
+    <input type="number" id="offerPercentage" placeholder="Enter percentage" min="1" max="100" style="width:100%;padding:8px;border-radius:5px;border:1px solid #ccc;margin-bottom:10px;">
+    <input type="hidden" id="offerCatId">
+    <div>
+      <button class="save-btn" onclick="submitCategoryOffer()">Add Offer</button>
+      <button class="close-btn" onclick="closeOfferModal()">Cancel</button>
+    </div>
+  </div>
+</div>
   <div class="modal" id="categoryModal">
     <div class="modal-content">
       <h3 id="modalTitle">Add Category</h3>
@@ -252,6 +283,69 @@
 </div>
 
 <script>
+
+  const offerModal = document.getElementById("offerModal");
+
+function openOfferModal(id) {
+  document.getElementById("offerCatId").value = id;
+  document.getElementById("offerPercentage").value = "";
+  offerModal.style.display = "flex";
+}
+
+function closeOfferModal() {
+  offerModal.style.display = "none";
+}
+
+async function submitCategoryOffer() {
+  const id = document.getElementById("offerCatId").value;
+  const percentage = document.getElementById("offerPercentage").value;
+
+  if (!percentage || percentage < 1 || percentage > 100) {
+    Swal.fire("Invalid", "Enter a valid percentage between 1 and 100", "warning");
+    return;
+  }
+
+  try {
+    const response = await fetch(`/admin/category/offer/${id}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ percentage })
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      Swal.fire("Error", data.error || "Failed", "error");
+      return;
+    }
+    Swal.fire("Success", data.message, "success").then(() => location.reload());
+  } catch (e) {
+    Swal.fire("Error", "Server error", "error");
+  }
+}
+
+async function removeCategoryOffer(id) {
+  const confirm = await Swal.fire({
+    title: "Remove Offer?",
+    text: "This will remove the category offer.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Yes, remove it"
+  });
+
+  if (!confirm.isConfirmed) return;
+
+  try {
+    const response = await fetch(`/admin/category/offer/${id}`, { method: "DELETE" });
+    const data = await response.json();
+    if (!response.ok) {
+      Swal.fire("Error", data.error || "Failed", "error");
+      return;
+    }
+    Swal.fire("Removed!", data.message, "success").then(() => location.reload());
+  } catch (e) {
+    Swal.fire("Error", "Server error", "error");
+  }
+}
+
   const modal = document.getElementById("categoryModal");
   const catName = document.getElementById("catName");
   const catDesc = document.getElementById("catDesc");
@@ -319,6 +413,8 @@
     }
   }
   
+
+
   async function toggleStatus(id, checked){
     try{
       const response = await fetch(`/admin/toggleCategoryStatus/${id}`, {
