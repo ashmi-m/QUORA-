@@ -13,6 +13,7 @@ const loadCheckoutPage = async (req, res) => {
       return res.redirect("/cart");
     }
 
+    
     const page = parseInt(req.query.page) || 1;
     const limit = 3;
     const skip = (page - 1) * limit;
@@ -23,10 +24,12 @@ const loadCheckoutPage = async (req, res) => {
     const totalPages = Math.ceil(addresses.length / limit);
     const appliedCoupon = req.session.appliedCoupon || null;
     let subtotal = 0;
+
     const itemsWithTotal = cart.items
       .map(item => {
         const product = item.productId;
         if (!product) return null;
+         if (product.isBlocked) return null;
 
         const regularPrice = Number(product.regularPrice || 0);
         const discount = Number(product.productOffer || 0);
@@ -60,6 +63,8 @@ const loadCheckoutPage = async (req, res) => {
       totalPages,
       appliedCoupon
     });
+
+    
 
   } catch (error) {
     console.error("CHECKOUT ERROR ❌", error);

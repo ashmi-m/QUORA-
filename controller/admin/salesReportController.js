@@ -67,7 +67,6 @@ const loadSalesReport = async (req, res) => {
     orders.forEach(o => {
       statusMap[o.status] = (statusMap[o.status] || 0) + 1;
     });
-
     res.render("salesReport", {
       totalOrders: orders.length,
       totalRevenue,

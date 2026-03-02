@@ -61,8 +61,6 @@ const createWalletOrder = async (req, res) => {
     res.json({ success: false, message: "Failed to create payment order" });
   }
 };
-
-
 const addMoneyToWallet = async (req, res) => {
   try {
     const userId = req.session.user._id;
@@ -72,8 +70,6 @@ const addMoneyToWallet = async (req, res) => {
       razorpay_signature,
       amount
     } = req.body;
-
-   
     const generated_signature = crypto
       .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
       .update(razorpay_order_id + "|" + razorpay_payment_id)
@@ -82,7 +78,6 @@ const addMoneyToWallet = async (req, res) => {
     if (generated_signature !== razorpay_signature) {
       return res.json({ success: false, message: "Payment verification failed" });
     }
-
     const creditAmount = Number(amount) / 100; 
 
     const updatedUser = await User.findByIdAndUpdate(
@@ -109,7 +104,6 @@ const addMoneyToWallet = async (req, res) => {
     res.json({ success: false, message: "Server error" });
   }
 };
-
 const creditWallet = async (userId, amount, reason, orderId = null) => {
   await User.findByIdAndUpdate(userId, {
     $inc: { wallet: amount },
@@ -125,7 +119,6 @@ const creditWallet = async (userId, amount, reason, orderId = null) => {
     }
   });
 };
-
 const debitWallet = async (userId, amount, reason, orderId = null) => {
   const user = await User.findOneAndUpdate(
     { _id: userId, wallet: { $gte: amount } },
