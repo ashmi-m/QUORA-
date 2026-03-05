@@ -1,3 +1,5 @@
+<%- include("../../views/partials/admin/header", { active: 'sales' }) %>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -5,108 +7,166 @@
   <link rel="stylesheet" href="/css/salesReport.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-
 <body>
 
-<div class="dashboard">
+<div class="main-content">
 
-  <aside class="sidebar">
-    <h2 class="logo">QUORA</h2>
-    <ul>
-      <li>Dashboard</li>
-      <li>Order</li>
-      <li>Products</li>
-      <li class="active">Sales report</li>
-      <li>Customer</li>
-      <li>Coupon</li>
-      <li>Category</li>
-      <li>Banner</li>
-      <li>Refund/Return</li>
-      <li>Sign Out</li>
-    </ul>
-  </aside>
-
-  <main class="main">
-
-    <div class="header">
-      <h2>Sales Report</h2>
-
-      <div class="actions">
-        <a href="/admin/export-pdf" class="btn">Export PDF</a>
-        <a href="/admin/export-excel" class="btn outline">Export Excel</a>
-      </div>
+  <!-- Page Header -->
+  <div class="page-header">
+    <h2>Sales Report</h2>
+    <div class="export-btns">
+      <a href="/admin/export-pdf?filter=<%= selectedFilter %>&startDate=<%= startDate %>&endDate=<%= endDate %>"
+         class="btn-export btn-pdf">⬇ Export PDF</a>
+      <a href="/admin/export-excel?filter=<%= selectedFilter %>&startDate=<%= startDate %>&endDate=<%= endDate %>"
+         class="btn-export btn-excel">⬇ Export Excel</a>
     </div>
-    <form method="GET" action="/admin/sales-report" class="filterBox">
-      <select name="filter">
-        <option value="daily">Today</option>
-        <option value="weekly">This Week</option>
-        <option value="monthly">This Month</option>
-        <option value="yearly">This Year</option>
-        <option value="custom">Custom</option>
-      </select>
+  </div>
 
-      <input type="date" name="startDate">
-      <input type="date" name="endDate">
+  <!-- Filter Form -->
+  <form method="GET" action="/admin/sales-report" class="filter-box">
+    <select name="filter" id="filterSelect" onchange="toggleCustomDates(this.value)">
+      <option value="daily"   <%= selectedFilter === 'daily'   ? 'selected' : '' %>>Today</option>
+      <option value="weekly"  <%= selectedFilter === 'weekly'  ? 'selected' : '' %>>This Week</option>
+      <option value="monthly" <%= selectedFilter === 'monthly' ? 'selected' : '' %>>This Month</option>
+      <option value="yearly"  <%= selectedFilter === 'yearly'  ? 'selected' : '' %>>This Year</option>
+      <option value="custom"  <%= selectedFilter === 'custom'  ? 'selected' : '' %>>Custom Range</option>
+    </select>
 
-      <button type="submit">Apply</button>
-    </form>
-
-    
-    <div class="grid-3">
-
-      <div class="card">
-        <h4>Total Orders</h4>
-        <h2><%= totalOrders %></h2>
-      </div>
-
-      <div class="card">
-        <h4>Total Revenue</h4>
-        <h2>₹<%= totalRevenue %></h2>
-      </div>
-
-      <div class="card">
-        <h4>Total Discount</h4>
-        <h2>₹<%= totalDiscount %></h2>
-      </div>
-
-    </div>
-    <div class="grid-2">
-
-      <div class="card">
-        <h4>Sales Overview</h4>
-        <canvas id="salesChart"></canvas>
-      </div>
-
-      <div class="card">
-        <h4>Orders by Status</h4>
-        <canvas id="statusChart"></canvas>
-      </div>
-
+    <div id="customDates" style="display:<%= selectedFilter === 'custom' ? 'flex' : 'none' %>; gap:10px; align-items:center;">
+      <label style="font-size:13px; color:#555;">From</label>
+      <input type="date" name="startDate" value="<%= startDate %>">
+      <label style="font-size:13px; color:#555;">To</label>
+      <input type="date" name="endDate" value="<%= endDate %>">
     </div>
 
-  </main>
+    <button type="submit">Apply Filter</button>
+  </form>
+
+  <!-- Summary Cards -->
+  <div class="grid-4">
+    <div class="card stat-card">
+      <h4>Overall Sales Count</h4>
+      <h2><%= totalOrders %></h2>
+      <span class="stat-label">orders</span>
+    </div>
+    <div class="card stat-card">
+      <h4>Overall Order Amount</h4>
+      <h2>₹<%= totalRevenue %></h2>
+      <span class="stat-label">revenue</span>
+    </div>
+    <div class="card stat-card">
+      <h4>Overall Discount</h4>
+      <h2>₹<%= totalDiscount %></h2>
+      <span class="stat-label">order-level discounts</span>
+    </div>
+    <div class="card stat-card">
+      <h4>Coupon Deductions</h4>
+      <h2>₹<%= totalCouponDiscount %></h2>
+      <span class="stat-label">product-level coupons</span>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="grid-2" style="margin-bottom:25px;">
+    <div class="card">
+      <h4>Revenue Overview</h4>
+      <canvas id="salesChart"></canvas>
+    </div>
+    <div class="card">
+      <h4>Orders by Status</h4>
+      <canvas id="statusChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Orders Table -->
+  <div class="card" style="overflow-x:auto;">
+    <h4 style="margin-bottom:16px;">Order Details</h4>
+    <table class="sales-table">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Date</th>
+          <th>Payment</th>
+          <th>Coupon</th>
+          <th>Discount</th>
+          <th>Amount</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (tableOrders.length === 0) { %>
+          <tr>
+            <td colspan="7" style="text-align:center; color:#aaa; padding:30px;">
+              No orders found for selected period
+            </td>
+          </tr>
+        <% } %>
+        <% tableOrders.forEach(function(order) { %>
+          <tr>
+            <td><%= order.orderId %></td>
+            <td><%= order.date %></td>
+            <td><%= order.paymentMethod %></td>
+            <td><%= order.couponCode %></td>
+            <td>₹<%= Number(order.discount).toFixed(2) %></td>
+            <td>₹<%= Number(order.totalAmount).toFixed(2) %></td>
+            <td>
+              <span class="status-badge status-<%= order.status.toLowerCase().replace(/ /g,'-') %>">
+                <%= order.status %>
+              </span>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
 
 </div>
 
 <script>
-const salesData = <%- JSON.stringify(chartData) %>;
-const statusData = <%- JSON.stringify(statusData) %>;
-
-new Chart(document.getElementById("salesChart"), {
-  type: "bar",
-  data: {
-    labels: salesData.labels,
-    datasets: [{ data: salesData.values }]
+  // Show/hide custom date inputs
+  function toggleCustomDates(val) {
+    document.getElementById("customDates").style.display =
+      val === "custom" ? "flex" : "none";
   }
-});
 
-new Chart(document.getElementById("statusChart"), {
-  type: "doughnut",
-  data: {
-    labels: statusData.labels,
-    datasets: [{ data: statusData.values }]
-  }
-});
+  // Charts
+  const salesData  = <%- JSON.stringify(chartData) %>;
+  const statusData = <%- JSON.stringify(statusData) %>;
+
+  new Chart(document.getElementById("salesChart"), {
+    type: "bar",
+    data: {
+      labels: salesData.labels,
+      datasets: [{
+        label: "Revenue (₹)",
+        data: salesData.values,
+        backgroundColor: "#3b5cff88",
+        borderColor: "#3b5cff",
+        borderWidth: 1,
+        borderRadius: 4
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+
+  new Chart(document.getElementById("statusChart"), {
+    type: "doughnut",
+    data: {
+      labels: statusData.labels,
+      datasets: [{
+        data: statusData.values,
+        backgroundColor: ["#3b5cff", "#00c9a7", "#ffa600", "#ff4d6d", "#9b59b6"]
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { position: "bottom" } }
+    }
+  });
 </script>
 
 </body>

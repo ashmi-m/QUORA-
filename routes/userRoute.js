@@ -48,7 +48,8 @@ router.get("/forgot-password", userController.loadForgotPassword);
 router.post("/forgot-password", userController.forgotPassword);   
 router.post("/verify-reset-otp", userController.verifyResetOtp);
 router.post("/reset-password", userController.resetPassword);
-
+router.get("/reset-otp", userController.loadResetOtpPage);
+router.post("/resend-reset-otp", userController.resendResetOtp);
 
 router.get("/shop", shopController.loadShopPage);
 router.get("/product/:id", shopController.loadProductDetails);

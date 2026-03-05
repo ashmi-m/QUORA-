@@ -3,7 +3,32 @@
 
 <div class="breadcrumb">
   Home / <strong>Products</strong>
+  
 </div>
+<% if (typeof unavailableItems !== "undefined" && unavailableItems.length > 0) { %>
+  <div style="
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 16px auto;
+    max-width: 960px;
+    color: #856404;
+    font-family: sans-serif;
+  ">
+    <strong>⚠️ The following items were removed — they are blocked or no longer available:</strong>
+    <ul style="margin: 8px 0 0 18px;">
+      <% unavailableItems.forEach(function(name) { %>
+        <li><%= name %></li>
+      <% }) %>
+    </ul>
+    <p style="margin: 8px 0 0;">
+      Please <a href="/cart" style="color: #856404; font-weight: bold;">go back to your cart</a> and remove them before ordering.
+    </p>
+  </div>
+<% } %>
+
+
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

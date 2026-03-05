@@ -92,9 +92,7 @@ const loadPayment = async (req, res) => {
 
 const placeOrder = async (req, res) => {
   try {
-    if (!req.session.user) {
-      return res.redirect("/login");
-    }
+    if (!req.session.user) return res.redirect("/login");
 
     const userId = req.session.user._id;
     const { addressId, paymentMethod } = req.body;
@@ -103,7 +101,10 @@ const placeOrder = async (req, res) => {
       return res.status(400).json({ success: false, message: "Address is required" });
     }
 
-    const cart = await Cart.findOne({ userId }).populate("items.productId");
+    const cart = await Cart.findOne({ userId }).populate({
+      path: "items.productId",
+      populate: { path: "category" }
+    });
 
     if (!cart || cart.items.length === 0) {
       return res.status(400).json({ success: false, message: "Cart is empty" });
@@ -119,7 +120,42 @@ const placeOrder = async (req, res) => {
       return res.status(400).json({ success: false, message: "Selected address not found" });
     }
 
+    // ✅ STEP 1: Re-validate every cart item before processing
+    for (const item of cart.items) {
+      const product = item.productId;
+
+      if (
+        !product ||
+        product.isBlocked ||
+        product.isListed === false ||
+        !product.category ||
+        product.category.isBlocked ||
+        product.category.isListed === false
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: `"${product?.productName || "A product"}" is no longer available. Please remove it from your cart.`
+        });
+      }
+
+      if (product.quantity <= 0) {
+        return res.status(400).json({
+          success: false,
+          message: `"${product.productName}" is out of stock. Please remove it from your cart.`
+        });
+      }
+
+      if (product.quantity < item.quantity) {
+        return res.status(400).json({
+          success: false,
+          message: `Only ${product.quantity} unit(s) of "${product.productName}" are available.`
+        });
+      }
+    }
+
+    // ✅ STEP 2: Process items — deduct stock + calculate prices & discounts
     let total = 0;
+    let totalProductDiscount = 0;
     const products = [];
 
     for (const item of cart.items) {
@@ -132,7 +168,7 @@ const placeOrder = async (req, res) => {
       if (!updatedProduct) {
         return res.status(400).json({
           success: false,
-          message: `${item.productId.productName} is out of stock`
+          message: `"${item.productId.productName}" went out of stock. Please update your cart.`
         });
       }
 
@@ -141,34 +177,53 @@ const placeOrder = async (req, res) => {
         await updatedProduct.save();
       }
 
-      total += updatedProduct.regularPrice * item.quantity;
+      const regularPrice = updatedProduct.regularPrice;
+      const offerPercent = updatedProduct.productOffer || 0;
+
+      // ✅ FIX 1: calculate salePrice after offer %
+      const salePrice = offerPercent > 0
+        ? regularPrice - (regularPrice * offerPercent) / 100
+        : regularPrice;
+
+      const itemDiscount = (regularPrice - salePrice) * item.quantity;
+      totalProductDiscount += itemDiscount;
+
+      // ✅ FIX 2: add to total ONCE using salePrice only (removed duplicate line)
+      total += salePrice * item.quantity;
 
       products.push({
         productId: updatedProduct._id,
         quantity: item.quantity,
-        price: updatedProduct.regularPrice,
+        price: regularPrice,
+        salePrice: salePrice,
+        discount: itemDiscount,
+        offerApplied: offerPercent,
         status: "Placed"
       });
     }
 
-   
+    // ✅ FIX 3: couponData declared ONCE only (removed duplicate declaration in step 5)
+    const couponData = req.session.appliedCoupon || null;
+    const couponDiscount = couponData ? couponData.discountAmount : 0;
+
+    const totalDiscount = totalProductDiscount + couponDiscount;
+    const finalTotal = total - couponDiscount;
+
+    // ✅ STEP 3: Wallet payment check
     if (paymentMethod === "Wallet") {
       const user = await User.findById(userId);
 
-      if (!user || user.wallet < total) {
+      if (!user || user.wallet < finalTotal) {
         return res.status(400).json({
           success: false,
-          message: `Insufficient wallet balance. Your balance: ₹${user?.wallet?.toFixed(2) || 0}, Required: ₹${total.toFixed(2)}`
+          message: `Insufficient wallet balance. Your balance: ₹${user?.wallet?.toFixed(2) || 0}, Required: ₹${finalTotal.toFixed(2)}`
         });
       }
-      await walletController.debitWallet(
-        userId,
-        total,
-        "Order payment via Wallet"
-      );
+
+      await walletController.debitWallet(userId, finalTotal, "Order payment via Wallet");
     }
 
- 
+    // ✅ STEP 4: Razorpay signature verification
     if (paymentMethod === "Razorpay") {
       const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
@@ -187,8 +242,7 @@ const placeOrder = async (req, res) => {
       }
     }
 
-   const couponData = req.session.appliedCoupon || null;
-const discountAmount = couponData ? couponData.discountAmount : 0;
+    // ✅ STEP 5: Create order
     await Order.create({
       userId,
       address: {
@@ -202,19 +256,20 @@ const discountAmount = couponData ? couponData.discountAmount : 0;
         altPhone: selectedAddress.altPhone
       },
       products,
-  totalAmount: total - discountAmount,
-  discount: discountAmount,
-  couponCode: couponData ? couponData.code : null,
-  paymentMethod,
-  status: paymentMethod === "COD" ? "Placed" : "Paid"
-});
+      totalAmount: finalTotal,   // ✅ FIX: was (total - discountAmount)
+      discount: totalDiscount,   // ✅ FIX: was (discountAmount) — now includes product offers too
+      couponCode: couponData ? couponData.code : null,
+      paymentMethod,
+      status: paymentMethod === "COD" ? "Placed" : "Paid"
+    });
 
+    // ✅ STEP 6: Clear cart and coupon session
     await Cart.deleteOne({ userId });
+    delete req.session.appliedCoupon;
 
     return res.status(200).json({ success: true });
-
   } catch (error) {
-    console.error("PLACE ORDER ERROR", error);
+    console.error("PLACE ORDER ERROR ❌", error);
     return res.status(500).json({
       success: false,
       message: "Order failed: " + error.message

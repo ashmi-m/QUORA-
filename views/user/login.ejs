@@ -133,17 +133,22 @@
 
     .password-box {
       position: relative;
+       display: flex;
+  align-items: center;
     }
 
     .password-box input {
+        width: 100%;
+  padding: 12px;
       padding-right: 40px;
+      border: 1px solid #ccc;
+  border-radius: 5px;
+
     }
 
     .password-box i {
       position: absolute;
-      top: 50%;
-      right: 12px;
-      transform: translateY(-50%);
+          right: 12px;
       cursor: pointer;
       color: #777;
     }
@@ -267,9 +272,11 @@
               </div>
               <button type="submit" class="login-button">Login</button>
         </form>
-        <div class="signup-link">
-                     Don't have an account? <a href="/signup">Sign Up</a>
-        <div class="or-line">OR</div>
+       <div class="signup-link">
+  Don't have an account? <a href="/signup">Sign Up</a>
+</div>
+
+<div class="or-line">OR</div>
         <a href="/auth/google" class="google-btn">
           <img src="https://img.icons8.com/color/16/000000/google-logo.png" style="margin-right: 10px;" />
           Sign in with Google

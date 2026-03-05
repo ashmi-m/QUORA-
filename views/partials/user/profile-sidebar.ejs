@@ -1,9 +1,18 @@
 <div class="profile-sidebar">
-    <div class="profile-image-box">
+   <div class="profile-image-box">
+
+    <% if (user.profileImage) { %>
         <img src="<%= user.profileImage %>" alt="Profile Image" id="profilePreview">
-        <input type="file" id="profileImageInput" hidden>
-        <button type="button" id="changeImageBtn">Change Photo</button>
-    </div>
+    <% } else { %>
+        <div class="avatar-placeholder" id="profilePreview">
+            <%= user.name.charAt(0).toUpperCase() %>
+        </div>
+    <% } %>
+
+    <input type="file" id="profileImageInput" hidden>
+    <button type="button" id="changeImageBtn">Change Photo</button>
+
+</div>
 
     <h3>Hello 👋 <%= user?.name %>
     </h3>
@@ -69,9 +78,21 @@
                 const result = await res.json();
 
                 if (result.success) {
-                    preview.src = result.image;
-                    Swal.fire("Success", "Profile image updated", "success");
-                } else {
+
+    const preview = document.getElementById("profilePreview");
+
+    if(preview.tagName === "IMG"){
+        preview.src = result.image;
+    }else{
+        const img = document.createElement("img");
+        img.src = result.image;
+        img.id = "profilePreview";
+        preview.replaceWith(img);
+    }
+
+    Swal.fire("Success", "Profile image updated", "success");
+}
+                else {
                     Swal.fire("Error", "Upload failed", "error");
                 }
             });

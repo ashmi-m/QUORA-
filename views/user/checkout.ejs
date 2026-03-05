@@ -1,11 +1,11 @@
 <%- include("../partials/user/header") %>
 <link rel="stylesheet" href="/css/checkout.css">
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <form action="/checkout/select-address" method="POST">
   <section class="checkout-container">
 
-    <!-- LEFT: ADDRESS -->
     <div class="address-section">
       <div class="section-header">
         <h3>Delivery Address</h3>
@@ -160,15 +160,23 @@
       messageEl.textContent = "Server error!";
     }
   });
+const form = document.querySelector("form");
 
-  const form = document.querySelector("form");
-  form.addEventListener("submit", function (e) {
-    const selectedAddress = document.querySelector('input[name="addressId"]:checked');
-    if (!selectedAddress) {
-      e.preventDefault();
-      alert("Please select an address!");
-    }
-  });
+form.addEventListener("submit", function (e) {
+  const selectedAddress = document.querySelector('input[name="addressId"]:checked');
+
+  if (!selectedAddress) {
+    e.preventDefault();
+
+    Swal.fire({
+      icon: "warning",
+      title: "Address Required",
+      text: "Please select a delivery address before proceeding to payment.",
+      confirmButtonText: "OK",
+      confirmButtonColor: "#3085d6"
+    });
+  }
+});
 </script>
 
 <%- include("../partials/user/footer") %>

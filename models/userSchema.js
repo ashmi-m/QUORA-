@@ -71,9 +71,7 @@ const userSchema=new Schema({
         type:Date,
         default:Date.now,
     },
-    // referalCode:{
-    //     type:String
-    // },
+    
     redeemed:{
         type:Boolean
     },
