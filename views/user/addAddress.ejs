@@ -19,24 +19,42 @@
 
         <form id="addressForm" action="/address/add" method="POST" novalidate>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label>Name</label>
-              <input name="name" required>
-            </div>
-
-            <div class="form-group">
-              <label>Mobile Number</label>
-<input name="mobile" maxlength="10" pattern="[6-9][0-9]{9}" required>
-            </div>
+         <div class="form-row">
+          <div class="form-group">
+            <label>Name</label>
+            <input 
+              name="name"
+              pattern="[A-Za-z ]{3,}"
+              title="Name must contain at least 3 letters"
+              required
+            >
           </div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label>Pincode</label>
-<input name="pincode" id="pincode" maxlength="6" pattern="[0-9]{6}" required>
+               <div class="form-group">
+            <label>Mobile Number</label>
+            <input 
+              name="mobile"
+              id="mobile"
+              maxlength="10"
+              pattern="[6-9][0-9]{9}"
+              inputmode="numeric"
+              required
+            >
+          </div>
+        </div>
 
-            </div>
+         <div class="form-row">
+          <div class="form-group">
+            <label>Pincode</label>
+            <input 
+              name="pincode"
+              id="pincode"
+              maxlength="6"
+              pattern="[0-9]{6}"
+              inputmode="numeric"
+              required
+            >
+          </div>
 
             <div class="form-group">
               <label>Locality</label>
@@ -112,7 +130,7 @@
       const pincode = document.querySelector("[name='pincode']").value.trim();
   if (!/^[6-9]\d{9}$/.test(mobile)) {
   e.preventDefault();
-  Swal.fire("Invalid Mobile", "Enter a valid Indian mobile number", "error");
+  Swal.fire("Invalid Mobile", "Enter a valid  mobile number", "error");
   return;
 }
 
