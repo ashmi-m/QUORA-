@@ -441,28 +441,42 @@
                         });
                 }
 
-                
                 function ResendOTP() {
-                    if (time > 0) {
-                        Swal.fire({
-                            icon: "warning",
-                            title: "Please wait",
-                            text: "You can resend OTP only after the timer ends."
-                        });
-                        return;
-                    }
-                    clearInterval(timerInterval);
-                    time = 60;
-                    startTimer();
-                    fetch('/resend-otp',{
-                        method : 'POST',
-                        headers : {
-                            'Content-type' : 'application/json'
-                        }
-                    })
-                    alert("Resend OTP called!");
+    if (time > 0) {
+        Swal.fire({
+            icon: "warning",
+            title: "Please wait",
+            text: "You can resend OTP only after the timer ends."
+        });
+        return;
+    }
+    clearInterval(timerInterval);
+    time = 60;
+    startTimer();
 
-                }
+    fetch('/resend-otp', {
+        method: 'POST',
+        headers: {
+            'Content-type': 'application/json'
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        Swal.fire({
+            icon: 'success',
+            title: 'OTP Sent',
+            text: data.message || "Resend OTP called!"
+        });
+    })
+    .catch(err => {
+        console.error(err);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to resend OTP. Please try again.'
+        });
+    });
+}
             </script>
 </body>
 </html>
