@@ -122,38 +122,8 @@ function copyRefCode() {
 
        
 
-        const menuButtons = document.querySelectorAll(".profile-menu button[data-target]");
-        const sections = document.querySelectorAll(".profile-section");
-
-        menuButtons.forEach(btn => {
-          btn.addEventListener("click", () => {
-            sections.forEach(sec => sec.classList.add("hidden"));
-            document.getElementById(btn.dataset.target).classList.remove("hidden");
-
-            menuButtons.forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-          });
-        });
 
 
-
-        const hash = window.location.hash;
-
-        if (hash) {
-          const targetId = hash.replace("#", "");
-          const targetSection = document.getElementById(targetId);
-          const targetBtn = document.querySelector(
-            `.profile-menu button[data-target="${targetId}"]`
-          );
-
-          if (targetSection && targetBtn) {
-            sections.forEach(sec => sec.classList.add("hidden"));
-            targetSection.classList.remove("hidden");
-
-            menuButtons.forEach(b => b.classList.remove("active"));
-            targetBtn.classList.add("active");
-          }
-        }
 
         const editBtn = document.getElementById("editProfileBtn");
         const saveBtn = document.getElementById("saveProfileBtn");

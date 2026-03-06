@@ -52,23 +52,32 @@
         </a>
     </div>
 </div>
-
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const changeBtn = document.getElementById("changeImageBtn");
-        const imageInput = document.getElementById("profileImageInput");
-        const preview = document.getElementById("profilePreview");
-        const logoutBtn = document.getElementById("logoutBtn");
+document.addEventListener("DOMContentLoaded", () => {
 
-        if (changeBtn && imageInput) {
-            changeBtn.addEventListener("click", () => imageInput.click());
+    const changeBtn = document.getElementById("changeImageBtn");
+    const imageInput = document.getElementById("profileImageInput");
+    const preview = document.getElementById("profilePreview");
+    const logoutBtn = document.getElementById("logoutBtn");
 
-            imageInput.addEventListener("change", async () => {
-                const file = imageInput.files[0];
-                if (!file) return;
+    /* ---- Prevent event duplication ---- */
+    if (changeBtn && !changeBtn.dataset.listenerAdded) {
 
-                const formData = new FormData();
-                formData.append("profileImage", file);
+        changeBtn.dataset.listenerAdded = "true";
+
+        changeBtn.addEventListener("click", () => {
+            imageInput.click();
+        });
+
+        imageInput.addEventListener("change", async () => {
+
+            const file = imageInput.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append("profileImage", file);
+
+            try {
 
                 const res = await fetch("/profile/upload-image", {
                     method: "PUT",
@@ -79,37 +88,54 @@
 
                 if (result.success) {
 
-    const preview = document.getElementById("profilePreview");
+                    const preview = document.getElementById("profilePreview");
 
-    if(preview.tagName === "IMG"){
-        preview.src = result.image;
-    }else{
-        const img = document.createElement("img");
-        img.src = result.image;
-        img.id = "profilePreview";
-        preview.replaceWith(img);
-    }
+                    if (preview.tagName === "IMG") {
+                        preview.src = result.image;
+                    } else {
+                        const img = document.createElement("img");
+                        img.src = result.image;
+                        img.id = "profilePreview";
+                        preview.replaceWith(img);
+                    }
 
-    Swal.fire("Success", "Profile image updated", "success");
-}
-                else {
+                    Swal.fire("Success", "Profile image updated", "success");
+
+                } else {
                     Swal.fire("Error", "Upload failed", "error");
                 }
-            });
-        }
 
-        if (logoutBtn) {
-            logoutBtn.addEventListener("click", () => {
-                Swal.fire({
-                    title: "Are you sure?",
-                    text: "You will be logged out of your account",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonText: "Yes, Logout"
-                }).then((result) => {
-                    if (result.isConfirmed) window.location.href = "/logout";
-                });
+            } catch (err) {
+                Swal.fire("Error", "Something went wrong", "error");
+            }
+
+        });
+    }
+
+    /* ---- Logout ---- */
+
+    if (logoutBtn && !logoutBtn.dataset.listenerAdded) {
+
+        logoutBtn.dataset.listenerAdded = "true";
+
+        logoutBtn.addEventListener("click", () => {
+
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You will be logged out of your account",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes, Logout"
+            }).then((result) => {
+
+                if (result.isConfirmed) {
+                    window.location.href = "/logout";
+                }
+
             });
-        }
-    });
+
+        });
+    }
+
+});
 </script>

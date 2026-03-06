@@ -310,6 +310,51 @@ document.getElementById("addressForm").addEventListener("submit", async (e) => {
 
   const data = Object.fromEntries(new FormData(e.target));
 
+  const name = data.name.trim();
+  const mobile = data.mobile.trim();
+  const pincode = data.pincode.trim();
+  const locality = data.locality.trim();
+  const address = data.address.trim();
+
+  const nameRegex = /^[A-Za-z\s]{3,50}$/;
+  const mobileRegex = /^[6-9]\d{9}$/;
+  const pincodeRegex = /^\d{6}$/;
+
+  if (!nameRegex.test(name)) {
+    Swal.fire("Invalid Name", "Name should contain only letters (min 3 characters)", "warning");
+    return;
+  }
+
+  if (!mobileRegex.test(mobile)) {
+    Swal.fire("Invalid Mobile Number", "Enter a valid 10 digit mobile number", "warning");
+    return;
+  }
+
+  if (!pincodeRegex.test(pincode)) {
+    Swal.fire("Invalid Pincode", "Pincode must be exactly 6 digits", "warning");
+    return;
+  }
+
+  if (locality.length < 3) {
+    Swal.fire("Invalid Locality", "Locality must be at least 3 characters", "warning");
+    return;
+  }
+
+  if (address.length < 10) {
+    Swal.fire("Invalid Address", "Address must be at least 10 characters", "warning");
+    return;
+  }
+
+  if (!data.city) {
+    Swal.fire("City Missing", "Please enter a valid pincode to auto fill city", "warning");
+    return;
+  }
+
+  if (!data.state) {
+    Swal.fire("State Missing", "Please select a state", "warning");
+    return;
+  }
+
   try {
     const res = await fetch("/profile/address/add", {
       method: "POST",
