@@ -161,10 +161,6 @@ footer {
 .add-address-btn:hover {
   background: #333;
 }
-.profile-image-box {
-  text-align: center;
-  margin-bottom: 20px;
-}
 
 .profile-image-box img {
   width: 110px;
@@ -183,17 +179,27 @@ footer {
   border-radius: 4px;
   cursor: pointer;
 }
+.profile-image-box {
+  text-align: center;
+  margin-bottom: 20px;
+}
 
-.avatar-placeholder{
-  width:110px;
-  height:110px;
-  border-radius:50%;
-  background:#000;
-  color:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:42px;
-  font-weight:bold;
-  margin:auto;
+.profile-image-box img,
+.avatar-placeholder {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 42px;
+  font-weight: bold;
+  background: #000;
+  color: #fff;
+  margin: auto;
+  border: 2px solid #ddd;
+  overflow: hidden;        /* ✅ add this */
+  text-transform: uppercase;
+  flex-shrink: 0;          /* ✅ add this */
+  line-height: 1;          /* ✅ add this */
 }

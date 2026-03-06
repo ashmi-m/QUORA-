@@ -73,97 +73,156 @@
                   <input type="text" name="phone" value="<%= user.phone %>" disabled>
                 </div>
 
-              <label>Your Referral Code</label>
-<input type="text" value="<%= user.refCode || 'Not generated yet' %>" readonly>
-                 
+                <label>Your Referral Code</label>
+                <input type="text" value="<%= user.refCode || 'Not generated yet' %>" readonly>
+
               </div>
-              </div>
-              <label>Gender</label>
-              <select name="gender" id="genderSelect" disabled>
-                <option value="">Select</option>
-                <option value="Male" <%=user.gender==="Male" ? "selected" : "" %>>Male</option>
-                <option value="Female" <%=user.gender==="Female" ? "selected" : "" %>>Female</option>
-                <option value="Other" <%=user.gender==="Other" ? "selected" : "" %>>Other</option>
-                <option value="Prefer not to say" <%=user.gender==="Prefer not to say" ? "selected" : "" %>>Prefer not
-                  to say</option>
-              </select>
-
-
-              <div class="profile-actions">
-                <button type="button" id="editProfileBtn">Edit Profile</button>
-                <button type="button" id="saveProfileBtn" class="hidden">Save Changes</button>
-              </div>
-            </form>
           </div>
-          <div id="ordersSection" class="profile-section hidden">
-            <%- include("./orders", { orders: orders }) %>
+          <label>Gender</label>
+          <select name="gender" id="genderSelect" disabled>
+            <option value="">Select</option>
+            <option value="Male" <%=user.gender==="Male" ? "selected" : "" %>>Male</option>
+            <option value="Female" <%=user.gender==="Female" ? "selected" : "" %>>Female</option>
+            <option value="Other" <%=user.gender==="Other" ? "selected" : "" %>>Other</option>
+            <option value="Prefer not to say" <%=user.gender==="Prefer not to say" ? "selected" : "" %>>Prefer not
+              to say</option>
+          </select>
 
-          </div>
-          <div id="addressSection" class="profile-section hidden">
 
-            <%- include("./manageAddress", { addresses: addresses }) %>
+          <div class="profile-actions">
+            <button type="button" id="editProfileBtn">Edit Profile</button>
+            <button type="button" id="saveProfileBtn" class="hidden">Save Changes</button>
           </div>
+          </form>
+        </div>
+        <div id="ordersSection" class="profile-section hidden">
+          <%- include("./orders", { orders: orders }) %>
 
         </div>
+        <div id="addressSection" class="profile-section hidden">
+
+          <%- include("./manageAddress", { addresses: addresses }) %>
+        </div>
+
+    </div>
     </div>
 
     <footer>© 2025 Quora - All Rights Reserved</footer>
-     <script>
-function copyRefCode() {
-  const input = document.getElementById("refCodeField");
-  input.select();
-  document.execCommand("copy");
-  Swal.fire("Copied!", "Referral code copied to clipboard", "success");
-}
-</script>
-    <script>
-      
-      document.addEventListener("DOMContentLoaded", () => {
+    
+<script>
+document.addEventListener("DOMContentLoaded", () => {
 
-       
+  /* ---- Profile Image Handling ---- */
+  const changeBtn = document.getElementById("changeImageBtn");
+  const imageInput = document.getElementById("profileImageInput");
 
 
+  if (changeBtn && imageInput && !changeBtn.dataset.listenerAdded) {
+    changeBtn.dataset.listenerAdded = "true";
 
+    changeBtn.addEventListener("click", () => imageInput.click());
 
-        const editBtn = document.getElementById("editProfileBtn");
-        const saveBtn = document.getElementById("saveProfileBtn");
+    imageInput.addEventListener("change", async () => {
+      const file = imageInput.files[0];
+      if (!file) return;
 
-        editBtn.addEventListener("click", () => {
-          document.querySelector("input[name='name']").disabled = false;
-          document.querySelector("input[name='phone']").disabled = false;
-          document.getElementById("genderSelect").disabled = false;
+      const formData = new FormData();
+      formData.append("profileImage", file);
 
-          editBtn.classList.add("hidden");
-          saveBtn.classList.remove("hidden");
+      try {
+        const res = await fetch("/profile/upload-image", {
+          method: "PUT",
+          body: formData
         });
 
-        saveBtn.addEventListener("click", async () => {
-          const data = {
-            name: document.querySelector("input[name='name']").value,
-            phone: document.querySelector("input[name='phone']").value,
-            gender: document.getElementById("genderSelect").value
-          };
+        const result = await res.json();
 
-          const res = await fetch("/profile/update", {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
-          });
+        if (result.success) {
+          updateProfilePreview(result.image);
+          Swal.fire("Success", "Profile image updated", "success");
+        } else {
+          Swal.fire("Error", "Upload failed", "error");
+        }
 
-          const result = await res.json();
+      } catch (err) {
+        Swal.fire("Error", "Something went wrong", "error");
+      }
+    });
+  }
 
-          if (result.success) {
-            Swal.fire("Success", "Profile updated", "success")
-              .then(() => location.reload());
-          } else {
-            Swal.fire("Error", result.message || "Update failed", "error");
-          }
+  /* ---- Copy Referral Code ---- */
+  const copyRefCodeBtn = document.getElementById("refCodeField");
+  window.copyRefCode = function() {
+    const input = document.getElementById("refCodeField");
+    input.select();
+    document.execCommand("copy");
+    Swal.fire("Copied!", "Referral code copied to clipboard", "success");
+  };
+
+  /* ---- Profile Edit & Save ---- */
+  const editBtn = document.getElementById("editProfileBtn");
+  const saveBtn = document.getElementById("saveProfileBtn");
+
+  if (editBtn && saveBtn) {
+    editBtn.addEventListener("click", () => {
+      document.querySelector("input[name='name']").disabled = false;
+      document.querySelector("input[name='phone']").disabled = false;
+      document.getElementById("genderSelect").disabled = false;
+
+      editBtn.classList.add("hidden");
+      saveBtn.classList.remove("hidden");
+    });
+
+    saveBtn.addEventListener("click", async () => {
+      const data = {
+        name: document.querySelector("input[name='name']").value,
+        phone: document.querySelector("input[name='phone']").value,
+        gender: document.getElementById("genderSelect").value
+      };
+
+      try {
+        const res = await fetch("/profile/update", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
         });
 
+        const result = await res.json();
+
+        if (result.success) {
+          Swal.fire("Success", "Profile updated", "success").then(() => location.reload());
+        } else {
+          Swal.fire("Error", result.message || "Update failed", "error");
+        }
+      } catch (err) {
+        Swal.fire("Error", "Something went wrong", "error");
+      }
+    });
+  }
+
+  /* ---- Logout ---- */
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (logoutBtn && !logoutBtn.dataset.listenerAdded) {
+    logoutBtn.dataset.listenerAdded = "true";
+
+    logoutBtn.addEventListener("click", () => {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You will be logged out of your account",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, Logout"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = "/logout";
+        }
       });
-      
-    </script>
+    });
+  }
 
+
+});
+</script>
   </body>
 
   </html>

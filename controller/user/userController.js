@@ -150,50 +150,6 @@ function generateRefCode(name) {
   const random = Math.random().toString(36).substring(2, 7).toUpperCase();
   return prefix + random;
 }
-// const signup = async (req, res) => {
-//   try {
-    
-//     const { name, email, password, confirmPassword, phone } = req.body;
-
-
-//     if (password !== confirmPassword) {
-//       return res.render("signup", { message: "Passwords do not match" });
-
-//     }
-
-
-//     const findUser = await User.findOne({ email });
-    
-//     if (findUser) {
-//       console.log("user is already exist", findUser)
-//       return res.render("signup", { message: "User with this email already exists" });
-
-//     }
-
-
-//     const otp = generateOtp();
-
-   
-//     const emailSent = await sendVerificationEmail(email, otp);
-//     console.log("emailSent", emailSent)
-//     if (!emailSent) {
-//       return res.render("signup", { message: "Failed to send OTP. Try again." });
-//     }
-
-
-//     req.session.userOtp = otp;
-//     req.session.userData = { name, phone, email, password };
-
-//     console.log("OTP Sent:", otp);
-
-
-//     return res.render("conformOtp");
-
-//   } catch (error) {
-//     console.error("eerror in post signup", error);
-//     res.render("signup", { message: "Something went wrong. Please try again." });
-//   }
-// }
 const signup = async (req, res) => {
   try {
     const { name, email, password, confirmPassword, phone, refCode } = req.body;

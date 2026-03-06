@@ -54,7 +54,6 @@
 
               <label>Email address</label>
               <input type="email" id="email" name="email" placeholder="Enter your Email">
-              <div id="error2" class="error-message"></div>
                
 
               <label>Referral Code (optional)</label>
@@ -76,8 +75,7 @@
               </div>
               <div id="error5" class="error-message"></div>
 
-              <div id="error2" class="error-message"></div>
- 
+              <div id="error2" class="error-message"></div> 
                <% if (locals.message && message.length> 0) { %>
                 <div class="alert alert-danger text-center">
                   <%= message %>
@@ -151,46 +149,34 @@
     return true;
 
     }
-    function phoneValidate() {
-      const phoneVal = phoneid.value.trim();
+   
+function phoneValidate() {
+  const phoneVal = phoneid.value.trim();
 
-  
   if (!/^\d{10}$/.test(phoneVal)) {
-    Swal.fire({
-      icon: "error",
-      title: "Invalid Phone Number",
-      text: "Phone number must contain exactly 10 digits.",
-    });
+    error3.textContent = "Phone number must contain exactly 10 digits.";
+    error3.style.display = "block";
     return false;
   }
 
- 
-  const sequentialAsc = "01234567890123456789"; 
+  const sequentialAsc = "01234567890123456789";
   const sequentialDesc = "98765432109876543210";
 
   if (sequentialAsc.includes(phoneVal) || sequentialDesc.includes(phoneVal)) {
-    Swal.fire({
-      icon: "error",
-      title: "Invalid Phone Number",
-      text: "Sequential phone numbers are not allowed.",
-    });
+    error3.textContent = "Sequential phone numbers are not allowed.";
+    error3.style.display = "block";
     return false;
   }
 
-
   if (/^(\d)\1{9}$/.test(phoneVal)) {
-    Swal.fire({
-      icon: "error",
-      title: "Invalid Phone Number",
-      text: "Repeated digits are not allowed.",
-    });
+    error3.textContent = "Repeated digits are not allowed.";
+    error3.style.display = "block";
     return false;
   }
 
   error3.style.display = "none";
   return true;
-    }
-
+}
     function passwordValidate() {
       const passVal = passid.value;
       const cpassVal = cpassid.value;
@@ -237,20 +223,23 @@
       }
       return true;
     }
+signform.addEventListener("submit", function (e) {
 
-    signform.addEventListener("submit", function (e) {
-     
-      const validName = nameValidate();
-      const validEmail = emailValidate();
-      const validPhone = phoneValidate();
-      const validPassword = passwordValidate();
-      const validTerms = termsValidate();
+  const validName = nameValidate();
+  const validEmail = emailValidate();
+  const validPhone = phoneValidate();
+  const validPassword = passwordValidate();
+  if (!(validName && validEmail && validPhone && validPassword)) {
+    e.preventDefault();
+    return;
+  }
+  const validTerms = termsValidate();
 
-      if (!(validName && validEmail && validPhone && validPassword && validTerms)) {
-        e.preventDefault(); 
-        
-      }
-    })
+  if (!validTerms) {
+    e.preventDefault();
+  }
+
+});
 
   
    

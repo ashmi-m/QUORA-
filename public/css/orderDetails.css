@@ -161,21 +161,95 @@ body {
 }
 
 .cancel-btn {
-  background: #ff4d4f;
+  background: #fff;
+  color: #e53935;
+  border: 2px solid #e53935;
+  padding: 10px 22px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  transition: all 0.2s ease;
+}
+.cancel-btn:hover {
+  background: #e53935;
   color: #fff;
-  border: none;
-  padding: 10px 16px;
+  box-shadow: 0 4px 14px rgba(229, 57, 53, 0.35);
+  transform: translateY(-1px);
+}
+.cancel-product-btn {
+  background: #fff;
+  color: #e53935;
+  border: 1.5px solid #e53935;
+  padding: 7px 16px;
   border-radius: 6px;
   cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 8px;
+  transition: all 0.2s ease;
+}
+.cancel-product-btn:hover {
+  background: #e53935;
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(229, 57, 53, 0.3);
 }
 
 .invoice-btn {
-  background: #000;
+  background: #111;
   color: #fff;
-  border: none;
-  padding: 10px 16px;
+  border: 2px solid #111;
+  padding: 10px 22px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.2s ease;
+}
+.invoice-btn:hover {
+  background: #fff;
+  color: #111;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+.return-btn {
+  background: #fff;
+  color: #f57c00;
+  border: 2px solid #f57c00;
+  padding: 10px 22px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  transition: all 0.2s ease;
+}
+.return-btn:hover {
+  background: #f57c00;
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(245, 124, 0, 0.35);
+  transform: translateY(-1px);
+}
+.return-product-btn {
+  background: #fff;
+  color: #f57c00;
+  border: 1.5px solid #f57c00;
+  padding: 7px 16px;
   border-radius: 6px;
   cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 8px;
+  transition: all 0.2s ease;
+}
+.return-product-btn:hover {
+  background: #f57c00;
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(245, 124, 0, 0.3);
 }
 
 @media (max-width: 900px) {

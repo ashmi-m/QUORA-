@@ -1,56 +1,41 @@
 <div class="profile-sidebar">
-   <div class="profile-image-box">
+  <div class="profile-image-box">
+  <% if (user.profileImage && user.profileImage.trim() !== "") { %>
+  <img src="<%= user.profileImage %>" 
+       alt="Profile Image" 
+       id="profilePreview"
+       onerror="this.style.display='none'; document.getElementById('avatarFallback').style.display='flex';">
+  <div class="avatar-placeholder" id="avatarFallback" style="display:none;"><%= user.name.charAt(0).toUpperCase() %></div>
+<% } else { %>
+  <div class="avatar-placeholder" id="profilePreview"><%= user.name.charAt(0).toUpperCase() %></div>
+<% } %>
 
-    <% if (user.profileImage) { %>
-        <img src="<%= user.profileImage %>" alt="Profile Image" id="profilePreview">
-    <% } else { %>
-        <div class="avatar-placeholder" id="profilePreview">
-            <%= user.name.charAt(0).toUpperCase() %>
-        </div>
-    <% } %>
-
-    <input type="file" id="profileImageInput" hidden>
-    <button type="button" id="changeImageBtn">Change Photo</button>
-
+  <input type="file" id="profileImageInput" hidden>
+  <button type="button" id="changeImageBtn">Change Photo</button>
 </div>
 
-    <h3>Hello 👋 <%= user?.name %>
-    </h3>
+  <h3>Hello 👋 <%= user?.name %></h3>
 
-    <div class="profile-menu">
-        <a href="/userprofile">
-            <button class="<%= activePage === 'profile' ? 'active' : '' %>" data-target="profileSection">
-                Profile Information
-            </button>
-        </a>
-
-        <a href="/orders">
-            <button type="button" class="<%= activePage === 'orders' ? 'active' : '' %>">
-                My Orders
-            </button>
-        </a>
-
-        <a href="/manage-address">
-            <button type="button" class="<%= activePage === 'address' ? 'active' : '' %>">
-                Manage Address
-            </button>
-        </a>
-          <a href="/wallet">
-        <button type="button" class="<%= activePage === 'wallet' ? 'active' : '' %>">
-            My Wallet
-        </button>
+  <div class="profile-menu">
+    <a href="/userprofile">
+      <button class="<%= activePage === 'profile' ? 'active' : '' %>">Profile Information</button>
     </a>
-
-        <a>
-            <button type="button" id="logoutBtn">Logout</button>
-        </a>
-
-        <a href="/userprofile/privacy-security">
-            <button type="button" class="<%= activePage === 'security' ? 'active' : '' %>">
-                Privacy & Security
-            </button>
-        </a>
-    </div>
+    <a href="/orders">
+      <button class="<%= activePage === 'orders' ? 'active' : '' %>">My Orders</button>
+    </a>
+    <a href="/manage-address">
+      <button class="<%= activePage === 'address' ? 'active' : '' %>">Manage Address</button>
+    </a>
+    <a href="/wallet">
+      <button class="<%= activePage === 'wallet' ? 'active' : '' %>">My Wallet</button>
+    </a>
+    <a>
+      <button type="button" id="logoutBtn">Logout</button>
+    </a>
+    <a href="/userprofile/privacy-security">
+      <button class="<%= activePage === 'security' ? 'active' : '' %>">Privacy & Security</button>
+    </a>
+  </div>
 </div>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
