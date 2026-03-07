@@ -17,37 +17,7 @@
     </div>
 
     <div class="profile-container">
-      <!-- <div class="profile-sidebar">
-        <div class="profile-image-box">
-          <img src="<%= user.profileImage %>" alt="Profile Image" id="profilePreview">
-          <input type="file" id="profileImageInput" hidden>
-          <button type="button" id="changeImageBtn">Change Photo</button>
-        </div>
-        <h3>Hello 👋 <%= user?.name %>
-        </h3>
-
-
-
-        <div class="profile-menu">
-          <button class="active" data-target="profileSection">Profile Information</button>
-          <a href="/orders">
-            <button type="button">My Orders</button>
-          </a>
-           <a href="/manage-address">
-            <button type="button">Manage Address</button>
-          </a>
-        
-
-          <a ><button type="button" id="logoutBtn" >Logout</button></a>
-          
-          <a href="/userprofile/privacy-security">
-            <button type="button">Privacy & Security</button>
-          </a>
-
-
-
-        </div>
-      </div> -->
+      
 
       <%- include("../partials/user/profile-sidebar", { user, activePage: 'profile' }) %>
 
@@ -78,17 +48,18 @@
 
               </div>
           </div>
-          <label>Gender</label>
-          <select name="gender" id="genderSelect" disabled>
-            <option value="">Select</option>
-            <option value="Male" <%=user.gender==="Male" ? "selected" : "" %>>Male</option>
-            <option value="Female" <%=user.gender==="Female" ? "selected" : "" %>>Female</option>
-            <option value="Other" <%=user.gender==="Other" ? "selected" : "" %>>Other</option>
-            <option value="Prefer not to say" <%=user.gender==="Prefer not to say" ? "selected" : "" %>>Prefer not
-              to say</option>
-          </select>
-
-
+         <div class="row">
+  <div>
+    <label>Gender</label>
+    <select name="gender" id="genderSelect" disabled>
+      <option value="">Select Gender</option>
+      <option value="Male" <%= user.gender==="Male" ? "selected" : "" %>>Male</option>
+      <option value="Female" <%= user.gender==="Female" ? "selected" : "" %>>Female</option>
+      <option value="Other" <%= user.gender==="Other" ? "selected" : "" %>>Other</option>
+      <option value="Prefer not to say" <%= user.gender==="Prefer not to say" ? "selected" : "" %>>Prefer not to say</option>
+    </select>
+  </div>
+</div>
           <div class="profile-actions">
             <button type="button" id="editProfileBtn">Edit Profile</button>
             <button type="button" id="saveProfileBtn" class="hidden">Save Changes</button>
@@ -111,8 +82,6 @@
     
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-
-  /* ---- Profile Image Handling ---- */
   const changeBtn = document.getElementById("changeImageBtn");
   const imageInput = document.getElementById("profileImageInput");
 
@@ -149,8 +118,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
-
-  /* ---- Copy Referral Code ---- */
   const copyRefCodeBtn = document.getElementById("refCodeField");
   window.copyRefCode = function() {
     const input = document.getElementById("refCodeField");
@@ -159,7 +126,6 @@ document.addEventListener("DOMContentLoaded", () => {
     Swal.fire("Copied!", "Referral code copied to clipboard", "success");
   };
 
-  /* ---- Profile Edit & Save ---- */
   const editBtn = document.getElementById("editProfileBtn");
   const saveBtn = document.getElementById("saveProfileBtn");
 
@@ -200,7 +166,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  /* ---- Logout ---- */
   const logoutBtn = document.getElementById("logoutBtn");
   if (logoutBtn && !logoutBtn.dataset.listenerAdded) {
     logoutBtn.dataset.listenerAdded = "true";

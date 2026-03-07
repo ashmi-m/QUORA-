@@ -469,7 +469,7 @@ const downloadInvoice = async (req, res) => {
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename=invoice-${order._id}.pdf`
+`attachment; filename=invoice-${order.orderId}.pdf`
     );
     const doc = new PDFDocument({ margin: 50 });
     doc.pipe(res);
@@ -496,7 +496,7 @@ const downloadInvoice = async (req, res) => {
         .text(value, x, ty + 11);
     };
 
-    drawLabel("Order ID", `${order._id}`, margin, y);
+drawLabel("Order ID", `${order.orderId}`, margin, y);
     drawLabel("Order Date", new Date(order.createdAt).toDateString(), margin, y + 36);
     drawLabel("Payment Method", order.paymentMethod, margin + contentW / 2, y);
     drawLabel("Order Status", order.status, margin + contentW / 2, y + 36);

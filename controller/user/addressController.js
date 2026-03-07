@@ -45,7 +45,6 @@ const getAddresses = async (req, res) => {
   try {
     const userId = req.session.user._id;
     const addressDoc = await Address.findOne({ userId }).lean();
-
     const addresses = addressDoc?.addresses || [];
     res.json({ success: true, addresses });
   } catch (error) {
@@ -82,7 +81,6 @@ const addAddressFromProfile = async (req, res) => {
         addresses: [newAddress]
       });
     }
-
     await addressDoc.save();
     return res.json({
       success: true,

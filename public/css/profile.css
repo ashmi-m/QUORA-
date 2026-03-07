@@ -198,8 +198,21 @@ footer {
   color: #fff;
   margin: auto;
   border: 2px solid #ddd;
-  overflow: hidden;        /* ✅ add this */
+  overflow: hidden;        
   text-transform: uppercase;
-  flex-shrink: 0;          /* ✅ add this */
-  line-height: 1;          /* ✅ add this */
+  flex-shrink: 0;         
+  line-height: 1;          
+}
+.profile-section select{
+  width:100%;
+  padding:10px;
+  margin-top:5px;
+  border:1px solid #ddd;
+  border-radius:5px;
+  background:#fff;
+}
+.profile-section input:disabled,
+.profile-section select:disabled{
+  background:#f5f5f5;
+  cursor:not-allowed;
 }
