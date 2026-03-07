@@ -58,6 +58,23 @@ const loadSalesReport = async (req, res) => {
     const selectedFilter = req.query.filter || "monthly";
     const startDate = req.query.startDate || "";
     const endDate = req.query.endDate || "";
+ const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const skip = (page - 1) * limit;
+
+    const totalOrdersCount = await Order.countDocuments({
+      ...filter,
+      status: { $nin: ["Cancelled", "Payment Failed"] }
+    });
+
+    const order= await Order.find({
+      ...filter,
+      status: { $nin: ["Cancelled", "Payment Failed"] }
+    })
+      .populate("products.productId")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
     const orders = await Order.find({
       ...filter,
@@ -103,7 +120,7 @@ const loadSalesReport = async (req, res) => {
     });
 
    
-    const tableOrders = orders.slice(0, 50).map((o) => ({
+const tableOrders = orders.map((o) => ({
       orderId: o.orderId || o._id,
       date: new Date(o.createdAt).toLocaleDateString("en-IN"),
       paymentMethod: o.paymentMethod,
@@ -126,7 +143,9 @@ const loadSalesReport = async (req, res) => {
       tableOrders,
       selectedFilter,
       startDate,
-      endDate
+      endDate,
+      currentPage: page,
+  totalPages: Math.ceil(totalOrdersCount / limit)
     });
 
   } catch (error) {

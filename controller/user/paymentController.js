@@ -50,10 +50,7 @@ const loadPayment = async (req, res) => {
         item.productId.salePrice || item.productId.regularPrice || 0
       );
       subtotal += price * Number(item.quantity || 1);
-    // let subtotal = 0;
-    // cart.items.forEach(item => {
-    //   const price = Number(item.productId.salePrice || item.productId.regularPrice || 0);
-    //   subtotal += price * Number(item.quantity || 1);
+  
     });
     const deliveryCharge = subtotal > 1000 ? 0 : 50;
     const discount = req.session.appliedCoupon ? req.session.appliedCoupon.discountAmount : 0;
@@ -69,7 +66,6 @@ const loadPayment = async (req, res) => {
     });
 
     res.render("payment", {
-      // cartItems: cart.items,
       cartItems: validItems,  
       address,
       subtotal,

@@ -10,8 +10,6 @@
 <body>
 
 <div class="main-content">
-
-  <!-- Page Header -->
   <div class="page-header">
     <h2>Sales Report</h2>
     <div class="export-btns">
@@ -21,8 +19,6 @@
          class="btn-export btn-excel">⬇ Export Excel</a>
     </div>
   </div>
-
-  <!-- Filter Form -->
   <form method="GET" action="/admin/sales-report" class="filter-box">
     <select name="filter" id="filterSelect" onchange="toggleCustomDates(this.value)">
       <option value="daily"   <%= selectedFilter === 'daily'   ? 'selected' : '' %>>Today</option>
@@ -41,8 +37,6 @@
 
     <button type="submit">Apply Filter</button>
   </form>
-
-  <!-- Summary Cards -->
   <div class="grid-4">
     <div class="card stat-card">
       <h4>Overall Sales Count</h4>
@@ -65,8 +59,6 @@
       <span class="stat-label">product-level coupons</span>
     </div>
   </div>
-
-  <!-- Charts -->
   <div class="grid-2" style="margin-bottom:25px;">
     <div class="card">
       <h4>Revenue Overview</h4>
@@ -77,8 +69,6 @@
       <canvas id="statusChart"></canvas>
     </div>
   </div>
-
-  <!-- Orders Table -->
   <div class="card" style="overflow-x:auto;">
     <h4 style="margin-bottom:16px;">Order Details</h4>
     <table class="sales-table">
@@ -119,17 +109,36 @@
       </tbody>
     </table>
   </div>
+<div class="pagination" style="margin-top:20px; text-align:center;">
+
+  <% if (currentPage > 1) { %>
+    <a href="?page=<%= currentPage-1 %>&filter=<%= selectedFilter %>&startDate=<%= startDate %>&endDate=<%= endDate %>" class="page-btn">
+      Prev
+    </a>
+  <% } %>
+
+  <% for(let i=1;i<=totalPages;i++){ %>
+    <a href="?page=<%= i %>&filter=<%= selectedFilter %>&startDate=<%= startDate %>&endDate=<%= endDate %>"
+       class="page-btn <%= currentPage===i ? 'active-page':'' %>">
+       <%= i %>
+    </a>
+  <% } %>
+
+  <% if (currentPage < totalPages) { %>
+    <a href="?page=<%= currentPage+1 %>&filter=<%= selectedFilter %>&startDate=<%= startDate %>&endDate=<%= endDate %>" class="page-btn">
+      Next
+    </a>
+  <% } %>
+
+</div>
 
 </div>
 
 <script>
-  // Show/hide custom date inputs
   function toggleCustomDates(val) {
     document.getElementById("customDates").style.display =
       val === "custom" ? "flex" : "none";
   }
-
-  // Charts
   const salesData  = <%- JSON.stringify(chartData) %>;
   const statusData = <%- JSON.stringify(statusData) %>;
 

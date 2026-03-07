@@ -119,8 +119,6 @@ const placeOrder = async (req, res) => {
     if (!selectedAddress) {
       return res.status(400).json({ success: false, message: "Selected address not found" });
     }
-
-    // ✅ STEP 1: Re-validate every cart item before processing
     for (const item of cart.items) {
       const product = item.productId;
 
@@ -152,8 +150,6 @@ const placeOrder = async (req, res) => {
         });
       }
     }
-
-    // ✅ STEP 2: Process items — deduct stock + calculate prices & discounts
     let total = 0;
     let totalProductDiscount = 0;
     const products = [];
@@ -179,16 +175,12 @@ const placeOrder = async (req, res) => {
 
       const regularPrice = updatedProduct.regularPrice;
       const offerPercent = updatedProduct.productOffer || 0;
-
-      // ✅ FIX 1: calculate salePrice after offer %
       const salePrice = offerPercent > 0
         ? regularPrice - (regularPrice * offerPercent) / 100
         : regularPrice;
 
       const itemDiscount = (regularPrice - salePrice) * item.quantity;
       totalProductDiscount += itemDiscount;
-
-      // ✅ FIX 2: add to total ONCE using salePrice only (removed duplicate line)
       total += salePrice * item.quantity;
 
       products.push({
@@ -201,15 +193,11 @@ const placeOrder = async (req, res) => {
         status: "Placed"
       });
     }
-
-    // ✅ FIX 3: couponData declared ONCE only (removed duplicate declaration in step 5)
     const couponData = req.session.appliedCoupon || null;
     const couponDiscount = couponData ? couponData.discountAmount : 0;
 
     const totalDiscount = totalProductDiscount + couponDiscount;
     const finalTotal = total - couponDiscount;
-
-    // ✅ STEP 3: Wallet payment check
     if (paymentMethod === "Wallet") {
       const user = await User.findById(userId);
 
@@ -222,8 +210,6 @@ const placeOrder = async (req, res) => {
 
       await walletController.debitWallet(userId, finalTotal, "Order payment via Wallet");
     }
-
-    // ✅ STEP 4: Razorpay signature verification
     if (paymentMethod === "Razorpay") {
       const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
@@ -241,8 +227,6 @@ const placeOrder = async (req, res) => {
         return res.status(400).json({ success: false, message: "Payment verification failed" });
       }
     }
-
-    // ✅ STEP 5: Create order
     await Order.create({
       userId,
       address: {
@@ -256,14 +240,13 @@ const placeOrder = async (req, res) => {
         altPhone: selectedAddress.altPhone
       },
       products,
-      totalAmount: finalTotal,   // ✅ FIX: was (total - discountAmount)
-      discount: totalDiscount,   // ✅ FIX: was (discountAmount) — now includes product offers too
+      totalAmount: finalTotal,   
+      discount: totalDiscount,   
       couponCode: couponData ? couponData.code : null,
       paymentMethod,
       status: paymentMethod === "COD" ? "Placed" : "Paid"
     });
 
-    // ✅ STEP 6: Clear cart and coupon session
     await Cart.deleteOne({ userId });
     delete req.session.appliedCoupon;
 
