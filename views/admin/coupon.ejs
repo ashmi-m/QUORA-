@@ -1,114 +1,128 @@
-<%-include("../partials/admin/header", {active : 'coupon'})%>
+<%- include("../partials/admin/header", { active: 'coupon' }) %>
 
-<link rel="stylesheet" href="/css/admin-coupon.css" />
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="/css/admin-coupon.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<div class="coupon-wrapper">
-  <div class="page-header">
-    <h1>Coupons</h1>
-    <span class="breadcrumb">Admin / <span>Coupons</span></span>
-  </div>
-
- 
-  <div class="form-card">
-    <h2 class="form-title">Add Coupon</h2>
-    <form id="couponForm">
-      <div class="form-row">
-        <div class="form-group">
-          <label>Code</label>
-          <input type="text" name="code" placeholder="Enter coupon code" required />
-        </div>
-        <div class="form-group">
-          <label>DiscountType Type</label>
-          <select name="discountType" class="select-highlight">
-            <option value="percentage">Percentage</option>
-            <option value="fixed">Fixed</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Discount Percentage</label>
-          <input type="number" name="discountValue" placeholder="Enter discount value" min="0" required />
-        </div>
-        <div class="form-group">
-          <label>Max Discount Value</label>
-          <input type="number" name="maxDiscount" placeholder="Enter max discount" min="0" />
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Description</label>
-          <input type="text" name="description" placeholder="Enter description" />
-        </div>
-        <div class="form-group">
-          <label>Limit</label>
-          <input type="number" name="limit" placeholder="Enter usage limit" min="1" required />
-        </div>
-        <div class="form-group">
-          <label>Expiry Date</label>
-          <input type="date" name="expiryDate" required />
-        </div>
-        <div class="form-group">
-          <label>Minimum Purchase</label>
-          <input type="number" name="minimumPurchase" placeholder="Enter minimum purchase" min="0" />
-        </div>
-      </div>
-      <div class="form-btn-row">
-        <button type="submit" class="btn-add">ADD</button>
-      </div>
-    </form>
-  </div>
-
-
-  <div class="table-card">
-    <div class="table-header">
-      <h3>All Coupons</h3>
-      <span class="table-count"><%= coupons ? coupons.length : 0 %> coupons</span>
+  <div class="coupon-wrapper">
+    <div class="page-header">
+      <h1>Coupons</h1>
+      <span class="breadcrumb">Admin / <span>Coupons</span></span>
     </div>
-    <table>
-      <thead>
-        <tr>
-          <th>Code</th>
-          <th>Coupon type</th>
-          <th>Min. Purchase</th>
-          <th>%</th>
-          <th>Usage Limit</th>
-          <th>Created On</th>
-          <th>Expiry Date</th>
-          <th>Status</th>
-          <th>Description</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="couponTableBody">
-        <% if (coupons && coupons.length > 0) { %>
-          <% coupons.forEach(coupon => { %>
-            <tr id="row-<%= coupon._id %>">
-              <td class="td-bold"><%= coupon.code %></td>
-              <td><%= coupon.discountType %></td>
-              <td><%= coupon.minimumPurchase %></td>
-              <td><%= coupon.discountValue %></td>
-              <td><%= coupon.limit %></td>
-              <td><%= new Date(coupon.createdAt).toLocaleDateString('en-GB') %></td>
-              <td><%= new Date(coupon.expiryDate).toLocaleDateString('en-GB') %></td>
-              <td>
-                <span class="<%= coupon.isActive ? 'badge-true' : 'badge-false' %>">
-                  <%= coupon.isActive ? 'Active' : 'Inactive' %>
-                </span>
-              </td>
-              <td><%= coupon.description %></td>
-              <td class="action-cell">
-              
-<button onclick="toggleCoupon('<%= coupon._id %>')" class="btn-block">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="#9e9e9e" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10" stroke="#9e9e9e" stroke-width="2" fill="none"/>
-                    <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" stroke="#9e9e9e" stroke-width="2"/>
-                  </svg>
-                </a>
-               
-                <button
-                  class="btn-edit"
-                  title="Edit"
-                  onclick="openEditModal(
+
+    <div class="form-card">
+      <h2 class="form-title">Add Coupon</h2>
+      <form id="couponForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Code</label>
+            <input type="text" name="code" placeholder="Enter coupon code" required />
+          </div>
+          <div class="form-group">
+            <label>DiscountType Type</label>
+            <select name="discountType" class="select-highlight">
+              <option value="percentage">Percentage</option>
+              <option value="fixed">Fixed</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Discount Percentage</label>
+            <input type="number" name="discountValue" placeholder="Enter discount value" min="0" required />
+          </div>
+          <div class="form-group">
+            <label>Max Discount Value</label>
+            <input type="number" name="maxDiscount" placeholder="Enter max discount" min="0" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Description</label>
+            <input type="text" name="description" placeholder="Enter description" />
+          </div>
+          <div class="form-group">
+            <label>Limit</label>
+            <input type="number" name="limit" placeholder="Enter usage limit" min="1" required />
+          </div>
+          <div class="form-group">
+            <label>Expiry Date</label>
+            <input type="date" name="expiryDate" required />
+          </div>
+          <div class="form-group">
+            <label>Minimum Purchase</label>
+            <input type="number" name="minimumPurchase" placeholder="Enter minimum purchase" min="0" />
+          </div>
+        </div>
+        <div class="form-btn-row">
+          <button type="submit" class="btn-add">ADD</button>
+        </div>
+      </form>
+    </div>
+
+
+    <div class="table-card">
+      <div class="table-header">
+        <h3>All Coupons</h3>
+        <span class="table-count">
+          <%= coupons ? coupons.length : 0 %> coupons
+        </span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Coupon type</th>
+            <th>Min. Purchase</th>
+            <th>%</th>
+            <th>Usage Limit</th>
+            <th>Created On</th>
+            <th>Expiry Date</th>
+            <th>Status</th>
+            <th>Description</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="couponTableBody">
+          <% if (coupons && coupons.length> 0) { %>
+            <% coupons.forEach(coupon=> { %>
+              <tr id="row-<%= coupon._id %>">
+                <td class="td-bold">
+                  <%= coupon.code %>
+                </td>
+                <td>
+                  <%= coupon.discountType %>
+                </td>
+                <td>
+                  <%= coupon.minimumPurchase %>
+                </td>
+                <td>
+                  <%= coupon.discountValue %>
+                </td>
+                <td>
+                  <%= coupon.limit %>
+                </td>
+                <td>
+                  <%= new Date(coupon.createdAt).toLocaleDateString('en-GB') %>
+                </td>
+                <td>
+                  <%= new Date(coupon.expiryDate).toLocaleDateString('en-GB') %>
+                </td>
+                <td>
+                  <span class="<%= coupon.isActive ? 'badge-true' : 'badge-false' %>">
+                    <%= coupon.isActive ? 'Active' : 'Inactive' %>
+                  </span>
+                </td>
+                <td>
+                  <%= coupon.description %>
+                </td>
+                <td class="action-cell">
+
+                  <button onclick="toggleCoupon('<%= coupon._id %>')" class="btn-block">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="#9e9e9e" viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="10" stroke="#9e9e9e" stroke-width="2" fill="none" />
+                      <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" stroke="#9e9e9e" stroke-width="2" />
+                    </svg>
+                    </a>
+
+                    <button class="btn-edit" title="Edit" onclick="openEditModal(
                     '<%= coupon._id %>',
                     '<%= coupon.code %>',
                     '<%= coupon.discountValue %>',
@@ -117,157 +131,153 @@
                     '<%= new Date(coupon.expiryDate).toISOString().split(`T`)[0] %>',
                     '<%= coupon.minimumPurchase %>',
                     '<%= coupon.description %>'
-                  )"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="#f0a500" viewBox="0 0 24 24">
-                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
-                  </svg>
-                </button>
-              </td>
-            </tr>
-          <% }) %>
-        <% } else { %>
-          <tr>
-            <td colspan="10" class="no-data">
-              <span class="no-data-icon">🎟</span>
-              No coupons found.
-            </td>
-          </tr>
+                  )">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="#f0a500" viewBox="0 0 24 24">
+                        <path
+                          d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                      </svg>
+                    </button>
+                </td>
+              </tr>
+              <% }) %>
+                <% } else { %>
+                  <tr>
+                    <td colspan="10" class="no-data">
+                      <span class="no-data-icon">🎟</span>
+                      No coupons found.
+                    </td>
+                  </tr>
+                  <% } %>
+        </tbody>
+      </table>
+
+
+      <% if (totalPages>= 1) { %>
+        <div class="pagination">
+          <% if (currentPage> 1) { %>
+            <a href="/admin/coupon?page=<%= currentPage - 1 %>" class="page-btn">← Previous</a>
+            <% } %>
+              <% for (let i=1; i <=totalPages; i++) { %>
+                <a href="/admin/coupon?page=<%= i %>" class="page-btn <%= i === currentPage ? 'page-active' : '' %>">
+                  <%= i %>
+                </a>
+                <% } %>
+                  <% if (currentPage < totalPages) { %>
+                    <a href="/admin/coupon?page=<%= currentPage + 1 %>" class="page-btn">Next →</a>
+                    <% } %>
+        </div>
         <% } %>
-      </tbody>
-    </table>
-
-   
-    <% if (totalPages >= 1) { %>
-      <div class="pagination">
-        <% if (currentPage > 1) { %>
-          <a href="/admin/coupon?page=<%= currentPage - 1 %>" class="page-btn">← Previous</a>
-        <% } %>
-        <% for (let i = 1; i <= totalPages; i++) { %>
-          <a href="/admin/coupon?page=<%= i %>" class="page-btn <%= i === currentPage ? 'page-active' : '' %>">
-            <%= i %>
-          </a>
-        <% } %>
-        <% if (currentPage < totalPages) { %>
-          <a href="/admin/coupon?page=<%= currentPage + 1 %>" class="page-btn">Next →</a>
-        <% } %>
-      </div>
-    <% } %>
-  </div>
-
-</div>
-
-
-<div id="editModal" class="modal-overlay" style="display:none;">
-  <div class="modal-box">
-
-    <div class="modal-header">
-      <h3>Edit Coupon</h3>
-      <button class="modal-close" onclick="closeEditModal()">✕</button>
     </div>
 
-    <form id="editCouponForm">
-      <input type="hidden" id="editId" />
-
-      <div class="modal-grid">
-        <div class="modal-group">
-          <label>Code</label>
-          <input type="text" id="editCode" placeholder="Coupon code" required />
-        </div>
-        <div class="modal-group">
-          <label>Discount Percentage</label>
-          <input type="number" id="editDiscountValue" placeholder="Discount value" min="0" required />
-        </div>
-        <div class="modal-group">
-          <label>Max Discount Value</label>
-          <input type="number" id="editMaxDiscount" placeholder="Max discount" min="0" />
-        </div>
-        <div class="modal-group">
-          <label>Limit</label>
-          <input type="number" id="editLimit" placeholder="Usage limit" min="1" required />
-        </div>
-        <div class="modal-group">
-          <label>Expiry Date</label>
-          <input type="date" id="editExpiryDate" required />
-        </div>
-        <div class="modal-group">
-          <label>Minimum Purchase</label>
-          <input type="number" id="editMinimumPurchase" placeholder="Min purchase" min="0" />
-        </div>
-      </div>
-
-      <div class="modal-group" style="margin-top: 16px;">
-        <label>Description</label>
-        <input type="text" id="editDescription" placeholder="Description" />
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn-close-modal" onclick="closeEditModal()">Close</button>
-        <button type="submit" class="btn-save-modal">Save changes</button>
-      </div>
-    </form>
-
   </div>
-</div>
+  <div id="editModal" class="modal-overlay" style="display:none;">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Edit Coupon</h3>
+        <button class="modal-close" onclick="closeEditModal()">✕</button>
+      </div>
 
+      <form id="editCouponForm">
+        <input type="hidden" id="editId" />
 
-<script>
+        <div class="modal-grid">
+          <div class="modal-group">
+            <label>Code</label>
+            <input type="text" id="editCode" placeholder="Coupon code" required />
+          </div>
+          <div class="modal-group">
+            <label>Discount Percentage</label>
+            <input type="number" id="editDiscountValue" placeholder="Discount value" min="0" required />
+          </div>
+          <div class="modal-group">
+            <label>Max Discount Value</label>
+            <input type="number" id="editMaxDiscount" placeholder="Max discount" min="0" />
+          </div>
+          <div class="modal-group">
+            <label>Limit</label>
+            <input type="number" id="editLimit" placeholder="Usage limit" min="1" required />
+          </div>
+          <div class="modal-group">
+            <label>Expiry Date</label>
+            <input type="date" id="editExpiryDate" required />
+          </div>
+          <div class="modal-group">
+            <label>Minimum Purchase</label>
+            <input type="number" id="editMinimumPurchase" placeholder="Min purchase" min="0" />
+          </div>
+        </div>
+
+        <div class="modal-group" style="margin-top: 16px;">
+          <label>Description</label>
+          <input type="text" id="editDescription" placeholder="Description" />
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-close-modal" onclick="closeEditModal()">Close</button>
+          <button type="submit" class="btn-save-modal">Save changes</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <script>
     async function toggleCoupon(id) {
-  const res = await fetch(`/admin/coupons/toggle/${id}`, { method: "POST" });
-  const data = await res.json();
-  if (data.success) location.reload();
-}
-async function deleteCoupon(id) {
-  if (!confirm("Delete this coupon?")) return;
+      const res = await fetch(`/admin/coupons/toggle/${id}`, { method: "POST" });
+      const data = await res.json();
+      if (data.success) location.reload();
+    }
+    async function deleteCoupon(id) {
+      if (!confirm("Delete this coupon?")) return;
 
-  const res = await fetch(`/admin/coupons/${id}`, {
-    method: "DELETE"
-  });
+      const res = await fetch(`/admin/coupons/${id}`, {
+        method: "DELETE"
+      });
 
-  const data = await res.json();
-  if (data.success) {
-    document.getElementById(`row-${id}`).remove();
-  }
-}
+      const data = await res.json();
+      if (data.success) {
+        document.getElementById(`row-${id}`).remove();
+      }
+    }
 
-document.getElementById("couponForm").addEventListener("submit", async function(e) {
-  e.preventDefault();
-  const data = Object.fromEntries(new FormData(this).entries());
+    document.getElementById("couponForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(this).entries());
 
-  if (!data.code || data.code.length < 3)
-    return Swal.fire({ icon:"warning", title:"Invalid Code", text:"Coupon code must be at least 3 characters" });
-  if (!data.discountValue || data.discountValue <= 0)
-    return Swal.fire({ icon:"warning", title:"Invalid Discount", text:"Discount must be greater than 0" });
-  if (!data.limit || data.limit < 1)
-    return Swal.fire({ icon:"warning", title:"Invalid Limit", text:"Usage limit must be at least 1" });
-  if (!data.expiryDate)
-    return Swal.fire({ icon:"warning", title:"Expiry Required", text:"Please select expiry date" });
+      if (!data.code || data.code.length < 3)
+        return Swal.fire({ icon: "warning", title: "Invalid Code", text: "Coupon code must be at least 3 characters" });
+      if (!data.discountValue || data.discountValue <= 0)
+        return Swal.fire({ icon: "warning", title: "Invalid Discount", text: "Discount must be greater than 0" });
+      if (!data.limit || data.limit < 1)
+        return Swal.fire({ icon: "warning", title: "Invalid Limit", text: "Usage limit must be at least 1" });
+      if (!data.expiryDate)
+        return Swal.fire({ icon: "warning", title: "Expiry Required", text: "Please select expiry date" });
 
-  try {
-    const res = await fetch("/admin/coupons/add", {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body: JSON.stringify(data)
+      try {
+        const res = await fetch("/admin/coupons/add", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+
+        if (!res.ok || !result.success)
+          return Swal.fire({ icon: "error", title: "Failed", text: result.message || "Could not add coupon" });
+
+        Swal.fire({ icon: "success", title: "Coupon Added 🎉", timer: 2000, showConfirmButton: false });
+        addCouponToTable(result.coupon);
+        this.reset();
+      } catch (err) {
+        Swal.fire({ icon: "error", title: "Server Error", text: "Something went wrong" });
+      }
     });
-    const result = await res.json();
 
-    if (!res.ok || !result.success)
-      return Swal.fire({ icon:"error", title:"Failed", text: result.message || "Could not add coupon" });
+    function addCouponToTable(c) {
+      const tbody = document.getElementById("couponTableBody");
+      const emptyRow = tbody.querySelector(".no-data");
+      if (emptyRow) emptyRow.closest("tr").remove();
 
-    Swal.fire({ icon:"success", title:"Coupon Added 🎉", timer:2000, showConfirmButton:false });
-    addCouponToTable(result.coupon);
-    this.reset();
-  } catch(err) {
-    Swal.fire({ icon:"error", title:"Server Error", text:"Something went wrong" });
-  }
-});
-
-function addCouponToTable(c) {
-  const tbody = document.getElementById("couponTableBody");
-  const emptyRow = tbody.querySelector(".no-data");
-  if (emptyRow) emptyRow.closest("tr").remove();
-
-  tbody.insertAdjacentHTML("afterbegin", `
+      tbody.insertAdjacentHTML("afterbegin", `
     <tr id="row-${c._id}">
       <td class="td-bold">${c.code}</td>
       <td>${c.discountType}</td>
@@ -293,87 +303,85 @@ function addCouponToTable(c) {
       </td>
     </tr>
   `);
-}
+    }
 
-function openEditModal(id, code, discountValue, maxDiscount, limit, expiryDate, minimumPurchase, description) {
-  document.getElementById("editId").value             = id;
-  document.getElementById("editCode").value           = code;
-  document.getElementById("editDiscountValue").value  = discountValue;
-  document.getElementById("editMaxDiscount").value    = maxDiscount;
-  document.getElementById("editLimit").value          = limit;
-  document.getElementById("editExpiryDate").value     = expiryDate;
-  document.getElementById("editMinimumPurchase").value= minimumPurchase;
-  document.getElementById("editDescription").value    = description;
+    function openEditModal(id, code, discountValue, maxDiscount, limit, expiryDate, minimumPurchase, description) {
+      document.getElementById("editId").value = id;
+      document.getElementById("editCode").value = code;
+      document.getElementById("editDiscountValue").value = discountValue;
+      document.getElementById("editMaxDiscount").value = maxDiscount;
+      document.getElementById("editLimit").value = limit;
+      document.getElementById("editExpiryDate").value = expiryDate;
+      document.getElementById("editMinimumPurchase").value = minimumPurchase;
+      document.getElementById("editDescription").value = description;
 
-  document.getElementById("editModal").style.display = "flex";
-  document.body.style.overflow = "hidden";
-}
+      document.getElementById("editModal").style.display = "flex";
+      document.body.style.overflow = "hidden";
+    }
 
-function closeEditModal() {
-  document.getElementById("editModal").style.display = "none";
-  document.body.style.overflow = "";
-}
+    function closeEditModal() {
+      document.getElementById("editModal").style.display = "none";
+      document.body.style.overflow = "";
+    }
 
-document.getElementById("editModal").addEventListener("click", function(e) {
-  if (e.target === this) closeEditModal();
-});
-
-document.getElementById("editCouponForm").addEventListener("submit", async function(e) {
-  e.preventDefault();
-  const id = document.getElementById("editId").value;
-
-  const data = {
-    code:            document.getElementById("editCode").value.trim(),
-    discountValue:   Number(document.getElementById("editDiscountValue").value),
-    maxDiscount:     Number(document.getElementById("editMaxDiscount").value),
-    limit:           Number(document.getElementById("editLimit").value),
-    expiryDate:      document.getElementById("editExpiryDate").value,
-    minimumPurchase: Number(document.getElementById("editMinimumPurchase").value),
-    description:     document.getElementById("editDescription").value.trim(),
-  };
-  if (!data.code || data.code.length < 3)
-    return Swal.fire({ icon:"warning", title:"Invalid Code", text:"Coupon code must be at least 3 characters" });
-  if (!data.discountValue || data.discountValue <= 0)
-    return Swal.fire({ icon:"warning", title:"Invalid Discount", text:"Discount must be greater than 0" });
-  if (!data.limit || data.limit < 1)
-    return Swal.fire({ icon:"warning", title:"Invalid Limit", text:"Usage limit must be at least 1" });
-  if (!data.expiryDate)
-    return Swal.fire({ icon:"warning", title:"Missing Date", text:"Please select an expiry date" });
-
-  try {
-const res = await fetch(`/admin/coupons/edit/${id}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
+    document.getElementById("editModal").addEventListener("click", function (e) {
+      if (e.target === this) closeEditModal();
     });
 
-    let result;
-    try {
-      result = await res.json();
-    } catch(parseErr) {
-      return Swal.fire({ icon:"error", title:"Server Error", text:`Server returned status ${res.status}. Check your backend route.` });
-    }
+    document.getElementById("editCouponForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const id = document.getElementById("editId").value;
 
-    if (!res.ok || !result.success)
-      return Swal.fire({ icon:"error", title:"Failed", text: result.message || "Update failed" });
+      const data = {
+        code: document.getElementById("editCode").value.trim(),
+        discountValue: Number(document.getElementById("editDiscountValue").value),
+        maxDiscount: Number(document.getElementById("editMaxDiscount").value),
+        limit: Number(document.getElementById("editLimit").value),
+        expiryDate: document.getElementById("editExpiryDate").value,
+        minimumPurchase: Number(document.getElementById("editMinimumPurchase").value),
+        description: document.getElementById("editDescription").value.trim(),
+      };
+      if (!data.code || data.code.length < 3)
+        return Swal.fire({ icon: "warning", title: "Invalid Code", text: "Coupon code must be at least 3 characters" });
+      if (!data.discountValue || data.discountValue <= 0)
+        return Swal.fire({ icon: "warning", title: "Invalid Discount", text: "Discount must be greater than 0" });
+      if (!data.limit || data.limit < 1)
+        return Swal.fire({ icon: "warning", title: "Invalid Limit", text: "Usage limit must be at least 1" });
+      if (!data.expiryDate)
+        return Swal.fire({ icon: "warning", title: "Missing Date", text: "Please select an expiry date" });
 
-    Swal.fire({ icon:"success", title:"Updated! ✅", timer:1800, showConfirmButton:false });
-    closeEditModal();
+      try {
+        const res = await fetch(`/admin/coupons/edit/${id}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
 
-    const row = document.getElementById(`row-${id}`);
-    if (row) {
-      row.cells[0].textContent = data.code;
-      row.cells[3].textContent = data.discountValue;
-      row.cells[4].textContent = data.limit;
-      row.cells[6].textContent = new Date(data.expiryDate).toLocaleDateString("en-GB");
-      row.cells[8].textContent = data.description;
-    }
+        let result;
+        try {
+          result = await res.json();
+        } catch (parseErr) {
+          return Swal.fire({ icon: "error", title: "Server Error", text: `Server returned status ${res.status}. Check your backend route.` });
+        }
 
-  } catch(err) {
-    console.error("Edit coupon error:", err);
-    Swal.fire({ icon:"error", title:"Server Error", text: err.message || "Something went wrong. Check the console." });
-  }
-});
-</script>
+        if (!res.ok || !result.success)
+          return Swal.fire({ icon: "error", title: "Failed", text: result.message || "Update failed" });
 
+        Swal.fire({ icon: "success", title: "Updated! ✅", timer: 1800, showConfirmButton: false });
+        closeEditModal();
 
+        const row = document.getElementById(`row-${id}`);
+        if (row) {
+          row.cells[0].textContent = data.code;
+          row.cells[3].textContent = data.discountValue;
+          row.cells[4].textContent = data.limit;
+          row.cells[6].textContent = new Date(data.expiryDate).toLocaleDateString("en-GB");
+          row.cells[8].textContent = data.description;
+        }
+
+      } catch (err) {
+        console.error("Edit coupon error:", err);
+        Swal.fire({ icon: "error", title: "Server Error", text: err.message || "Something went wrong. Check the console." });
+      }
+    });
+  </script>
