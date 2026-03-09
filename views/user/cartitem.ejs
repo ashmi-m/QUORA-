@@ -123,46 +123,61 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("cart-total").textContent = `₹ ${subtotal}`;
   }
   document.querySelectorAll(".delete").forEach(btn => {
-    btn.addEventListener("click", async (e) => {
-      const itemEl = e.target.closest(".cart-item");
-      const itemId = itemEl.dataset.id;
+  btn.addEventListener("click", async (e) => {
 
-      try {
-        const res = await fetch("/cart/remove", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ itemId })
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          Swal.fire("Error", data.message || "Remove failed", "error");
-          return;
-        }
-
-        itemEl.remove();
-        updateSummary();
-
-        Swal.fire({
-          icon: "success",
-          title: "Removed!",
-          text: "Item removed from cart",
-          timer: 1200,
-          showConfirmButton: false
-        });
-
-        if (document.querySelectorAll(".cart-item").length === 0) {
-          document.querySelector(".cart-main").innerHTML =
-            '<div class="empty-cart">Your cart is empty 😢</div>';
-        }
-
-      } catch (err) {
-        console.error(err);
-        Swal.fire("Error", "Something went wrong", "error");
-      }
+    const confirm = await Swal.fire({
+      title: "Remove item?",
+      text: "Do you want to remove this product from cart?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, remove it",
+      cancelButtonText: "Cancel"
     });
+
+    if (!confirm.isConfirmed) return;
+
+    const itemEl = e.target.closest(".cart-item");
+    const itemId = itemEl.dataset.id;
+
+    try {
+      const res = await fetch("/cart/remove", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ itemId })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        Swal.fire("Error", data.message || "Remove failed", "error");
+        return;
+      }
+
+      itemEl.remove();
+      updateSummary();
+
+      Swal.fire({
+        icon: "success",
+        title: "Removed!",
+        text: "Item removed from cart",
+        timer: 1200,
+        showConfirmButton: false
+      });
+
+      if (document.querySelectorAll(".cart-item").length === 0) {
+        document.querySelector(".cart-main").innerHTML =
+          '<div class="empty-cart">Your cart is empty 😢</div>';
+      }
+
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Something went wrong", "error");
+    }
+
   });
+});
 
   document.querySelectorAll(".increase-qty, .decrease-qty").forEach(btn => {
     btn.addEventListener("click", async (e) => {

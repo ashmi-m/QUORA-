@@ -152,6 +152,7 @@ function generateRefCode(name) {
 }
 const signup = async (req, res) => {
   try {
+
     const { name, email, password, confirmPassword, phone, refCode } = req.body;
 
     if (password !== confirmPassword) {
@@ -159,19 +160,24 @@ const signup = async (req, res) => {
     }
 
     const findUser = await User.findOne({ email });
+
     if (findUser) {
       return res.render("signup", { message: "User already exists" });
     }
 
     const otp = generateOtp();
+
     console.log("🟢 Generated OTP for", email, "is:", otp);
+
     const emailSent = await sendVerificationEmail(email, otp);
 
     if (!emailSent) {
       return res.render("signup", { message: "Failed to send OTP" });
     }
 
+   
     req.session.userOtp = otp;
+    req.session.userOtpExpiry = Date.now() + 2 * 60 * 1000; // 2 minutes
 
     req.session.userData = {
       name,
@@ -197,76 +203,103 @@ const securePassword = async (password) => {
 
   }
 }
-
 const conformOtp = async (req, res) => {
   try {
-    console.log('accessed backend');
-
-
-    console.log("req is in confirm otp", req.body)
     const { otp } = req.body;
-    console.log('OTP recieved ib backend is ', typeof otp)
-    console.log("session otp is ", typeof req.session.userOtp);
+    if (!req.session.userOtp || !req.session.userOtpExpiry) {
+      return res.status(400).json({
+        success: false,
+        message: "OTP expired. Please signup again"
+      });
+    }
+    if (Date.now() > req.session.userOtpExpiry) {
+      delete req.session.userOtp;
+      delete req.session.userOtpExpiry;
+      delete req.session.userData;
 
-    if (otp === req.session.userOtp) {
-      console.log("otp verified");
+      return res.status(400).json({
+        success: false,
+        message: "OTP expired. Please signup again"
+      });
+    }
+    if (String(otp) === String(req.session.userOtp)) {
 
       const user = req.session.userData;
-      console.log("user is", user)
+
       if (!user) {
-        return res.status(400).json({ success: false, message: "user session expired please try again" })
+        return res.status(400).json({
+          success: false,
+          message: "Session expired. Please signup again"
+        });
       }
+
       const passwordHash = await securePassword(user.password);
-let newRefCode;
-let isUnique = false;
 
-while (!isUnique) {
-  newRefCode = generateRefCode(user.name);
-  const exists = await User.findOne({ refCode: newRefCode });
-  if (!exists) isUnique = true;
-}
+      let newRefCode;
+      let isUnique = false;
 
-const saveUserData = new User({
-  name: user.name,
-  email: user.email,
-  phone: user.phone,
-  password: passwordHash,
-  refCode: newRefCode,
-  referredBy: user.referredBy || null,
-  wallet: 0
-});
+      while (!isUnique) {
+        newRefCode = generateRefCode(user.name);
+        const exists = await User.findOne({ refCode: newRefCode });
+        if (!exists) isUnique = true;
+      }
+
+      const saveUserData = new User({
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        password: passwordHash,
+        refCode: newRefCode,
+        referredBy: user.referredBy || null,
+        wallet: 0
+      });
 
       await saveUserData.save();
-if (user.referredBy) {
-  const referrer = await User.findOne({ refCode: user.referredBy });
-  if (referrer && referrer._id.toString() !== saveUserData._id.toString()) {
-    await creditWallet(referrer._id, 50, `Referral bonus for ${user.name} joining`);
-    console.log(`₹50 added to ${referrer.name}'s wallet for referral`);
-  }
-}
-      
+
+      if (user.referredBy) {
+        const referrer = await User.findOne({ refCode: user.referredBy });
+
+        if (referrer && referrer._id.toString() !== saveUserData._id.toString()) {
+          await creditWallet(
+            referrer._id,
+            50,
+            `Referral bonus for ${user.name} joining`
+          );
+        }
+      }
+
       req.session.user = {
         _id: saveUserData._id,
         name: saveUserData.name,
         email: saveUserData.email
       };
 
-
-
       delete req.session.userOtp;
+      delete req.session.userOtpExpiry;
       delete req.session.userData;
 
-      return res.status(200).json({ success: true, message: "otp verified successfully" })
+      return res.status(200).json({
+        success: true,
+        message: "OTP verified successfully"
+      });
+
     } else {
-      res.status(400).json({ success: false, message: "Invalid OTP,Please try again" })
+
+      return res.status(400).json({
+        success: false,
+        message: "Invalid OTP. Please try again"
+      });
+
     }
 
   } catch (error) {
-    console.error("Error Verifying OTP", error);
-    res.status(500).json({ success: false, message: "An error occured" })
-
+    console.error("Error verifying OTP", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
   }
-}
+};
 const resendOtp = async (req, res) => {
   try {
     const { email } = req.session.userData || req.body;
@@ -377,13 +410,14 @@ const loadResetOtpPage = (req, res) => {
     return res.redirect("/forgot-password");
   }
   if (Date.now() > req.session.resetOtpExpiry) {
-    delete req.session.resetOtp;
-    delete req.session.resetOtpExpiry;
-    delete req.session.resetEmail;
-    return res.render("forgotPassword", {
-      message: "OTP expired. Please request a new one."
-    });
-  }
+  delete req.session.resetOtp;
+  delete req.session.resetOtpExpiry;
+  delete req.session.resetEmail;
+
+  return res.render("forgotPassword", {
+    message: "OTP has expired. Please request a new one."
+  });
+}
 
  
   const remainingMs = req.session.resetOtpExpiry - Date.now();
@@ -404,15 +438,16 @@ const verifyResetOtp = async (req, res) => {
       });
     }
    
-     if (Date.now() > req.session.resetOtpExpiry) {
-      delete req.session.resetOtp;
-      delete req.session.resetOtpExpiry;
+    if (Date.now() > req.session.resetOtpExpiry) {
+  delete req.session.resetOtp;
+  delete req.session.resetOtpExpiry;
+  delete req.session.resetEmail;
       return res.render("forgotPassword", {
         message: "OTP has expired. Please request a new one."
       });
     }
  
-     if (otp === req.session.resetOtp) {
+     if (String(otp) === String(req.session.resetOtp)) {
       delete req.session.resetOtp;
       delete req.session.resetOtpExpiry;
       return res.render("resetPassword", { message: "" });
@@ -454,8 +489,9 @@ const resetPassword = async (req, res) => {
     }
 
   
-    delete req.session.resetOtp;
-    delete req.session.resetEmail;
+ delete req.session.resetOtp;
+delete req.session.resetEmail;
+delete req.session.resetOtpExpiry;
 
     return res.redirect("/login");
   } catch (error) {

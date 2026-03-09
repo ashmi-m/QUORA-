@@ -1,8 +1,6 @@
 const Order = require("../../models/orderSchema");
 const PDFDocument = require("pdfkit");
 const ExcelJS = require("exceljs");
-
-
 const getDateFilter = (query) => {
   const now = new Date();
   let start, end;
@@ -13,7 +11,6 @@ const getDateFilter = (query) => {
       start.setHours(0, 0, 0, 0);
       end = new Date();
       break;
-
     case "weekly":
       start = new Date();
       start.setDate(start.getDate() - 7);
