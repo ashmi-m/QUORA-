@@ -69,7 +69,7 @@ const loadCheckoutPage = async (req, res) => {
     const deliveryCharge = subtotal > 1000 ? 0 : 50;
     const discountAmount = appliedCoupon ? appliedCoupon.discountAmount : 0;
     const total = subtotal + deliveryCharge - discountAmount;
-
+ 
     res.render("checkout", {
       cart: { ...cart, items: itemsWithTotal },
       addresses: paginatedAddresses,

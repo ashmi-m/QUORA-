@@ -169,7 +169,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const itemEl = e.target.closest(".cart-item");
       const itemId = itemEl.dataset.id;
       const action = e.target.classList.contains("increase-qty") ? "inc" : "dec";
-      const quantity = parseInt(itemEl.querySelector(".quantityinfrontend").value) + 1;
+      const qtyInput1 = itemEl.querySelector(".quantityinfrontend");
+      let quantity = parseInt(qtyInput1.value);
+      quantity = action === "inc" ? quantity + 1 : quantity - 1;
 
       try {
         const res = await fetch("/cart/update", {

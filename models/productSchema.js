@@ -50,7 +50,7 @@ const productSchema = new Schema({
     },
     stock: {
         type: Number,
-        required: true,
+        required: false,
         min: 0
     },
 

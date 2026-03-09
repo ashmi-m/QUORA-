@@ -2,6 +2,9 @@
 const express = require('express');
 const session = require("express-session");
 const app = express();
+
+const morgan = require('morgan');
+app.use(morgan('dev'))
 const path = require("path");
 // const env = require("dotenv").config();
 require("dotenv").config({ path: "./.env" });

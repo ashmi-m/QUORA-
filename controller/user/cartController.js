@@ -143,10 +143,12 @@ const addToCart = async (req, res) => {
     });
   }
 };
+
 const updateCartItem = async (req, res) => {
   try {
     const { itemId, action, quantity } = req.body;
-    console.log("QUANTITY", quantity);
+    console.log("QUANTITY is", quantity);
+
     const cart = await Cart.findOne({ userId: req.user._id })
       .populate({
         path: "items.productId",
@@ -156,7 +158,9 @@ const updateCartItem = async (req, res) => {
     if (!cart) {
       return res.status(404).json({ message: "Cart not found" });
     }
-    const item = cart.items.id(itemId);
+
+    const item = cart.items.id(itemId);    
+
     if (!item) {
       return res.status(404).json({ message: "Item not found" });
     }
@@ -182,13 +186,8 @@ const updateCartItem = async (req, res) => {
       return res.status(400).json({
         message: "Invalid action"
       });
-    }
+    }    
 
-    if (item.quantity > product.quantity) {
-      return res.status(400).json({
-        message: `Only ${product.quantity} items available`
-      });
-    }
     if (action === "inc") {
       if (item.quantity >= MAX_QTY) {
         return res.status(400).json({
@@ -206,6 +205,14 @@ const updateCartItem = async (req, res) => {
 
       item.quantity -= 1;
     }
+
+      if (item.quantity > product.quantity) {
+      
+      return res.status(400).json({
+        message: `Only ${product.quantity} items available`
+      });
+    }
+
     item.totalPrice = item.quantity * item.price;
     await cart.save();
 

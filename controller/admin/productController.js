@@ -184,7 +184,7 @@ if (req.files && req.files.length > 0) {
       regularPrice,
       createdOn: new Date(),
        quantity,
-       stock,
+      //  stock,
       size: products.size,
       color: products.color,
       productImage: productImages,
