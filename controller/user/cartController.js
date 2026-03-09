@@ -227,27 +227,38 @@ const updateCartItem = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
 const removeCartItem = async (req, res) => {
   try {
     const { itemId } = req.body;
-    const cart = await Cart.findOne({ userId: req.user._id });
-    if (!cart) return res.status(404).json({ message: "Cart not found" });
-    const initialLength = cart.items.length;
-    cart.items = cart.items.filter(item => item._id.toString() !== itemId.toString());
 
-    if (cart.items.length === initialLength) {
+    // ✅ FIXED: Use req.user._id consistently (same as other controllers)
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    const userId = req.user._id;
+
+    const cart = await Cart.findOne({ userId });
+
+    if (!cart) {
+      return res.status(404).json({ message: "Cart not found" });
+    }
+
+    const item = cart.items.id(itemId);
+
+    if (!item) {
       return res.status(404).json({ message: "Item not found" });
     }
 
+    item.deleteOne();
     await cart.save();
-    res.json({ message: "Item removed successfully" });
+
+    res.json({ success: true, message: "Item removed successfully" });
+
   } catch (err) {
     console.error("Remove Cart Item Error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
-
 
 
 module.exports = {

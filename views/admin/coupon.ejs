@@ -152,21 +152,21 @@
       </table>
 
 
-      <% if (totalPages>= 1) { %>
-        <div class="pagination">
-          <% if (currentPage> 1) { %>
-            <a href="/admin/coupon?page=<%= currentPage - 1 %>" class="page-btn">← Previous</a>
-            <% } %>
-              <% for (let i=1; i <=totalPages; i++) { %>
-                <a href="/admin/coupon?page=<%= i %>" class="page-btn <%= i === currentPage ? 'page-active' : '' %>">
-                  <%= i %>
-                </a>
-                <% } %>
-                  <% if (currentPage < totalPages) { %>
-                    <a href="/admin/coupon?page=<%= currentPage + 1 %>" class="page-btn">Next →</a>
-                    <% } %>
-        </div>
-        <% } %>
+<% if (totalPages > 1) { %>
+  <div class="pagination">
+    <% if (currentPage > 1) { %>
+      <a href="/admin/coupons?page=<%= currentPage - 1 %>" class="page-btn">← Previous</a>
+    <% } %>
+    <% for (let i = 1; i <= totalPages; i++) { %>
+      <a href="/admin/coupons?page=<%= i %>" class="page-btn <%= i === currentPage ? 'page-active' : '' %>">
+        <%= i %>
+      </a>
+    <% } %>
+    <% if (currentPage < totalPages) { %>
+      <a href="/admin/coupons?page=<%= currentPage + 1 %>" class="page-btn">Next →</a>
+    <% } %>
+  </div>
+<% } %>
     </div>
 
   </div>

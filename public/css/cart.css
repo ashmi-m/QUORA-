@@ -218,6 +218,10 @@ body {
   font-size: 14px;
   margin-top: 8px;
 }
+.cart-item.out-stock .delete {
+  pointer-events: all !important;
+  cursor: pointer !important;
+}
 
 
 .empty-cart {

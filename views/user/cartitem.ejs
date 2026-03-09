@@ -88,16 +88,16 @@
 
 
 
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
 
-
 document.addEventListener("DOMContentLoaded", () => {
 
+  // ─── URL error alert ───────────────────────────────────────────
   const params = new URLSearchParams(window.location.search);
   const error = params.get("error");
-
   if (error === "all_unavailable") {
     Swal.fire({
       icon: "warning",
@@ -107,78 +107,101 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-});
-
-document.addEventListener("DOMContentLoaded", () => {
+  // ─── Update summary ────────────────────────────────────────────
   function updateSummary() {
     let subtotal = 0;
-
     document.querySelectorAll(".cart-item").forEach(item => {
-      subtotal += parseFloat(
-        item.querySelector(".item-total").textContent.replace("₹", "")
-      );
+      const totalEl = item.querySelector(".item-total");
+      if (!totalEl) return;
+      const val = parseFloat(totalEl.textContent.replace(/[₹,\s]/g, "").trim());
+      if (!isNaN(val)) subtotal += val;
     });
-
     document.getElementById("cart-subtotal").textContent = `₹ ${subtotal}`;
     document.getElementById("cart-total").textContent = `₹ ${subtotal}`;
   }
-  document.querySelectorAll(".delete").forEach(btn => {
-  btn.addEventListener("click", async (e) => {
 
-    const confirm = await Swal.fire({
-      title: "Remove item?",
-      text: "Do you want to remove this product from cart?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, remove it",
-      cancelButtonText: "Cancel"
-    });
+  // ─── Update checkout button based on out-of-stock items ────────
+  function updateCheckoutBtn() {
+    const remainingItems = document.querySelectorAll(".cart-item");
+    const stillHasOutOfStock = [...remainingItems].some(el =>
+      el.classList.contains("out-stock")
+    );
 
-    if (!confirm.isConfirmed) return;
+    const checkoutBtn = document.querySelector(".checkout-btn");
+    const checkoutWarning = document.querySelector(".checkout-warning");
 
-    const itemEl = e.target.closest(".cart-item");
-    const itemId = itemEl.dataset.id;
-
-    try {
-      const res = await fetch("/cart/remove", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ itemId })
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        Swal.fire("Error", data.message || "Remove failed", "error");
-        return;
+    if (checkoutBtn) {
+      if (stillHasOutOfStock) {
+        checkoutBtn.classList.add("disabled-checkout");
+        checkoutBtn.setAttribute("href", "javascript:void(0)");
+        if (checkoutWarning) checkoutWarning.style.display = "block";
+      } else {
+        checkoutBtn.classList.remove("disabled-checkout");
+        checkoutBtn.setAttribute("href", "/checkout");
+        if (checkoutWarning) checkoutWarning.style.display = "none";
       }
-
-      itemEl.remove();
-      updateSummary();
-
-      Swal.fire({
-        icon: "success",
-        title: "Removed!",
-        text: "Item removed from cart",
-        timer: 1200,
-        showConfirmButton: false
-      });
-
-      if (document.querySelectorAll(".cart-item").length === 0) {
-        document.querySelector(".cart-main").innerHTML =
-          '<div class="empty-cart">Your cart is empty 😢</div>';
-      }
-
-    } catch (err) {
-      console.error(err);
-      Swal.fire("Error", "Something went wrong", "error");
     }
+  }
 
+  // ─── Delete item ───────────────────────────────────────────────
+  document.querySelectorAll(".delete").forEach(btn => {
+    btn.addEventListener("click", async (e) => {
+
+      const confirm = await Swal.fire({
+        title: "Remove item?",
+        text: "Do you want to remove this product from cart?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, remove it",
+        cancelButtonText: "Cancel"
+      });
+
+      if (!confirm.isConfirmed) return;
+
+      const itemEl = e.target.closest(".cart-item");
+      const itemId = itemEl.dataset.id;
+
+      try {
+        const res = await fetch("/cart/remove", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ itemId })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          Swal.fire("Error", data.message || "Remove failed", "error");
+          return;
+        }
+
+        itemEl.remove();
+        updateSummary();
+        updateCheckoutBtn(); // ✅ re-check after removal
+
+        Swal.fire({
+          icon: "success",
+          title: "Removed!",
+          text: "Item removed from cart",
+          timer: 1200,
+          showConfirmButton: false
+        });
+
+        if (document.querySelectorAll(".cart-item").length === 0) {
+          document.querySelector(".cart-main").innerHTML =
+            '<div class="empty-cart">Your cart is empty 😢</div>';
+        }
+
+      } catch (err) {
+        console.error(err);
+        Swal.fire("Error", "Something went wrong", "error");
+      }
+    });
   });
-});
 
+  // ─── Increase / Decrease quantity ──────────────────────────────
   document.querySelectorAll(".increase-qty, .decrease-qty").forEach(btn => {
     btn.addEventListener("click", async (e) => {
       const itemEl = e.target.closest(".cart-item");
@@ -207,12 +230,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         let qtyInput = itemEl.querySelector("input");
         let qty = parseInt(qtyInput.value);
-
         qty = action === "inc" ? qty + 1 : Math.max(1, qty - 1);
         qtyInput.value = qty;
 
         const price = parseFloat(
-          itemEl.querySelector(".item-price").textContent.replace("₹", "")
+          itemEl.querySelector(".item-price").textContent.replace(/[₹,\s]/g, "").trim()
         );
 
         itemEl.querySelector(".item-total").textContent = `₹ ${price * qty}`;
