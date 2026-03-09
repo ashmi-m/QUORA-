@@ -4,8 +4,38 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <form action="/checkout/select-address" method="POST">
-  <section class="checkout-container">
+<section class="checkout-container">
+  <div class="available-coupons-strip">
+    <h4 class="coupons-title">🏷️ Available Coupons</h4>
 
+    <% if(!coupons || coupons.length === 0){ %>
+      <p class="muted">No coupons available</p>
+    <% } %>
+
+    <div class="coupons-scroll">
+    <% if(coupons){ coupons.forEach(coupon => { %>
+      <div class="coupon-card">
+        <div class="coupon-left">
+          <strong class="coupon-code"><%= coupon.code %></strong>
+          <p class="coupon-discount">
+            <% if(coupon.discountType === "percentage"){ %>
+              <%= coupon.discountValue %>% OFF
+            <% } else { %>
+              ₹<%= coupon.discountValue %> OFF
+            <% } %>
+          </p>
+          <small class="coupon-min">Min ₹<%= coupon.minimumPurchase %></small>
+        </div>
+        <button
+          type="button"
+          onclick="applyCouponCode('<%= coupon.code %>')"
+          class="btn-apply"
+        >Apply</button>
+      </div>
+    <% }) } %>
+    </div>
+  </div>
+  <div class="checkout-grid">
     <div class="address-section">
       <div class="section-header">
         <h3>Delivery Address</h3>
@@ -13,18 +43,16 @@
       </div>
 
       <% if (addresses.length === 0) { %>
-        <div class="empty-state">
-          <p>No address found</p>
-        </div>
+        <div class="empty-state"><p>No address found</p></div>
       <% } %>
 
       <div class="address-list">
         <% addresses.forEach((addr, index) => { %>
           <label class="address-card">
-            <input 
-              type="radio" 
-              name="addressId" 
-              value="<%= addr._id %>" 
+            <input
+              type="radio"
+              name="addressId"
+              value="<%= addr._id %>"
               <%= index === 0 ? "checked" : "" %>
             >
             <div class="address-info">
@@ -50,122 +78,155 @@
         </div>
       <% } %>
     </div>
-
-   
     <div class="summary-section">
       <h3>Order Summary</h3>
 
-    
-<div class="coupon-section">
-  <input type="text" id="couponCode" placeholder="Enter coupon code" 
-         value="<%= appliedCoupon ? appliedCoupon.code : '' %>" 
-         <%= appliedCoupon ? 'disabled' : '' %>>
-  <button type="button" id="applyCouponBtn" class="btn-secondary" 
+      <div class="coupon-section">
+        <input type="text" id="couponCode" placeholder="Enter coupon code"
+          value="<%= appliedCoupon ? appliedCoupon.code : '' %>"
+          <%= appliedCoupon ? 'disabled' : '' %>>
+        <button type="button" id="applyCouponBtn" class="btn-secondary"
           style="<%= appliedCoupon ? 'display:none;' : '' %>">Apply</button>
-  <button type="button" id="removeCouponBtn" class="btn-secondary" 
+        <button type="button" id="removeCouponBtn" class="btn-secondary"
           style="<%= appliedCoupon ? 'display:inline-block;' : 'display:none;' %>">Remove</button>
-  <p id="couponMessage" class="muted">
-    <%= appliedCoupon ? 'Coupon applied successfully' : '' %>
-  </p>
-</div>
+      </div>
+      <p id="couponMessage" class="coupon-msg">
+        <%= appliedCoupon ? 'Coupon applied successfully' : '' %>
+      </p>
 
-<div class="summary-row">
-  <span>Discount</span>
-  <span id="discount">₹ <%= appliedCoupon ? appliedCoupon.discountAmount.toFixed(2) : '0.00' %></span>
-</div>
-
-<div class="summary-row total">
-  <span>Total</span>
-  <span id="total">₹ <%= appliedCoupon ? (total - appliedCoupon.discountAmount).toFixed(2) : total.toFixed(2) %></span>
-</div>
+      <div class="summary-divider"></div>
 
       <div class="summary-row">
         <span>Delivery</span>
         <span id="deliveryCharge">₹ <%= deliveryCharge.toFixed(2) %></span>
       </div>
 
-      <div class="summary-row">
+      <div class="summary-row discount-row">
         <span>Discount</span>
-        <span id="discount">₹ 0.00</span>
+        <span id="discount">- ₹ <%= appliedCoupon ? appliedCoupon.discountAmount.toFixed(2) : '0.00' %></span>
       </div>
+
+      <div class="summary-divider"></div>
 
       <div class="summary-row total">
         <span>Total</span>
-        <span id="total">₹ <%= total.toFixed(2) %></span>
+        <span id="total">₹ <%= appliedCoupon ? (subtotal + deliveryCharge - appliedCoupon.discountAmount).toFixed(2) : total.toFixed(2) %></span>
       </div>
 
       <button type="submit" class="pay-btn">Proceed to Payment</button>
     </div>
 
-  </section>
+  </div>
+</section>
 </form>
 
+
 <script>
- 
-  const applyBtn = document.getElementById("applyCouponBtn");
-  const removeBtn = document.getElementById("removeCouponBtn");
-  const couponInput = document.getElementById("couponCode");
-  const messageEl = document.getElementById("couponMessage");
 
-  const subtotalEl = document.getElementById("subtotal");
-  const deliveryEl = document.getElementById("deliveryCharge");
-  const discountEl = document.getElementById("discount");
-  const totalEl = document.getElementById("total");
+const applyBtn = document.getElementById("applyCouponBtn");
+const removeBtn = document.getElementById("removeCouponBtn");
+const couponInput = document.getElementById("couponCode");
+const messageEl = document.getElementById("couponMessage");
 
-  const subtotal = parseFloat(<%= subtotal.toFixed(2) %>);
-  const deliveryCharge = parseFloat(<%= deliveryCharge.toFixed(2) %>);
-  let discountAmount = 0;
+const discountEl = document.getElementById("discount");
+const totalEl = document.getElementById("total");
 
-  applyBtn.addEventListener("click", async () => {
-    const code = couponInput.value.trim();
-    if (!code) {
-      messageEl.textContent = "Enter coupon code!";
-      return;
+const subtotal = parseFloat(<%= subtotal.toFixed(2) %>);
+const deliveryCharge = parseFloat(<%= deliveryCharge.toFixed(2) %>);
+
+let discountAmount = 0;
+
+
+applyBtn.addEventListener("click", async () => {
+
+  const code = couponInput.value.trim();
+
+  if (!code) {
+    messageEl.textContent = "Enter coupon code!";
+    return;
+  }
+
+  try {
+
+    const res = await axios.post("/apply-coupon", { code });
+
+    if (res.data.success) {
+
+      discountAmount = res.data.discount;
+
+      discountEl.textContent = `- ₹ ${discountAmount.toFixed(2)}`;
+
+      totalEl.textContent =
+        `₹ ${(subtotal + deliveryCharge - discountAmount).toFixed(2)}`;
+
+      messageEl.textContent = res.data.message;
+
+      applyBtn.style.display = "none";
+      removeBtn.style.display = "inline-block";
+
+      couponInput.disabled = true;
+
+    } else {
+
+      messageEl.textContent = res.data.message;
+
     }
 
-    try {
-      const res = await axios.post("/apply-coupon", { code });
-      if (res.data.success) {
-        discountAmount = res.data.discount;
-        discountEl.textContent = `₹ ${discountAmount.toFixed(2)}`;
-        totalEl.textContent = `₹ ${(subtotal + deliveryCharge - discountAmount).toFixed(2)}`;
-        messageEl.textContent = res.data.message;
-        applyBtn.style.display = "none";
-        removeBtn.style.display = "inline-block";
-        couponInput.disabled = true;
-      } else {
-        messageEl.textContent = res.data.message;
-      }
-    } catch (err) {
-      console.error(err);
-      messageEl.textContent = "Server error!";
-    }
-  });
+  } catch (err) {
+    console.error(err);
+    messageEl.textContent = "Server error!";
+  }
 
-  removeBtn.addEventListener("click", async () => {
-    try {
-      const res = await axios.post("/remove-coupon");
-      if (res.data.success) {
-        discountAmount = 0;
-        discountEl.textContent = `₹ 0.00`;
-        totalEl.textContent = `₹ ${(subtotal + deliveryCharge).toFixed(2)}`;
-        messageEl.textContent = res.data.message;
-        applyBtn.style.display = "inline-block";
-        removeBtn.style.display = "none";
-        couponInput.disabled = false;
-        couponInput.value = "";
-      }
-    } catch (err) {
-      console.error(err);
-      messageEl.textContent = "Server error!";
+});
+
+
+function applyCouponCode(code) {
+  couponInput.value = code;
+  applyBtn.click();
+}
+
+
+removeBtn.addEventListener("click", async () => {
+
+  try {
+
+    const res = await axios.post("/remove-coupon");
+
+    if (res.data.success) {
+
+      discountAmount = 0;
+
+      discountEl.textContent = `- ₹ 0.00`;
+
+      totalEl.textContent =
+        `₹ ${(subtotal + deliveryCharge).toFixed(2)}`;
+
+      messageEl.textContent = res.data.message;
+
+      applyBtn.style.display = "inline-block";
+      removeBtn.style.display = "none";
+
+      couponInput.disabled = false;
+      couponInput.value = "";
+
     }
-  });
+
+  } catch (err) {
+    console.error(err);
+    messageEl.textContent = "Server error!";
+  }
+
+});
+
 const form = document.querySelector("form");
 
 form.addEventListener("submit", function (e) {
-  const selectedAddress = document.querySelector('input[name="addressId"]:checked');
+
+  const selectedAddress =
+    document.querySelector('input[name="addressId"]:checked');
 
   if (!selectedAddress) {
+
     e.preventDefault();
 
     Swal.fire({
@@ -175,8 +236,11 @@ form.addEventListener("submit", function (e) {
       confirmButtonText: "OK",
       confirmButtonColor: "#3085d6"
     });
+
   }
+
 });
+
 </script>
 
 <%- include("../partials/user/footer") %>

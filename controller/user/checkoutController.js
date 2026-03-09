@@ -1,6 +1,7 @@
 
 const Cart = require("../../models/cartSchema");
 const Address = require("../../models/addressSchema");
+const Coupon = require("../../models/couponSchema");
 
 const loadCheckoutPage = async (req, res) => {
   try {
@@ -70,12 +71,20 @@ const loadCheckoutPage = async (req, res) => {
     const discountAmount = appliedCoupon ? appliedCoupon.discountAmount : 0;
     const total = subtotal + deliveryCharge - discountAmount;
  
+
+     const coupons = await Coupon.find({
+      isActive: true,
+      expiryDate: { $gt: new Date() },
+      minimumPurchase: { $lte: subtotal }
+    }).lean();
+
     res.render("checkout", {
       cart: { ...cart, items: itemsWithTotal },
       addresses: paginatedAddresses,
       subtotal,
       deliveryCharge,
       total,
+      coupons,
       currentPage: page,
       totalPages,
       appliedCoupon,

@@ -89,9 +89,6 @@ router.get("/checkout", userAuth, checkoutController.loadCheckoutPage);
 
 
 router.post("/checkout/select-address", checkoutController.selectAddress);
-
-
-// router.get("/checkout/payment", paymentController.loadPayment);
 router.get("/checkout/payment", userAuth, paymentController.loadPayment);
 router.post("/checkout/payment/place", orderController.placeOrder);
 router.get("/order-success", paymentController.loadOrderSuccess);

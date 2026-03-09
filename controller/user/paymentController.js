@@ -47,14 +47,13 @@ const loadPayment = async (req, res) => {
      let subtotal = 0;
     validItems.forEach((item) => {
       const price = Number(
-        item.productId.salePrice || item.productId.regularPrice || 0
+        item.productId.regularPrice || item.productId.salePrice  || 0
       );
       subtotal += price * Number(item.quantity || 1);
   
     });
     const deliveryCharge = subtotal > 1000 ? 0 : 50;
     const discount = req.session.appliedCoupon ? req.session.appliedCoupon.discountAmount : 0;
-
     const grandTotal = subtotal + deliveryCharge - discount;
     const amountInPaise = Math.round(grandTotal * 100);
 
