@@ -1,253 +1,241 @@
 <%- include("../partials/user/header") %>
-<link rel="stylesheet" href="/css/cart.css">
+  <link rel="stylesheet" href="/css/cart.css">
 
-<section class="container cart-main">
+  <section class="container cart-main">
 
-  <% if (!cart || cart.items.length === 0) { %>
+    <% if (!cart || cart.items.length===0) { %>
 
-    <div class="empty-cart">Your cart is empty 😢</div>
+      <div class="empty-cart">Your cart is empty 😢</div>
 
-  <% } else { %>
+      <% } else { %>
 
-    <div class="cart-products">
-      <% let subtotal = 0; %>
+        <div class="cart-products">
+          <% let subtotal=0; %>
 
-      <% cart.items.forEach(item => { %>
-        <%
-          const price = item.productId.salePrice || item.productId.regularPrice || 0;
-          const qty = item.quantity;
-          const total = price * qty;
-          subtotal += total;
+            <% cart.items.forEach(item=> { %>
+              <% const regularPrice=item.productId.regularPrice || 0; const offerPercent=item.productId.productOffer ||
+                0; const price=offerPercent> 0
+                ? Math.round(regularPrice - (regularPrice * offerPercent) / 100)
+                : (item.productId.salePrice || regularPrice);
+                const qty = item.quantity;
+                const total = price * qty;
+                subtotal += total;
 
-          const outOfStock = item.productId.quantity<= 0;
-        %>
+                const outOfStock = item.productId.quantity<= 0; %>
 
-        <div class="cart-item <%= outOfStock ? 'out-stock' : '' %>" data-id="<%= item._id %>">
+                  <div class="cart-item <%= outOfStock ? 'out-stock' : '' %>" data-id="<%= item._id %>">
 
-          <img src="<%= item.productId.productImage?.[0] || '/images/default.png' %>" alt="product">
+                    <img src="<%= item.productId.productImage?.[0] || '/images/default.png' %>" alt="product">
 
-          <div class="item-details">
-            <div class="item-name"><%= item.productId.productName %></div>
+                    <div class="item-details">
+                      <div class="item-name">
+                        <%= item.productId.productName %>
+                      </div>
 
-            <% if (outOfStock) { %>
-              <div class="stock-label">Out of Stock</div>
-            <% } %>
+                      <% if (outOfStock) { %>
+                        <div class="stock-label">Out of Stock</div>
+                        <% } %>
 
-            <div class="item-price">₹ <%= price %></div>
+                          <div class="item-price">₹ <%= price %>
+                          </div>
 
-            <div class="quantity">
-              <button class="decrease-qty" <%= outOfStock ? "disabled" : "" %>>-</button>
-              <input type="text" class="quantityinfrontend" value="<%= qty %>" readonly>
-              <button class="increase-qty" <%= outOfStock ? "disabled" : "" %>>+</button>
-            </div>
+                          <div class="quantity">
+                            <button class="decrease-qty" <%=outOfStock ? "disabled" : "" %>>-</button>
+                            <input type="text" class="quantityinfrontend" value="<%= qty %>" readonly>
+                            <button class="increase-qty" <%=outOfStock ? "disabled" : "" %>>+</button>
+                          </div>
 
-            <div class="item-total">₹ <%= total %></div>
-          </div>
+                          <div class="item-total">₹ <%= total %>
+                          </div>
+                    </div>
 
-          <button class="delete">✕</button>
+                    <button class="delete">✕</button>
+                  </div>
+                  <% }) %>
+
+                    <a href="/shop" class="continue-shopping">
+                      ← Continue Shopping
+                    </a>
+
         </div>
-      <% }) %>
 
-  <a href="/shop" class="continue-shopping">
-  ← Continue Shopping
-</a>
+        <div class="cart-summary">
+          <h2>Cart Summary</h2>
+          <p>Subtotal: <span id="cart-subtotal">₹ <%= subtotal %></span></p>
+          <p>Total: <span id="cart-total">₹ <%= subtotal %></span></p>
 
-    </div>
+          <% let hasOutOfStock=false; for (let i=0; i < cart.items.length; i++) { if (cart.items[i].productId.quantity
+            <=0) { hasOutOfStock=true; break; } } %>
 
-    <div class="cart-summary">
-      <h2>Cart Summary</h2>
-      <p>Subtotal: <span id="cart-subtotal">₹ <%= subtotal %></span></p>
-      <p>Total: <span id="cart-total">₹ <%= subtotal %></span></p>
+            <a href="<%= hasOutOfStock ? 'javascript:void(0)' : '/checkout' %>"
+              class="checkout-btn <%= hasOutOfStock ? 'disabled-checkout' : '' %>">
+              Checkout
+            </a>
 
-      <% 
-        let hasOutOfStock = false;
-        for (let i = 0; i < cart.items.length; i++) {
-          if (cart.items[i].productId.quantity <= 0) {
-            hasOutOfStock = true;
-            break;
-          }
-        }
-      %>
+            <% if (hasOutOfStock) { %>
+              <p class="checkout-warning">
+                Remove out-of-stock items to proceed
+              </p>
+              <% } %>
 
-      <a href="<%= hasOutOfStock ? 'javascript:void(0)' : '/checkout' %>"
-         class="checkout-btn <%= hasOutOfStock ? 'disabled-checkout' : '' %>">
-        Checkout
-      </a>
+        </div>
 
-      <% if (hasOutOfStock) { %>
-        <p class="checkout-warning">
-          Remove out-of-stock items to proceed
-        </p>
-      <% } %>
+        <% } %>
 
-    </div>
-
-  <% } %>
-
-</section>
+  </section>
 
 
 
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<script>
+  <script>
 
-document.addEventListener("DOMContentLoaded", () => {
-
-  // ─── URL error alert ───────────────────────────────────────────
-  const params = new URLSearchParams(window.location.search);
-  const error = params.get("error");
-  if (error === "all_unavailable") {
-    Swal.fire({
-      icon: "warning",
-      title: "Unavailable Products",
-      text: "Some products in your cart are unavailable or blocked. Please remove them to continue.",
-      confirmButtonColor: "#3085d6"
-    });
-  }
-
-  // ─── Update summary ────────────────────────────────────────────
-  function updateSummary() {
-    let subtotal = 0;
-    document.querySelectorAll(".cart-item").forEach(item => {
-      const totalEl = item.querySelector(".item-total");
-      if (!totalEl) return;
-      const val = parseFloat(totalEl.textContent.replace(/[₹,\s]/g, "").trim());
-      if (!isNaN(val)) subtotal += val;
-    });
-    document.getElementById("cart-subtotal").textContent = `₹ ${subtotal}`;
-    document.getElementById("cart-total").textContent = `₹ ${subtotal}`;
-  }
-
-  // ─── Update checkout button based on out-of-stock items ────────
-  function updateCheckoutBtn() {
-    const remainingItems = document.querySelectorAll(".cart-item");
-    const stillHasOutOfStock = [...remainingItems].some(el =>
-      el.classList.contains("out-stock")
-    );
-
-    const checkoutBtn = document.querySelector(".checkout-btn");
-    const checkoutWarning = document.querySelector(".checkout-warning");
-
-    if (checkoutBtn) {
-      if (stillHasOutOfStock) {
-        checkoutBtn.classList.add("disabled-checkout");
-        checkoutBtn.setAttribute("href", "javascript:void(0)");
-        if (checkoutWarning) checkoutWarning.style.display = "block";
-      } else {
-        checkoutBtn.classList.remove("disabled-checkout");
-        checkoutBtn.setAttribute("href", "/checkout");
-        if (checkoutWarning) checkoutWarning.style.display = "none";
-      }
-    }
-  }
-
-  // ─── Delete item ───────────────────────────────────────────────
-  document.querySelectorAll(".delete").forEach(btn => {
-    btn.addEventListener("click", async (e) => {
-
-      const confirm = await Swal.fire({
-        title: "Remove item?",
-        text: "Do you want to remove this product from cart?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-        confirmButtonText: "Yes, remove it",
-        cancelButtonText: "Cancel"
-      });
-
-      if (!confirm.isConfirmed) return;
-
-      const itemEl = e.target.closest(".cart-item");
-      const itemId = itemEl.dataset.id;
-
-      try {
-        const res = await fetch("/cart/remove", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ itemId })
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          Swal.fire("Error", data.message || "Remove failed", "error");
-          return;
-        }
-
-        itemEl.remove();
-        updateSummary();
-        updateCheckoutBtn(); // ✅ re-check after removal
-
+    document.addEventListener("DOMContentLoaded", () => {
+      const params = new URLSearchParams(window.location.search);
+      const error = params.get("error");
+      if (error === "all_unavailable") {
         Swal.fire({
-          icon: "success",
-          title: "Removed!",
-          text: "Item removed from cart",
-          timer: 1200,
-          showConfirmButton: false
+          icon: "warning",
+          title: "Unavailable Products",
+          text: "Some products in your cart are unavailable or blocked. Please remove them to continue.",
+          confirmButtonColor: "#3085d6"
         });
-
-        if (document.querySelectorAll(".cart-item").length === 0) {
-          document.querySelector(".cart-main").innerHTML =
-            '<div class="empty-cart">Your cart is empty 😢</div>';
-        }
-
-      } catch (err) {
-        console.error(err);
-        Swal.fire("Error", "Something went wrong", "error");
       }
-    });
-  });
-
-  // ─── Increase / Decrease quantity ──────────────────────────────
-  document.querySelectorAll(".increase-qty, .decrease-qty").forEach(btn => {
-    btn.addEventListener("click", async (e) => {
-      const itemEl = e.target.closest(".cart-item");
-      const itemId = itemEl.dataset.id;
-      const action = e.target.classList.contains("increase-qty") ? "inc" : "dec";
-      const qtyInput1 = itemEl.querySelector(".quantityinfrontend");
-      let quantity = parseInt(qtyInput1.value);
-      quantity = action === "inc" ? quantity + 1 : quantity - 1;
-
-      try {
-        const res = await fetch("/cart/update", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ itemId, action, quantity })
+      function updateSummary() {
+        let subtotal = 0;
+        document.querySelectorAll(".cart-item").forEach(item => {
+          const totalEl = item.querySelector(".item-total");
+          if (!totalEl) return;
+          const val = parseFloat(totalEl.textContent.replace(/[₹,\s]/g, "").trim());
+          if (!isNaN(val)) subtotal += val;
         });
-
-        const data = await res.json();
-        if (!res.ok) {
-          Swal.fire({
-            icon: "warning",
-            title: "Limit reached",
-            text: data.message
-          });
-          return;
-        }
-
-        let qtyInput = itemEl.querySelector("input");
-        let qty = parseInt(qtyInput.value);
-        qty = action === "inc" ? qty + 1 : Math.max(1, qty - 1);
-        qtyInput.value = qty;
-
-        const price = parseFloat(
-          itemEl.querySelector(".item-price").textContent.replace(/[₹,\s]/g, "").trim()
+        document.getElementById("cart-subtotal").textContent = `₹ ${subtotal}`;
+        document.getElementById("cart-total").textContent = `₹ ${subtotal}`;
+      }
+      function updateCheckoutBtn() {
+        const remainingItems = document.querySelectorAll(".cart-item");
+        const stillHasOutOfStock = [...remainingItems].some(el =>
+          el.classList.contains("out-stock")
         );
 
-        itemEl.querySelector(".item-total").textContent = `₹ ${price * qty}`;
-        updateSummary();
+        const checkoutBtn = document.querySelector(".checkout-btn");
+        const checkoutWarning = document.querySelector(".checkout-warning");
 
-      } catch (err) {
-        console.error(err);
-        Swal.fire("Error", "Something went wrong", "error");
+        if (checkoutBtn) {
+          if (stillHasOutOfStock) {
+            checkoutBtn.classList.add("disabled-checkout");
+            checkoutBtn.setAttribute("href", "javascript:void(0)");
+            if (checkoutWarning) checkoutWarning.style.display = "block";
+          } else {
+            checkoutBtn.classList.remove("disabled-checkout");
+            checkoutBtn.setAttribute("href", "/checkout");
+            if (checkoutWarning) checkoutWarning.style.display = "none";
+          }
+        }
       }
+      document.querySelectorAll(".delete").forEach(btn => {
+        btn.addEventListener("click", async (e) => {
+
+          const confirm = await Swal.fire({
+            title: "Remove item?",
+            text: "Do you want to remove this product from cart?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, remove it",
+            cancelButtonText: "Cancel"
+          });
+
+          if (!confirm.isConfirmed) return;
+
+          const itemEl = e.target.closest(".cart-item");
+          const itemId = itemEl.dataset.id;
+
+          try {
+            const res = await fetch("/cart/remove", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ itemId })
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+              Swal.fire("Error", data.message || "Remove failed", "error");
+              return;
+            }
+
+            itemEl.remove();
+            updateSummary();
+            updateCheckoutBtn();
+
+            Swal.fire({
+              icon: "success",
+              title: "Removed!",
+              text: "Item removed from cart",
+              timer: 1200,
+              showConfirmButton: false
+            });
+
+            if (document.querySelectorAll(".cart-item").length === 0) {
+              document.querySelector(".cart-main").innerHTML =
+                '<div class="empty-cart">Your cart is empty 😢</div>';
+            }
+
+          } catch (err) {
+            console.error(err);
+            Swal.fire("Error", "Something went wrong", "error");
+          }
+        });
+      });
+      document.querySelectorAll(".increase-qty, .decrease-qty").forEach(btn => {
+        btn.addEventListener("click", async (e) => {
+          const itemEl = e.target.closest(".cart-item");
+          const itemId = itemEl.dataset.id;
+          const action = e.target.classList.contains("increase-qty") ? "inc" : "dec";
+          const qtyInput1 = itemEl.querySelector(".quantityinfrontend");
+          let quantity = parseInt(qtyInput1.value);
+          quantity = action === "inc" ? quantity + 1 : quantity - 1;
+
+          try {
+            const res = await fetch("/cart/update", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ itemId, action, quantity })
+            });
+
+            const data = await res.json();
+            if (!res.ok) {
+              Swal.fire({
+                icon: "warning",
+                title: "Limit reached",
+                text: data.message
+              });
+              return;
+            }
+
+            let qtyInput = itemEl.querySelector("input");
+            let qty = parseInt(qtyInput.value);
+            qty = action === "inc" ? qty + 1 : Math.max(1, qty - 1);
+            qtyInput.value = qty;
+
+            const price = parseFloat(
+              itemEl.querySelector(".item-price").textContent.replace(/[₹,\s]/g, "").trim()
+            );
+
+            itemEl.querySelector(".item-total").textContent = `₹ ${price * qty}`;
+            updateSummary();
+
+          } catch (err) {
+            console.error(err);
+            Swal.fire("Error", "Something went wrong", "error");
+          }
+        });
+      });
+
     });
-  });
+  </script>
 
-});
-</script>
-
-<%- include("../partials/user/footer") %>
+  <%- include("../partials/user/footer") %>

@@ -1,28 +1,51 @@
-
 const Cart = require("../../models/cartSchema");
 const Address = require("../../models/addressSchema");
 const Order = require("../../models/orderSchema");
 const razorpay = require("../../config/razorpay");
 const crypto = require("crypto");
 
+function applyOffer(product) {
+  const categoryOffer = product.category?.categoryOffer || 0;
+  const productOffer = product.productOffer || 0;
+  const effectiveOffer = Math.max(productOffer, categoryOffer);
+
+  product.effectiveOffer = effectiveOffer;
+  product.salePrice =
+    effectiveOffer > 0
+      ? Math.round(product.regularPrice - (product.regularPrice * effectiveOffer) / 100)
+      : null;
+}
+
 const loadPayment = async (req, res) => {
   try {
+
     const userId = req.session.user._id;
     const addressId = req.session.selectedAddress;
 
     if (!addressId) return res.redirect("/checkout");
 
-    const cart = await Cart.findOne({ userId }).populate("items.productId").lean();
+    const cart = await Cart.findOne({ userId })
+      .populate({
+        path: "items.productId",
+        populate: { path: "category" }
+      })
+      .lean();
+
     if (!cart || cart.items.length === 0) return res.redirect("/checkout");
 
     const addressDoc = await Address.findOne({ userId }).lean();
-    const address = addressDoc.addresses.find(a => a._id.toString() === addressId.toString());
+
+    const address = addressDoc.addresses.find(
+      a => a._id.toString() === addressId.toString()
+    );
+
     if (!address) return res.redirect("/checkout");
- 
+
     const unavailableItems = [];
     const validItems = [];
 
-     for (const item of cart.items) {
+    for (const item of cart.items) {
+
       const product = item.productId;
 
       const isUnavailable =
@@ -40,24 +63,34 @@ const loadPayment = async (req, res) => {
         validItems.push(item);
       }
     }
+
     if (validItems.length === 0) {
       return res.redirect("/cart?error=all_unavailable");
     }
 
-     let subtotal = 0;
+    let subtotal = 0;
+
     validItems.forEach((item) => {
-      const price = Number(
-        item.productId.regularPrice || item.productId.salePrice  || 0
-      );
-      subtotal += price * Number(item.quantity || 1);
-  
+
+      const product = item.productId;
+      applyOffer(product);
+
+      const salePrice = product.salePrice ?? product.regularPrice;
+
+      subtotal += salePrice * Number(item.quantity || 1);
+
     });
+
     const deliveryCharge = subtotal > 1000 ? 0 : 50;
-    const discount = req.session.appliedCoupon ? req.session.appliedCoupon.discountAmount : 0;
+
+    const discount = req.session.appliedCoupon
+      ? req.session.appliedCoupon.discountAmount
+      : 0;
+
     const grandTotal = subtotal + deliveryCharge - discount;
+
     const amountInPaise = Math.round(grandTotal * 100);
 
-    
     const razorpayOrder = await razorpay.orders.create({
       amount: amountInPaise,
       currency: "INR",
@@ -65,7 +98,7 @@ const loadPayment = async (req, res) => {
     });
 
     res.render("payment", {
-      cartItems: validItems,  
+      cartItems: validItems,
       address,
       subtotal,
       deliveryCharge,
@@ -75,7 +108,7 @@ const loadPayment = async (req, res) => {
       razorpayKey: process.env.RAZORPAY_KEY_ID,
       razorpayOrderId: razorpayOrder.id,
       razorpayAmount: amountInPaise,
-       unavailableItems
+      unavailableItems
     });
 
   } catch (err) {
@@ -83,10 +116,13 @@ const loadPayment = async (req, res) => {
     res.redirect("/checkout");
   }
 };
+
 const loadOrderSuccess = (req, res) => {
   const method = req.query.method || "COD";
+
   req.session.cart = null;
   req.session.selectedAddress = null;
+
   res.render("order-success", {
     paymentMethod: method,
     ordersPage: "/orders"

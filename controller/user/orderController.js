@@ -6,6 +6,20 @@ const Address = require("../../models/addressSchema");
 const walletController = require("../user/walletController");
 const PDFDocument = require("pdfkit");
 
+
+function applyOffer(product) {
+  const categoryOffer = product.category?.categoryOffer || 0;
+  const productOffer = product.productOffer || 0;
+
+  const effectiveOffer = Math.max(productOffer, categoryOffer);
+
+  const salePrice =
+    effectiveOffer > 0
+      ? Math.round(product.regularPrice - (product.regularPrice * effectiveOffer) / 100)
+      : product.regularPrice;
+
+  return { salePrice, effectiveOffer };
+}
 const loadOrders = async (req, res) => {
   try {
     if (!req.session.user) return res.redirect("/login");
@@ -60,7 +74,10 @@ const loadPayment = async (req, res) => {
     if (!addressId) return res.redirect("/checkout");
 
     const cart = await Cart.findOne({ userId })
-      .populate("items.productId")
+      .populate({
+        path: "items.productId",
+        populate: { path: "category" }
+      })
       .lean();
 
     if (!cart || cart.items.length === 0)
@@ -74,8 +91,10 @@ const loadPayment = async (req, res) => {
     if (!address) return res.redirect("/checkout");
 
     let total = 0;
+
     cart.items.forEach(item => {
-      total += Number(item.productId.regularPrice) * Number(item.quantity);
+      const { salePrice } = applyOffer(item.productId);
+      total += Number(salePrice) * Number(item.quantity);
     });
 
     res.render("payment", {
@@ -156,10 +175,10 @@ const placeOrder = async (req, res) => {
 
     for (const item of cart.items) {
       const updatedProduct = await Product.findOneAndUpdate(
-        { _id: item.productId._id, quantity: { $gte: item.quantity } },
-        { $inc: { quantity: -item.quantity } },
-        { new: true }
-      );
+  { _id: item.productId._id, quantity: { $gte: item.quantity } },
+  { $inc: { quantity: -item.quantity } },
+  { new: true }
+).populate("category");
 
       if (!updatedProduct) {
         return res.status(400).json({
@@ -174,10 +193,8 @@ const placeOrder = async (req, res) => {
       }
 
       const regularPrice = updatedProduct.regularPrice;
-      const offerPercent = updatedProduct.productOffer || 0;
-      const salePrice = offerPercent > 0
-        ? regularPrice - (regularPrice * offerPercent) / 100
-        : regularPrice;
+
+const { salePrice, effectiveOffer } = applyOffer(updatedProduct);
 
       const itemDiscount = (regularPrice - salePrice) * item.quantity;
       totalProductDiscount += itemDiscount;
@@ -189,7 +206,7 @@ const placeOrder = async (req, res) => {
         price: regularPrice,
         salePrice: salePrice,
         discount: itemDiscount,
-        offerApplied: offerPercent,
+      offerApplied: effectiveOffer,
         status: "Placed"
       });
     }

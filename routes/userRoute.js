@@ -115,7 +115,7 @@ router.post("/userprofile/change-password",userAuth,profileController.changePass
 router.post("/userprofile/change-email", userAuth, profileController.changeEmail);
 
 router.post( "/userprofile/verify-email", userAuth, profileController.verifyEmail);
-router.put("/profile/update", profileController.updateProfile);
+// router.put("/profile/update", profileController.updateProfile);
 router.post("/wishlist/toggle", userAuth, wishlistController.toggleWishlist);
 router.post('/wishlist/remove', userAuth, wishlistController.removeFromWishlist);
 router.get("/order-failed",paymentController.loadOrderFailed)
