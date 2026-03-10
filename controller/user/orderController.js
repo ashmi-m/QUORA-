@@ -542,7 +542,7 @@ drawLabel("Order ID", `${order.orderId}`, margin, y);
       if (item.status === "Cancelled") return;
 
       const name = item.productId?.productName || "Product";
-      const price = item.price;
+      const price = item.salePrice;
       const qty = item.quantity;
       const subtotal = price * qty;
       total += subtotal;
@@ -594,7 +594,6 @@ const viewOrderDetails = async (req, res) => {
     if (!order) {
       return res.status(404).render("error", { message: "Order not found or access denied" });
     }
-
     res.render("user/orderDetails", {
       title: "Order Details",
       order: order,

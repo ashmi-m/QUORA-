@@ -152,7 +152,6 @@ const viewOrderDetails = async (req, res) => {
     if (!order) {
       return res.status(404).send("Order not found");
     }
-
     res.render("adminOrderDetails", { order });
   } catch (err) {
     console.error(err);
@@ -310,9 +309,9 @@ const getOrderDetailsJson = async (req, res) => {
         console.error("Error fetching address:", err);
       }
     }
+
     const products = order.products.map((p, index) => {
       let imagePath = "/images/no-image.png";
-
       if (p.productId?.productImage?.length > 0) {
         const img = p.productId.productImage[0];
         imagePath = img.startsWith("http") ? img : `/uploads/${img}`;
@@ -322,7 +321,7 @@ const getOrderDetailsJson = async (req, res) => {
         name: p.productId?.productName || "Product",
         image: imagePath,
         quantity: p.quantity,
-        price: p.price,
+        price: p.salePrice,
         status: p.status || "Placed",
         returnRequested: !!p.returnRequested,
         returnReason: p.returnReason || ""

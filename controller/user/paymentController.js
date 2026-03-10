@@ -69,13 +69,13 @@ const loadPayment = async (req, res) => {
     }
 
     let subtotal = 0;
-
+    
     validItems.forEach((item) => {
-
       const product = item.productId;
       applyOffer(product);
 
       const salePrice = product.salePrice ?? product.regularPrice;
+
 
       subtotal += salePrice * Number(item.quantity || 1);
 
