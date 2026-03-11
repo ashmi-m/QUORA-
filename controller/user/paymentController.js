@@ -18,7 +18,6 @@ function applyOffer(product) {
 
 const loadPayment = async (req, res) => {
   try {
-
     const userId = req.session.user._id;
     const addressId = req.session.selectedAddress;
 
@@ -45,7 +44,6 @@ const loadPayment = async (req, res) => {
     const validItems = [];
 
     for (const item of cart.items) {
-
       const product = item.productId;
 
       const isUnavailable =
@@ -69,23 +67,40 @@ const loadPayment = async (req, res) => {
     }
 
     let subtotal = 0;
-    
+
     validItems.forEach((item) => {
       const product = item.productId;
       applyOffer(product);
 
       const salePrice = product.salePrice ?? product.regularPrice;
 
-
       subtotal += salePrice * Number(item.quantity || 1);
-
     });
 
     const deliveryCharge = subtotal > 1000 ? 0 : 50;
 
-    const discount = req.session.appliedCoupon
-      ? req.session.appliedCoupon.discountAmount
-      : 0;
+    let discount = 0;
+
+    // ✅ Validate applied coupon
+    if (req.session.appliedCoupon) {
+      const Coupon = require("../models/couponSchema"); // adjust path if needed
+      const coupon = await Coupon.findOne({ code: req.session.appliedCoupon.code });
+
+      if (coupon) {
+        // Coupon exists, calculate discount
+        if (coupon.discountType === "percentage") {
+          discount = (subtotal * coupon.discountValue) / 100;
+        } else {
+          discount = coupon.discountValue;
+        }
+        // Update session in case the discount amount changes
+        req.session.appliedCoupon.discountAmount = discount;
+      } else {
+        // Coupon was deleted by admin, remove from session
+        req.session.appliedCoupon = null;
+        discount = 0;
+      }
+    }
 
     const grandTotal = subtotal + deliveryCharge - discount;
 
@@ -108,7 +123,8 @@ const loadPayment = async (req, res) => {
       razorpayKey: process.env.RAZORPAY_KEY_ID,
       razorpayOrderId: razorpayOrder.id,
       razorpayAmount: amountInPaise,
-      unavailableItems
+      unavailableItems,
+      
     });
 
   } catch (err) {

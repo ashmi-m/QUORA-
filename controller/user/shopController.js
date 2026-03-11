@@ -107,9 +107,6 @@ products.forEach(applyOffer);
     res.status(500).send("Internal Server Error");
   }
 };
-
-
-
 const loadProductDetails = async (req, res) => {
   try {
     const productId = req.params.id;
@@ -130,8 +127,6 @@ const loadProductDetails = async (req, res) => {
     product.salePrice = effectiveOffer > 0
       ? Math.round(product.regularPrice - (product.regularPrice * effectiveOffer / 100))
       : null;
-
-
     const categoryId = product.category?._id || product.category;
 
     const relatedProducts = await Product.find({
