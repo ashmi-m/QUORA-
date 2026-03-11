@@ -210,11 +210,29 @@ const { salePrice, effectiveOffer } = applyOffer(updatedProduct);
         status: "Placed"
       });
     }
-    const couponData = req.session.appliedCoupon || null;
-    const couponDiscount = couponData ? couponData.discountAmount : 0;
+    // const couponData = req.session.appliedCoupon || null;
+    // const couponDiscount = couponData ? couponData.discountAmount : 0;
 
-    const totalDiscount = totalProductDiscount + couponDiscount;
-    const finalTotal = total - couponDiscount;
+    // const totalDiscount = totalProductDiscount + couponDiscount;
+    // const finalTotal = total - couponDiscount;
+const couponData = req.session.appliedCoupon || null;
+const couponDiscount = couponData ? couponData.discountAmount : 0;
+
+const deliveryCharge = total > 1000 ? 0 : 50;
+
+const totalDiscount = totalProductDiscount + couponDiscount;
+
+const finalTotal = total - couponDiscount + deliveryCharge;
+
+    
+if (paymentMethod === "COD" && finalTotal > 1000) {
+  return res.status(400).json({
+    success: false,
+    message: "Cash on Delivery is not allowed for orders above ₹1000. Please choose another payment method."
+  });
+}
+
+
     if (paymentMethod === "Wallet") {
       const user = await User.findById(userId);
 

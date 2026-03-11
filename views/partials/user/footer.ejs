@@ -1,72 +1,161 @@
-
 <footer>
   <style>
     footer {
-      background-color: #fdd9d6;
-      padding: 40px 20px;
-      font-family: sans-serif;
-      color: #333;
+      background: linear-gradient(160deg, #2d1a12 0%, #4a2416 50%, #5e2d1a 100%);
+      padding: 56px 0 0 0;
+      font-family: 'Montserrat', Arial, sans-serif;
+      color: #f5e6da;
     }
 
     .footer-top {
       display: flex;
       justify-content: space-between;
       flex-wrap: wrap;
-      gap: 20px;
+      gap: 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 48px;
     }
 
     .footer-top > div {
       flex: 1;
-      min-width: 250px;
+      min-width: 220px;
     }
 
-    .footer-top h2 {
-      margin-bottom: 10px;
-      font-size: 24px;
+    .footer-top .about h2 {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: 4px;
+      color: #e8a87c;
+      margin: 0 0 18px 0;
+    }
+
+    .footer-top .about p {
+      font-size: 13.5px;
+      color: #c9a98a;
+      line-height: 1.9;
+      margin: 0;
+      max-width: 320px;
     }
 
     .footer-top h4 {
-      margin-bottom: 10px;
-      font-size: 18px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: #e8a87c;
+      margin: 0 0 22px 0;
+      padding-bottom: 12px;
+      position: relative;
     }
 
-    .footer-top p,
-    .footer-top li {
-      font-size: 14px;
-      line-height: 1.6;
+    .footer-top h4::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 28px;
+      height: 2px;
+      background: #e8a87c;
+      border-radius: 2px;
     }
 
     .footer-top ul {
       list-style: none;
       padding: 0;
+      margin: 0;
+    }
+
+    .footer-top ul li {
+      margin-bottom: 10px;
     }
 
     .footer-top a {
       text-decoration: none;
-      color: #000;
-      transition: color 0.3s;
+      color: #c9a98a;
+      font-size: 14px;
+      transition: color 0.2s, padding-left 0.2s;
+      display: inline-block;
     }
 
     .footer-top a:hover {
-      color: #d44c4c;
+      color: #f5e6da;
+      padding-left: 5px;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .contact-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(232, 168, 124, 0.12);
+      border: 1px solid rgba(232, 168, 124, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+
+    .contact-text {
+      font-size: 13.5px;
+      color: #c9a98a;
+      line-height: 1.6;
+    }
+
+    .contact-text strong {
+      display: block;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #e8a87c;
+      margin-bottom: 2px;
+    }
+
+    .contact-text a {
+      color: #c9a98a;
+      font-size: 13.5px;
+      padding-left: 0 !important;
+    }
+
+    .contact-text a:hover {
+      color: #f5e6da;
+      padding-left: 0 !important;
     }
 
     .footer-bottom {
       text-align: center;
-      padding-top: 20px;
-      font-size: 14px;
-      border-top: 1px solid #ccc;
-      margin-top: 20px;
+      padding: 20px 48px;
+      font-size: 13px;
+      border-top: 1px solid rgba(232, 168, 124, 0.15);
+      margin-top: 48px;
+      color: #9a7a65;
+    }
+
+    @media (max-width: 768px) {
+      .footer-top {
+        padding: 0 24px;
+        gap: 32px;
+      }
+      .footer-top > div {
+        min-width: 100%;
+      }
+      .footer-bottom {
+        padding: 20px 24px;
+      }
     }
   </style>
 
   <div class="footer-top">
     <div class="about">
       <h2>QUORA</h2>
-      <p>
-        Welcome to Quora, your ultimate destination for luxurious cosmetics and beauty essentials. We take pride in offering high-quality skincare and makeup collections, exceptional customer service, and a seamless shopping experience.
-        From bold lipsticks to nourishing moisturizers and dazzling eyeshadows, we have everything you need to enhance your natural beauty with confidence and charm.
-      </p>
+      <p>Welcome to Quora, your ultimate destination for luxurious cosmetics and beauty essentials. From bold lipsticks to nourishing moisturizers and dazzling eyeshadows — everything to enhance your natural beauty with confidence and charm.</p>
     </div>
 
     <div class="links">
@@ -75,17 +164,38 @@
         <li><a href="/">About Us</a></li>
         <li><a href="/">Store Locations</a></li>
         <li><a href="/">Privacy Policy</a></li>
-        <li><a href="/">Terms & Conditions</a></li>
-        <li><a href="/">Blog & Tech Guides</a></li>
+        <li><a href="/">Terms &amp; Conditions</a></li>
+        <li><a href="/">Blog &amp; Tech Guides</a></li>
         <li><a href="/">Support</a></li>
       </ul>
     </div>
 
     <div class="contact">
       <h4>Contact Us</h4>
-      <p>📍 Kochi, Kerala, India</p>
-      <p>📞 +91-456-789-000</p>
-      <p>✉️ <a href="mailto:quora@cosmetic.com">quora@cosmetic.com</a></p>
+
+      <div class="contact-item">
+        <div class="contact-icon">📍</div>
+        <div class="contact-text">
+          <strong>Location</strong>
+          Kochi, Kerala, India
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <div class="contact-icon">📞</div>
+        <div class="contact-text">
+          <strong>Phone</strong>
+          +91-456-789-000
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <div class="contact-icon">✉️</div>
+        <div class="contact-text">
+          <strong>Email</strong>
+          <a href="mailto:quora@cosmetic.com">quora@cosmetic.com</a>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -97,4 +207,3 @@
     document.getElementById("year").textContent = new Date().getFullYear();
   </script>
 </footer>
-

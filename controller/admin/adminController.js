@@ -425,6 +425,218 @@ const rejectReturn = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+const getDashboardChart = async (req, res) => {
+  try {
+    const filter = req.query.filter || "monthly";
+    const now = new Date();
+
+    let matchStage = { status: { $nin: ["Cancelled", "Payment Failed"] } };
+    let groupStage = {};
+
+    if (filter === "yearly") {
+      // Show all 12 months of current year
+      matchStage.createdAt = {
+        $gte: new Date(now.getFullYear(), 0, 1),
+        $lte: new Date(now.getFullYear(), 11, 31, 23, 59, 59)
+      };
+      groupStage = {
+        _id: { $month: "$createdAt" },
+        revenue: { $sum: "$totalAmount" }
+      };
+
+    } else {
+      // Show all days of current month
+      matchStage.createdAt = {
+        $gte: new Date(now.getFullYear(), now.getMonth(), 1),
+        $lte: new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59)
+      };
+      groupStage = {
+        _id: { $dayOfMonth: "$createdAt" },
+        revenue: { $sum: "$totalAmount" }
+      };
+    }
+
+    const chartData = await Order.aggregate([
+      { $match: matchStage },
+      { $group: groupStage },
+      { $sort: { "_id": 1 } }
+    ]);
+
+    res.json(chartData);
+
+  } catch (error) {
+    console.log("Dashboard chart error", error);
+    res.status(500).json({ success: false });
+  }
+};
+
+const getDashboardStats = async (req, res) => {
+  try {
+    const Order = require("../../models/orderSchema");
+    const totalOrders = await Order.countDocuments();
+    const delivered = await Order.countDocuments({ status: "Delivered" });
+    const cancelled = await Order.countDocuments({ status: "Cancelled" });
+    res.json({ totalOrders, delivered, cancelled });
+  } catch (err) {
+    res.status(500).json({});
+  }
+};
+
+const getTopProducts = async (req, res) => {
+  try {
+
+    const topProducts = await Order.aggregate([
+
+      { $unwind: "$products" },
+
+      {
+        $match: {
+          status: { $nin: ["Cancelled", "Payment Failed"] }
+        }
+      },
+
+      {
+        $group: {
+          _id: "$products.productId",
+          totalSold: { $sum: "$products.quantity" }
+        }
+      },
+
+      {
+        $sort: { totalSold: -1 }
+      },
+
+      {
+        $limit: 10
+      },
+
+      {
+        $lookup: {
+          from: "products",
+          localField: "_id",
+          foreignField: "_id",
+          as: "product"
+        }
+      },
+
+      {
+        $unwind: "$product"
+      },
+
+      {
+        $project: {
+          name: "$product.productName",
+          totalSold: 1
+        }
+      }
+
+    ]);
+
+    res.json(topProducts);
+
+  } catch (error) {
+
+    console.log("Top products error", error);
+    res.status(500).json({ success: false });
+
+  }
+};
+
+const getTopCategories = async (req, res) => {
+  try {
+    const topCategories = await Order.aggregate([
+      { $unwind: "$products" },
+      {
+        $match: {
+          "products.status": { $nin: ["Cancelled", "Payment Failed"] }
+        }
+      },
+      {
+        $lookup: {
+          from: "products",
+          localField: "products.productId",
+          foreignField: "_id",
+          as: "productData"
+        }
+      },
+      { $unwind: "$productData" },
+      {
+        $lookup: {
+          from: "categories",
+          localField: "productData.category",
+          foreignField: "_id",
+          as: "categoryData"
+        }
+      },
+      { $unwind: "$categoryData" },
+      {
+        $group: {
+          _id: "$categoryData._id",
+          name: { $first: "$categoryData.name" },
+          totalSold: { $sum: "$products.quantity" }
+        }
+      },
+      { $sort: { totalSold: -1 } },
+      { $limit: 10 },
+      { $project: { name: 1, totalSold: 1 } }
+    ]);
+
+    res.json(topCategories);
+  } catch (error) {
+    console.log("Top categories error", error);
+    res.status(500).json({ success: false });
+  }
+};
+const getTopBrands = async (req, res) => {
+  try {
+    const topBrands = await Order.aggregate([
+      { $unwind: "$products" },
+      {
+        $match: {
+          "products.status": { $nin: ["Cancelled", "Payment Failed"] }
+        }
+      },
+      {
+        $lookup: {
+          from: "products",
+          localField: "products.productId",
+          foreignField: "_id",
+          as: "productData"
+        }
+      },
+      { $unwind: "$productData" },
+      {
+        $lookup: {
+          from: "brands",                        // mongoose model "Brand" → collection "brands"
+          localField: "productData.brand",
+          foreignField: "_id",
+          as: "brandData"
+        }
+      },
+      { $unwind: "$brandData" },
+      {
+        $group: {
+          _id: "$brandData._id",
+          name: { $first: "$brandData.brandName" },  // ✅ matches your schema
+          totalSold: { $sum: "$products.quantity" }
+        }
+      },
+      { $sort: { totalSold: -1 } },
+      { $limit: 10 },
+      {
+        $project: {
+          name: 1,
+          totalSold: 1
+        }
+      }
+    ]);
+
+    res.json(topBrands);
+  } catch (error) {
+    console.log("Top brands error", error);
+    res.status(500).json({ success: false });
+  }
+};
 module.exports = {
   loadLogin,
   login,
@@ -438,6 +650,11 @@ module.exports = {
   getOrderDetailsJson,
   requestReturn,
   approveReturn,
-  rejectReturn
+  rejectReturn,
+  getDashboardChart,
+  getDashboardStats,
+  getTopProducts ,
+  getTopCategories,
+  getTopBrands
 
 };
