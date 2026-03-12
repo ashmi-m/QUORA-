@@ -60,11 +60,13 @@ const loadShopPage = async (req, res) => {
     else if (priceRange === "1000-5000") query.regularPrice = { $gte: 1000, $lte: 5000 };
     else if (priceRange === "5000-15000") query.regularPrice = { $gte: 5000, $lte: 15000 };
     else if (priceRange === "above15000") query.regularPrice = { $gt: 15000 };
-    let sortQuery = {};
-    if (sortOption === "low-high") sortQuery.regularPrice = 1;
-    else if (sortOption === "high-low") sortQuery.regularPrice = -1;
-    else if (sortOption === "a-z") sortQuery.productName = 1;
-    else if (sortOption === "z-a") sortQuery.productName = -1;
+let sortQuery = {};
+if (sortOption === "low-high") sortQuery = { regularPrice: 1 };
+else if (sortOption === "high-low") sortQuery = { regularPrice: -1 };
+else if (sortOption === "a-z") sortQuery = { productName: 1 };
+else if (sortOption === "z-a") sortQuery = { productName: -1 };
+else sortQuery = { createdAt: -1 };
+
     const [products, totalProducts, categories, brands] = await Promise.all([
       Product.find(query)
         .populate({ path: "category", select: "categoryOffer categoryName" })

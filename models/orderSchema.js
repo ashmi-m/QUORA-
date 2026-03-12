@@ -79,6 +79,10 @@ couponCode: {
     type: Number,
     required: true
   },
+  couponDiscount: {
+  type: Number,
+  default: 0
+},
 
   paymentMethod: {
     type: String,

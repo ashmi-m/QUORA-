@@ -1,6 +1,7 @@
 const Cart = require("../../models/cartSchema");
 const Address = require("../../models/addressSchema");
 const Order = require("../../models/orderSchema");
+const Coupon = require("../../models/couponSchema");
 const razorpay = require("../../config/razorpay");
 const crypto = require("crypto");
 
@@ -48,10 +49,12 @@ const loadPayment = async (req, res) => {
 
       const isUnavailable =
         !product ||
-        product.isBlocked ||
+        
+          product.isBlocked === true || 
         product.isListed === false ||
         !product.category ||
-        product.category.isBlocked ||
+        
+         product.category.isBlocked === true ||
         product.category.isListed === false ||
         product.quantity <= 0;
 
@@ -81,22 +84,21 @@ const loadPayment = async (req, res) => {
 
     let discount = 0;
 
-    // ✅ Validate applied coupon
+   
     if (req.session.appliedCoupon) {
-      const Coupon = require("../models/couponSchema"); // adjust path if needed
+
       const coupon = await Coupon.findOne({ code: req.session.appliedCoupon.code });
 
       if (coupon) {
-        // Coupon exists, calculate discount
+       
         if (coupon.discountType === "percentage") {
           discount = (subtotal * coupon.discountValue) / 100;
         } else {
           discount = coupon.discountValue;
         }
-        // Update session in case the discount amount changes
+      
         req.session.appliedCoupon.discountAmount = discount;
       } else {
-        // Coupon was deleted by admin, remove from session
         req.session.appliedCoupon = null;
         discount = 0;
       }

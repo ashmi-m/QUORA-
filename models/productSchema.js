@@ -48,6 +48,10 @@ const productSchema = new Schema({
         type: Boolean,
         default: false
     },
+    isListed: {
+        type: Boolean,
+        default: true
+    },
     stock: {
         type: Number,
         required: false,

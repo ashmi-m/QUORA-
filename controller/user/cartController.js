@@ -18,6 +18,7 @@ function applyOffer(product) {
 }
 
 
+
 const loadCartPage = async (req, res) => {
   try {
     console.log("USER:", req.user);
@@ -30,7 +31,9 @@ const loadCartPage = async (req, res) => {
 
     console.log("CART:", cart);
 
-    if (cart) {
+   if (cart) {
+      cart.items = cart.items.filter(item => item.productId != null); 
+
       cart.items.forEach(item => {
         if (item.productId) {
           applyOffer(item.productId);
@@ -57,6 +60,9 @@ const loadCartPage = async (req, res) => {
       .send(`Internal Server Error — Current Time: ${currentTime}`);
   }
 };
+
+
+
 
 const getCartItems = async (req, res) => {
   try {

@@ -91,6 +91,8 @@ const loadPayment = async (req, res) => {
     if (!address) return res.redirect("/checkout");
 
     let total = 0;
+    const couponDiscount = order.couponDiscount || 0;
+const finalTotal = total - couponDiscount;
 
     cart.items.forEach(item => {
       const { salePrice } = applyOffer(item.productId);
@@ -276,7 +278,8 @@ if (paymentMethod === "COD" && finalTotal > 1000) {
       },
       products,
       totalAmount: finalTotal,   
-      discount: totalDiscount,   
+      discount: totalDiscount,
+          couponDiscount: couponDiscount,
       couponCode: couponData ? couponData.code : null,
       paymentMethod,
       status: paymentMethod === "COD" ? "Placed" : "Paid"

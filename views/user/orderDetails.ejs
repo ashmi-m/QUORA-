@@ -70,9 +70,17 @@
                 </p>
                 <p>Quantity: <%= item.quantity %>
                 </p>
-                <p class="subtotal">
-                  Subtotal: ₹ <%= item.salePrice * item.quantity %>
-                </p>
+                <%
+let itemSubtotal = item.salePrice * item.quantity;
+
+if(order.couponDiscount){
+  itemSubtotal = itemSubtotal - order.couponDiscount;
+}
+%>
+
+<p class="subtotal">
+  Subtotal: ₹ <%= itemSubtotal %>
+</p>
 
 
 
@@ -149,19 +157,24 @@
           </div>
 
 
-          <div class="details-box">
-            <h3>Price Details</h3>
-            <p>Items Total: ₹ <%= order.itemsTotal || order.totalAmount %>
-            </p>
-            <p>Delivery Charges: ₹ <%= order.deliveryCharges || 0 %>
-            </p>
-            <p>Platform Fee: ₹ <%= order.platformFee || 0 %>
-            </p>
-            <hr>
-            <p class="grand-total">
-              Total Amount: ₹ <%= order.totalAmount %>
-            </p>
-          </div>
+         <div class="details-box">
+  <h3>Price Details</h3>
+
+  <p>Items Total: ₹ <%= order.totalAmount + (order.couponDiscount || 0) %></p>
+
+  <% if(order.couponDiscount && order.couponDiscount > 0){ %>
+    <p>Coupon Discount: - ₹ <%= order.couponDiscount %></p>
+  <% } %>
+
+  <p>Delivery Charges: ₹ <%= order.deliveryCharges || 0 %></p>
+  <p>Platform Fee: ₹ <%= order.platformFee || 0 %></p>
+
+  <hr>
+
+  <p class="grand-total">
+    Total Amount: ₹ <%= order.totalAmount %>
+  </p>
+</div>
         </section>
 
         <div class="order-actions">
