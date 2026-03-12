@@ -5,6 +5,9 @@
     <title>Home - Quora</title>
 
     <style>
+     body{
+  background: #fbfafa;
+}
       .products {
         text-align: center;
       }
@@ -180,44 +183,81 @@
           font-size: 16px;
         }
       }
+
+      
+      .about-hero {
+        text-align: center;
+        padding: 70px 20px 40px;
+      }
+
+      .about-hero h1 {
+        font-size: 42px;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #1a1a1a;
+      }
+
+      .about-image-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 40px 60px;
+      }
+
+      .about-image-grid .img-wrap {
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .about-image-grid .img-wrap:nth-child(1) { margin-top: 30px; }
+      .about-image-grid .img-wrap:nth-child(3) { margin-top: 50px; }
+
+      .about-image-grid img {
+        width: 100%;
+        height: 320px;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.4s ease;
+      }
+
+      .about-image-grid .img-wrap:hover img {
+        transform: scale(1.04);
+      }
+
+      @media (max-width: 768px) {
+        .about-image-grid {
+          grid-template-columns: 1fr;
+          padding: 0 20px 40px;
+        }
+
+        .about-image-grid .img-wrap:nth-child(n) {
+          margin-top: 0;
+        }
+
+        .about-hero h1 {
+          font-size: 28px;
+        }
+      }
     </style>
   </head>
 
   <body>
-    <section class="hero">
-      <div class="hero-left">
-        <img src="../../images/image 3.png" alt="Perfume collection">
-        <div class="hero-overlay"></div>
-        <div class="hero-text">
-          <h2>Perfume collection</h2>
-          <p>Vibrant experiences within curated products, experienced for you</p>
-        </div>
-      </div>
+  
 
-      <div class="hero-right">
-        <div class="right-bottom">
-          <div class="banner">
-            <img src="../../images/lipsick 2.jpeg" alt="Skincare">
-            <span>Skincare routine</span>
-          </div>
-          <div class="banner">
-            <img src="../../images/bodyloation.jpeg" alt="Eye makeup">
-            <span>Eye makeup</span>
-          </div>
-        </div>
-
-        <div class="right-bottom">
-          <div class="banner">
-            <img src="../../images/nailpolish 1.jpeg" alt="Skincare">
-            <span>Skincare routine</span>
-          </div>
-          <div class="banner">
-            <img src="../../images/eye1.jpeg" alt="Eye makeup">
-            <span>Eye makeup</span>
-          </div>
-        </div>
+    <div class="about-image-grid">
+      <div class="img-wrap">
+        <img src="/images/image 3.png" alt="Perfume Collection">
       </div>
-    </section>
+      <div class="img-wrap">
+        <img src="/images/lipsick 2.jpeg" alt="Lipstick & Makeup">
+      </div>
+      <div class="img-wrap">
+        <img src="/images/bodyloation.jpeg" alt="Skincare">
+      </div>
+    </div>
 
 
     <section class="products">
@@ -262,7 +302,7 @@
       <div class="offers-container">
         <h2>GREAT OFFERS</h2>
         <p>Explore the deals and offers</p>
-        <a href="/offers" class="explore-btn">EXPLORE</a>
+        <a href="/shop" class="explore-btn">EXPLORE</a>
       </div>
     </section>
 

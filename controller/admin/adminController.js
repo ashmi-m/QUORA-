@@ -434,7 +434,6 @@ const getDashboardChart = async (req, res) => {
     let groupStage = {};
 
     if (filter === "yearly") {
-      // Show all 12 months of current year
       matchStage.createdAt = {
         $gte: new Date(now.getFullYear(), 0, 1),
         $lte: new Date(now.getFullYear(), 11, 31, 23, 59, 59)
@@ -445,7 +444,6 @@ const getDashboardChart = async (req, res) => {
       };
 
     } else {
-      // Show all days of current month
       matchStage.createdAt = {
         $gte: new Date(now.getFullYear(), now.getMonth(), 1),
         $lte: new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59)
@@ -455,15 +453,12 @@ const getDashboardChart = async (req, res) => {
         revenue: { $sum: "$totalAmount" }
       };
     }
-
     const chartData = await Order.aggregate([
       { $match: matchStage },
       { $group: groupStage },
       { $sort: { "_id": 1 } }
     ]);
-
     res.json(chartData);
-
   } catch (error) {
     console.log("Dashboard chart error", error);
     res.status(500).json({ success: false });
@@ -484,32 +479,25 @@ const getDashboardStats = async (req, res) => {
 
 const getTopProducts = async (req, res) => {
   try {
-
     const topProducts = await Order.aggregate([
-
       { $unwind: "$products" },
-
       {
         $match: {
           status: { $nin: ["Cancelled", "Payment Failed"] }
         }
       },
-
       {
         $group: {
           _id: "$products.productId",
           totalSold: { $sum: "$products.quantity" }
         }
       },
-
       {
         $sort: { totalSold: -1 }
       },
-
       {
         $limit: 10
       },
-
       {
         $lookup: {
           from: "products",
@@ -518,18 +506,15 @@ const getTopProducts = async (req, res) => {
           as: "product"
         }
       },
-
       {
         $unwind: "$product"
       },
-
       {
         $project: {
           name: "$product.productName",
           totalSold: 1
         }
       }
-
     ]);
 
     res.json(topProducts);
@@ -607,7 +592,7 @@ const getTopBrands = async (req, res) => {
       { $unwind: "$productData" },
       {
         $lookup: {
-          from: "brands",                        // mongoose model "Brand" → collection "brands"
+          from: "brands",                        
           localField: "productData.brand",
           foreignField: "_id",
           as: "brandData"
@@ -617,7 +602,7 @@ const getTopBrands = async (req, res) => {
       {
         $group: {
           _id: "$brandData._id",
-          name: { $first: "$brandData.brandName" },  // ✅ matches your schema
+          name: { $first: "$brandData.brandName" },  
           totalSold: { $sum: "$products.quantity" }
         }
       },

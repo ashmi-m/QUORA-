@@ -273,8 +273,6 @@
         Swal.fire("❌ Error", "Something went wrong", "error");
       }
     });
-
-
     async function blockBrand(id) {
       try {
         const res = await fetch(`/admin/blockBrand/${id}`, {
@@ -295,8 +293,6 @@
         Swal.fire("❌ Error", err.message, "error");
       }
     }
-
-
     async function unblockBrand(id) {
       try {
         const res = await fetch(`/admin/unblockBrand/${id}`, { method: "PATCH", credentials: "same-origin" });

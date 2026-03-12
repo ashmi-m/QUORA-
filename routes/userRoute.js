@@ -12,7 +12,9 @@ const cartController =require("../controller/user/cartController")
 const wishlistController = require('../controller/user/wishlistController'); 
 const checkoutController = require("../controller/user/checkoutController");
 const paymentController = require("../controller/user/paymentController");
-
+router.get("/offers", (req, res) => {
+  res.redirect("/shop");
+});
 const walletController = require("../controller/user/walletController");
 const profileController = require("../controller/user/profileController")
 const userCouponController = require('../controller/user/userCouponController');
@@ -40,6 +42,7 @@ router.get('/auth/google/callback',passport.authenticate('google',{failureRedire
     console.log("Google login success:", req.user);
     res.redirect('/')
 });
+
 
 router.get("/login",preventAuthPages,userController.loadLogin);
 router.post("/login",userController.login);
@@ -128,6 +131,7 @@ router.post("/remove-coupon", userAuth, userCouponController.removeCoupon);
 router.get("/wallet", walletController.loadWallet);
 router.post("/wallet/create-order", walletController.createWalletOrder);
 router.post("/wallet/add", walletController.addMoneyToWallet);
+router.get('/about', userController.loadAboutPage);
 
 module.exports = router;
 

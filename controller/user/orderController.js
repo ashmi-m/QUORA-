@@ -558,7 +558,6 @@ drawLabel("Order ID", `${order.orderId}`, margin, y);
     y += ROW_H;
     let total = 0;
     let rowNum = 0;
-
     order.products.forEach((item, index) => {
       if (item.status === "Cancelled") return;
 

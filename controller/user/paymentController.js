@@ -38,7 +38,6 @@ const loadPayment = async (req, res) => {
     const address = addressDoc.addresses.find(
       a => a._id.toString() === addressId.toString()
     );
-
     if (!address) return res.redirect("/checkout");
 
     const unavailableItems = [];
@@ -64,7 +63,6 @@ const loadPayment = async (req, res) => {
         validItems.push(item);
       }
     }
-
     if (validItems.length === 0) {
       return res.redirect("/cart?error=all_unavailable");
     }

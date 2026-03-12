@@ -1,0 +1,564 @@
+<%- include('../partials/user/header') %>
+
+<head>
+  <title>About Us - Quora Cosmetics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --teal: #3ca89e;
+      --brown: #a15e3f;
+      --cream: #faf7f4;
+      --dark: #1a1a1a;
+      --mid: #555;
+      --light-border: #ece8e4;
+    }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: #fff;
+      color: var(--dark);
+    }
+    .about-hero {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 100px 20px 80px;
+      background: var(--cream);
+      overflow: hidden;
+    }
+
+    .about-hero::before {
+      content: 'QUORA';
+      position: absolute;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(120px, 20vw, 260px);
+      font-weight: 300;
+      color: rgba(161,94,63,0.06);
+      letter-spacing: 0.15em;
+      pointer-events: none;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .hero-inner {
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 18px;
+    }
+
+    .about-hero h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(52px, 8vw, 96px);
+      font-weight: 300;
+      font-style: italic;
+      letter-spacing: 0.04em;
+      color: var(--dark);
+      line-height: 1;
+    }
+
+    .hero-rule {
+      width: 60px;
+      height: 1px;
+      background: var(--brown);
+      margin: 24px auto 0;
+    }
+    .about-mosaic {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 14px;
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 60px 40px 80px;
+    }
+
+    .mosaic-item {
+      overflow: hidden;
+      border-radius: 4px;
+      position: relative;
+    }
+    .mosaic-item:nth-child(1) {
+      grid-row: 1 / 3;
+      grid-column: 1;
+    }
+
+    .mosaic-item:nth-child(2) {
+      grid-row: 1;
+      grid-column: 2;
+    }
+
+    .mosaic-item:nth-child(3) {
+      grid-row: 1;
+      grid-column: 3;
+    }
+    .mosaic-item:nth-child(4) {
+      grid-row: 2;
+      grid-column: 2 / 4;
+    }
+
+    .mosaic-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .mosaic-item:nth-child(1) img { min-height: 580px; }
+    .mosaic-item:nth-child(2) img { height: 270px; }
+    .mosaic-item:nth-child(3) img { height: 270px; }
+    .mosaic-item:nth-child(4) img { height: 280px; }
+
+    .mosaic-item:hover img {
+      transform: scale(1.06);
+    }
+
+    .mosaic-item:nth-child(1)::after {
+      content: 'EST. 2024';
+      position: absolute;
+      bottom: 22px;
+      left: 22px;
+      background: rgba(255,255,255,0.92);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--brown);
+      padding: 8px 14px;
+      border-radius: 2px;
+    }
+    .about-banner {
+      background: var(--teal);
+      color: #fff;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .banner-left {
+      padding: 80px 70px;
+      border-right: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .banner-right {
+      padding: 80px 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .banner-tagline {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 46px;
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.2;
+      margin-bottom: 30px;
+    }
+
+    .banner-body {
+      font-size: 14px;
+      line-height: 1.9;
+      font-weight: 300;
+      opacity: 0.9;
+    }
+
+    .banner-body strong {
+      font-weight: 700;
+    }
+
+    .banner-pill {
+      display: inline-block;
+      border: 1px solid rgba(255,255,255,0.6);
+      border-radius: 40px;
+      padding: 14px 36px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: #fff;
+      text-align: center;
+    }
+    .about-diff {
+      background: var(--cream);
+      padding: 90px 40px;
+    }
+
+    .diff-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .diff-header .eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 16px;
+    }
+
+    .diff-header h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(28px, 4vw, 46px);
+      font-weight: 400;
+      font-style: italic;
+      color: var(--dark);
+      margin-bottom: 14px;
+    }
+
+    .diff-header .sub-text {
+      font-size: 14px;
+      color: #888;
+      max-width: 500px;
+      margin: 0 auto;
+      line-height: 1.8;
+    }
+
+    .diff-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      max-width: 1060px;
+      margin: 0 auto;
+      border: 1px solid var(--light-border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .diff-card {
+      background: #fff;
+      padding: 44px 40px;
+      text-align: left;
+      transition: background 0.3s;
+      border-right: 1px solid var(--light-border);
+      border-bottom: 1px solid var(--light-border);
+    }
+
+    .diff-card:nth-child(2),
+    .diff-card:nth-child(4) { border-right: none; }
+
+    .diff-card:nth-child(3),
+    .diff-card:nth-child(4) { border-bottom: none; }
+
+    .diff-card:hover { background: #fdfaf8; }
+
+    .diff-card-icon { font-size: 26px; margin-bottom: 16px; }
+
+    .diff-card h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 22px;
+      color: var(--dark);
+    }
+
+    .diff-card ul { list-style: none; }
+
+    .diff-card ul li {
+      font-size: 13.5px;
+      color: #666;
+      padding: 9px 0;
+      border-bottom: 1px solid #f4f4f4;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      line-height: 1.6;
+    }
+
+    .diff-card ul li:last-child { border-bottom: none; }
+
+    .diff-card ul li::before {
+      content: '✓';
+      color: var(--teal);
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .about-stats {
+      background: var(--brown);
+      padding: 65px 40px;
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: wrap;
+    }
+
+    .stat-item {
+      text-align: center;
+      color: #fff;
+      padding: 0 60px;
+      position: relative;
+    }
+
+    .stat-item + .stat-item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 40px;
+      width: 1px;
+      background: rgba(255,255,255,0.25);
+    }
+
+    .stat-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 52px;
+      font-weight: 300;
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      margin-top: 8px;
+      opacity: 0.75;
+      font-weight: 500;
+    }
+    .offers-section {
+      width: 100%;
+      background-color: #fff;
+      display: flex;
+      justify-content: center;
+      padding: 60px 40px;
+    }
+
+    .offers-container {
+      background-image: url('/images/Flowers brushes cosmetics highlighter Candle Mac.jpeg');
+      background-size: cover;
+      background-position: center;
+      width: 100%;
+      max-width: 1200px;
+      border-radius: 12px;
+      padding: 140px 80px;
+      color: #fff;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .offers-container::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, rgba(0,0,0,0.55) 0%, transparent 70%);
+    }
+
+    .offers-container > * { position: relative; z-index: 1; }
+
+    .offers-container h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 52px;
+      font-weight: 300;
+      font-style: italic;
+      margin-bottom: 10px;
+    }
+
+    .offers-container p {
+      font-size: 15px;
+      margin-bottom: 28px;
+      font-weight: 300;
+      opacity: 0.9;
+      letter-spacing: 0.05em;
+      color: rgba(255,255,255,0.9);
+    }
+
+    .offers-container .explore-btn {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.8);
+      color: white;
+      padding: 13px 32px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      border-radius: 2px;
+      text-decoration: none;
+      display: inline-block;
+      width: fit-content;
+      transition: background 0.3s, border-color 0.3s;
+    }
+
+    .offers-container .explore-btn:hover {
+      background: rgba(255,255,255,0.15);
+      border-color: #fff;
+    }
+
+    @media (max-width: 900px) {
+      .about-mosaic {
+        grid-template-columns: 1fr 1fr;
+        padding: 30px 20px 50px;
+      }
+
+      .mosaic-item:nth-child(1) {
+        grid-row: 1;
+        grid-column: 1 / 3;
+      }
+
+      .mosaic-item:nth-child(1) img { min-height: 300px; }
+
+      .mosaic-item:nth-child(4) {
+        grid-column: 1 / 3;
+      }
+
+      .about-banner { grid-template-columns: 1fr; }
+      .banner-left { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.2); padding: 60px 30px; }
+      .banner-right { padding: 50px 30px; }
+
+      .diff-grid { grid-template-columns: 1fr; }
+      .diff-card { border-right: none !important; }
+
+      .stat-item + .stat-item::before { display: none; }
+      .stat-item { padding: 0 20px; }
+
+      .offers-container { padding: 80px 30px; }
+      .offers-container h2 { font-size: 38px; }
+    }
+
+    @media (max-width: 600px) {
+      .about-mosaic { grid-template-columns: 1fr; }
+      .mosaic-item:nth-child(1),
+      .mosaic-item:nth-child(4) { grid-column: 1; }
+      .mosaic-item:nth-child(1) img { min-height: 260px; }
+    }
+  </style>
+</head>
+
+<body>
+  <section class="about-hero">
+    <div class="hero-inner">
+      <p class="hero-eyebrow">Beauty Redefined</p>
+      <h1>Who We Are</h1>
+      <div class="hero-rule"></div>
+    </div>
+  </section>
+  <div class="about-mosaic">
+    <div class="mosaic-item">
+      <img src="/images/perfure-x.png" alt="Perfume Collection">
+    </div>
+    <div class="mosaic-item">
+      <img src="/images/red Perfume.png" alt="Luxury Perfume">
+    </div>
+    <div class="mosaic-item">
+      <img src="/images/blue perfume.jpg" alt="Signature Fragrance">
+    </div>
+    <div class="mosaic-item">
+      <img src="/images/nailpolish 1.jpeg" alt="Nail Polish Collection">
+    </div>
+  </div>
+  <section class="about-banner">
+    <div class="banner-left">
+      <p class="banner-tagline">Where self-care<br>meets science.</p>
+      <p class="banner-body">
+        Welcome to <strong>Quora Cosmetics</strong> — your one-stop destination for premium quality beauty products at unbeatable prices.
+        We combine elegance, care, and science to bring you cosmetics that redefine every routine and elevate every look.
+      </p>
+    </div>
+    <div class="banner-right">
+      <span class="banner-pill">What Makes Us Different</span>
+    </div>
+  </section>
+  <section class="about-diff">
+    <div class="diff-header">
+      <p class="eyebrow">Our Promise</p>
+      <h2>We don't just sell beauty —</h2>
+      <p class="sub-text">We curate an effortless beauty experience. Where self-care meets convenience.</p>
+    </div>
+
+    <div class="diff-grid">
+      <div class="diff-card">
+        <div class="diff-card-icon">🛒</div>
+        <h3>Smart Shopping Features</h3>
+        <ul>
+          <li>Cash on Delivery for peace of mind and easy check-out</li>
+          <li>Buy Now Pay Later and Installment Plans for flexible payment options</li>
+          <li>90 Days Buy Now, Get It Later – Pay Monthly at Look at Quality</li>
+          <li>Free Shipping on all orders above ₹2500. Because luxury should be accessible</li>
+        </ul>
+      </div>
+
+      <div class="diff-card">
+        <div class="diff-card-icon">🎁</div>
+        <h3>Exclusive Deals & Discounts</h3>
+        <ul>
+          <li>Huge Discounts & Irresistible Pricing all year long</li>
+          <li>Buy 2, Get 1 Free on select styles</li>
+          <li>Referral rewards – sharing the gift of beauty</li>
+          <li>Join our exclusive club for VIP benefits & early access</li>
+        </ul>
+      </div>
+
+      <div class="diff-card">
+        <div class="diff-card-icon">🌿</div>
+        <h3>Quality You Can Trust</h3>
+        <ul>
+          <li>Dermatologist tested & skin-safe ingredients</li>
+          <li>Cruelty-free and ethically sourced products</li>
+          <li>Paraben-free, sulphate-free formulations</li>
+          <li>100% transparent ingredient lists – no surprises</li>
+        </ul>
+      </div>
+
+      <div class="diff-card">
+        <div class="diff-card-icon">💖</div>
+        <h3>Customer First Always</h3>
+        <ul>
+          <li>Easy 7-day hassle-free returns – no questions asked</li>
+          <li>24/7 beauty advisor chat support</li>
+          <li>Personalised product recommendations for your skin type</li>
+          <li>Loyalty points earned on every single purchase</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+  <section class="about-stats">
+    <div class="stat-item">
+      <div class="stat-num">500+</div>
+      <div class="stat-label">Products</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">50K+</div>
+      <div class="stat-label">Happy Customers</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">100%</div>
+      <div class="stat-label">Cruelty Free</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">4.9★</div>
+      <div class="stat-label">Avg Rating</div>
+    </div>
+  </section>
+
+  <section class="offers-section">
+    <div class="offers-container">
+      <h2>Great Offers</h2>
+      <p>Explore the deals and offers</p>
+      <a href="/offers" class="explore-btn">Explore Now</a>
+    </div>
+  </section>
+
+</body>
+
+<%- include('../partials/user/footer') %>

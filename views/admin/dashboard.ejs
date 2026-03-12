@@ -87,8 +87,6 @@
     height: 300px;
     width: 100%;
   }
-
-  /* ── Three‑column ranking section ── */
   .dash-three-col {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -121,8 +119,6 @@
     overflow-y: auto;
     max-height: 340px;
   }
-
-  /* custom scrollbar */
   .rank-list::-webkit-scrollbar { width: 4px; }
   .rank-list::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
   .rank-list::-webkit-scrollbar-thumb { background: #c5cadd; border-radius: 4px; }
@@ -173,8 +169,6 @@
     white-space: nowrap;
     flex-shrink: 0;
   }
-
-  /* top‑3 number colors */
   .rank-num.n1 { color: #f5a623; font-size: 15px; }
   .rank-num.n2 { color: #9b9b9b; font-size: 14px; }
   .rank-num.n3 { color: #c47c3e; font-size: 14px; }
@@ -198,8 +192,6 @@
       <option value="yearly">Yearly</option>
     </select>
   </div>
-
-  <!-- Stat Cards -->
   <div class="dash-stat-grid">
     <div class="dash-stat-card">
       <div class="s-icon">📦</div>
@@ -222,16 +214,12 @@
       <span class="s-value" id="statCancelled">—</span>
     </div>
   </div>
-
-  <!-- Revenue Chart -->
   <div class="dash-chart-card">
     <h4 id="chartTitle">Revenue — Monthly View</h4>
     <div class="dash-chart-wrapper">
       <canvas id="dashboardChart"></canvas>
     </div>
   </div>
-
-  <!-- Top 10 Products | Categories | Brands -->
   <div class="dash-three-col">
 
     <div class="rank-card">
@@ -264,8 +252,6 @@
 <script>
 
 let chart;
-
-/* Build a single rank list item */
 function buildListItem(index, name, sold) {
   const numClass = index === 0 ? "n1" : index === 1 ? "n2" : index === 2 ? "n3" : "";
   return `
@@ -277,8 +263,6 @@ function buildListItem(index, name, sold) {
       <span class="sold-badge">Sold:${sold}</span>
     </li>`;
 }
-
-/* Revenue Chart */
 async function loadChart(filter) {
   const filterLabel = filter.charAt(0).toUpperCase() + filter.slice(1);
   document.getElementById("chartTitle").textContent = "Revenue — " + filterLabel + " View";
@@ -344,8 +328,6 @@ async function loadChart(filter) {
     }
   });
 }
-
-/* Stats */
 async function loadStats() {
   const res = await fetch("/admin/dashboard-stats");
   if (!res.ok) return;
@@ -354,8 +336,6 @@ async function loadStats() {
   document.getElementById("statDelivered").textContent   = data.delivered   || 0;
   document.getElementById("statCancelled").textContent   = data.cancelled   || 0;
 }
-
-/* Top Products */
 async function loadTopProducts() {
   const res  = await fetch("/admin/top-products");
   const data = await res.json();
@@ -364,8 +344,6 @@ async function loadTopProducts() {
   document.getElementById("topProductsList").innerHTML =
     html || '<li><span class="rank-empty">No data found</span></li>';
 }
-
-/* Top Categories */
 async function loadTopCategories() {
   const res  = await fetch("/admin/top-categories");
   const data = await res.json();
@@ -374,8 +352,6 @@ async function loadTopCategories() {
   document.getElementById("topCategoriesList").innerHTML =
     html || '<li><span class="rank-empty">No data found</span></li>';
 }
-
-/* Top Brands */
 async function loadTopBrands() {
   const res  = await fetch("/admin/top-brands");
   const data = await res.json();
@@ -385,11 +361,8 @@ async function loadTopBrands() {
     html || '<li><span class="rank-empty">No data found</span></li>';
 }
 
-/* Filter change */
 document.getElementById("dashFilter")
   .addEventListener("change", (e) => loadChart(e.target.value));
-
-/* Initial Load */
 loadChart("monthly");
 loadStats();
 loadTopProducts();

@@ -848,7 +848,14 @@ const updateProfileImage = async (req, res) => {
     res.json({ success: false });
   }
 };
-
+const loadAboutPage = async (req, res) => {
+  try {
+    res.render('about');
+  } catch (error) {
+    console.log("About page error:", error);
+    res.redirect('/pageNotFound');
+  }
+};
 module.exports = {
   loadHomepage,
   pageNotFound,
@@ -876,5 +883,6 @@ module.exports = {
   deleteAddress,
   updateProfileImage,
   loadAddAddressPageProfile,
-  loadManageAddressPage
+  loadManageAddressPage,
+  loadAboutPage
 };
