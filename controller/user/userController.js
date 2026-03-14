@@ -16,10 +16,15 @@ const Order = require("../../models/orderSchema");
 
 const loadHomepage = async (req, res) => {
   try {
-    const products = await Product.find()
-      .sort({ createdOn: -1 })
-      .limit(4)
-      .lean();
+    // const products = await Product.find()
+    //   .sort({ createdOn: -1 })
+    //   .limit(4)
+    //   .lean();
+
+    const products = await Product.find({ isBlocked: false })
+  .sort({ createdAt: -1 })
+  .limit(4)
+  .lean();
 
     let wishlistIds = [];
     let cartCount = 0;
@@ -49,10 +54,14 @@ const loadHomepage = async (req, res) => {
 
 const loadlandingpage = async (req, res) => {
   try {
-    const products = await Product.find()
-      .sort({ createdOn: -1 })
-      .limit(4)
-      .lean();
+    // const products = await Product.find()
+    //   .sort({ createdOn: -1 })
+    //   .limit(4)
+    //   .lean();
+    const products = await Product.find({ isBlocked: false })
+  .sort({ createdAt: -1 })
+  .limit(4)
+  .lean();
 
     let cart = null;
     let cartCount = 0;

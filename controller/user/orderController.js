@@ -556,16 +556,30 @@ drawLabel("Order ID", `${order.orderId}`, margin, y);
         .text(col.header, col.x + 4, y + 8, { width: col.w - 8, align: col.align });
     });
     y += ROW_H;
-    let total = 0;
-    let rowNum = 0;
-    order.products.forEach((item, index) => {
-      if (item.status === "Cancelled") return;
+   let total = 0;
+let rowNum = 0;
+const couponDiscount = order.couponDiscount || 0;
 
-      const name = item.productId?.productName || "Product";
-      const price = item.salePrice;
-      const qty = item.quantity;
-      const subtotal = price * qty;
-      total += subtotal;
+// Calculate total of non-cancelled items to distribute coupon proportionally
+const activeTotal = order.products
+  .filter(p => p.status !== "Cancelled")
+  .reduce((sum, p) => sum + (p.salePrice * p.quantity), 0);
+
+order.products.forEach((item, index) => {
+  if (item.status === "Cancelled") return;
+
+  const name = item.productId?.productName || "Product";
+  const qty = item.quantity;
+  const rawSubtotal = item.salePrice * qty;
+
+  // Distribute coupon discount proportionally across items
+  const itemCouponShare = activeTotal > 0 
+    ? Math.round((rawSubtotal / activeTotal) * couponDiscount) 
+    : 0;
+  const price = rawSubtotal > 0 ? ((rawSubtotal - itemCouponShare) / qty) : item.salePrice;
+  const subtotal = rawSubtotal - itemCouponShare;
+  total += subtotal;
+
       doc.rect(margin, y, contentW, ROW_H).fill(rowNum % 2 === 0 ? LIGHT_BG : WHITE);
       doc.rect(margin, y, contentW, ROW_H).strokeColor("#dddddd").lineWidth(0.5).stroke();
 
@@ -586,10 +600,12 @@ drawLabel("Order ID", `${order.orderId}`, margin, y);
       rowNum++;
     });
     doc.rect(margin, y, contentW, ROW_H + 2).fill(PRIMARY);
+
     doc.fillColor(WHITE).fontSize(10).font("Helvetica-Bold")
       .text("TOTAL", margin + 4, y + 9, { width: contentW - cols[4].w - 60, align: "right" });
-    doc.fillColor(ACCENT).fontSize(10).font("Helvetica-Bold")
-      .text(`Rs.${total.toFixed(2)}`, cols[4].x + 4, y + 9, { width: cols[4].w - 8, align: "right" });
+    
+doc.fillColor(ACCENT).fontSize(10).font("Helvetica-Bold")
+  .text(`Rs.${total.toFixed(2)}`, cols[4].x + 4, y + 9, { width: cols[4].w - 8, align: "right" });
     const footerY = doc.page.height - 55;
     doc.moveTo(margin, footerY - 10).lineTo(margin + contentW, footerY - 10)
       .strokeColor("#dddddd").lineWidth(1).stroke();

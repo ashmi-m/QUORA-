@@ -73,16 +73,6 @@ const getProductsData = async (req, res) => {
     res.json({ success: false, message: "Error fetching products" });
   }
 };
-const deleteProduct = async (req, res) => {
-  try {
-    const { id } = req.params;
-    await Product.findByIdAndDelete(id);
-    res.json({ success: true });
-  } catch (err) {
-    console.error("Error deleting product:", err);
-    res.json({ success: false, message: "Error deleting product" });
-  }
-};
 
 const getProductpage = async (req, res) => {
   try {
@@ -430,7 +420,6 @@ module.exports = {
   addProducts,
   getProductpage,
    getProductsData, 
-  deleteProduct, 
    getEditProductPage,
     updateProduct,
     loadShopPage ,

@@ -17,7 +17,7 @@
     </div>
 
     <div class="profile-container">
-      
+
 
       <%- include("../partials/user/profile-sidebar", { user, activePage: 'profile' }) %>
 
@@ -48,18 +48,19 @@
 
               </div>
           </div>
-         <div class="row">
-  <div>
-    <label>Gender</label>
-    <select name="gender" id="genderSelect" disabled>
-      <option value="">Select Gender</option>
-      <option value="Male" <%= user.gender==="Male" ? "selected" : "" %>>Male</option>
-      <option value="Female" <%= user.gender==="Female" ? "selected" : "" %>>Female</option>
-      <option value="Other" <%= user.gender==="Other" ? "selected" : "" %>>Other</option>
-      <option value="Prefer not to say" <%= user.gender==="Prefer not to say" ? "selected" : "" %>>Prefer not to say</option>
-    </select>
-  </div>
-</div>
+          <div class="row">
+            <div>
+              <label>Gender</label>
+              <select name="gender" id="genderSelect" disabled>
+                <option value="">Select Gender</option>
+                <option value="Male" <%=user.gender==="Male" ? "selected" : "" %>>Male</option>
+                <option value="Female" <%=user.gender==="Female" ? "selected" : "" %>>Female</option>
+                <option value="Other" <%=user.gender==="Other" ? "selected" : "" %>>Other</option>
+                <option value="Prefer not to say" <%=user.gender==="Prefer not to say" ? "selected" : "" %>>Prefer not
+                  to say</option>
+              </select>
+            </div>
+          </div>
           <div class="profile-actions">
             <button type="button" id="editProfileBtn">Edit Profile</button>
             <button type="button" id="saveProfileBtn" class="hidden">Save Changes</button>
@@ -79,115 +80,115 @@
     </div>
 
     <footer>© 2025 Quora - All Rights Reserved</footer>
-    
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const changeBtn = document.getElementById("changeImageBtn");
-  const imageInput = document.getElementById("profileImageInput");
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const changeBtn = document.getElementById("changeImageBtn");
+        const imageInput = document.getElementById("profileImageInput");
 
 
-  if (changeBtn && imageInput && !changeBtn.dataset.listenerAdded) {
-    changeBtn.dataset.listenerAdded = "true";
+        if (changeBtn && imageInput && !changeBtn.dataset.listenerAdded) {
+          changeBtn.dataset.listenerAdded = "true";
 
-    changeBtn.addEventListener("click", () => imageInput.click());
+          changeBtn.addEventListener("click", () => imageInput.click());
 
-    imageInput.addEventListener("change", async () => {
-      const file = imageInput.files[0];
-      if (!file) return;
+          imageInput.addEventListener("change", async () => {
+            const file = imageInput.files[0];
+            if (!file) return;
 
-      const formData = new FormData();
-      formData.append("profileImage", file);
+            const formData = new FormData();
+            formData.append("profileImage", file);
 
-      try {
-        const res = await fetch("/profile/upload-image", {
-          method: "PUT",
-          body: formData
-        });
+            try {
+              const res = await fetch("/profile/upload-image", {
+                method: "PUT",
+                body: formData
+              });
 
-        const result = await res.json();
+              const result = await res.json();
 
-        if (result.success) {
-          updateProfilePreview(result.image);
-          Swal.fire("Success", "Profile image updated", "success");
-        } else {
-          Swal.fire("Error", "Upload failed", "error");
+              if (result.success) {
+                updateProfilePreview(result.image);
+                Swal.fire("Success", "Profile image updated", "success");
+              } else {
+                Swal.fire("Error", "Upload failed", "error");
+              }
+
+            } catch (err) {
+              Swal.fire("Error", "Something went wrong", "error");
+            }
+          });
+        }
+        const copyRefCodeBtn = document.getElementById("refCodeField");
+        window.copyRefCode = function () {
+          const input = document.getElementById("refCodeField");
+          input.select();
+          document.execCommand("copy");
+          Swal.fire("Copied!", "Referral code copied to clipboard", "success");
+        };
+
+        const editBtn = document.getElementById("editProfileBtn");
+        const saveBtn = document.getElementById("saveProfileBtn");
+
+        if (editBtn && saveBtn) {
+          editBtn.addEventListener("click", () => {
+            document.querySelector("input[name='name']").disabled = false;
+            document.querySelector("input[name='phone']").disabled = false;
+            document.getElementById("genderSelect").disabled = false;
+
+            editBtn.classList.add("hidden");
+            saveBtn.classList.remove("hidden");
+          });
+
+          saveBtn.addEventListener("click", async () => {
+            const data = {
+              name: document.querySelector("input[name='name']").value,
+              phone: document.querySelector("input[name='phone']").value,
+              gender: document.getElementById("genderSelect").value
+            };
+
+            try {
+              const res = await fetch("/profile/update", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+              });
+
+              const result = await res.json();
+
+              if (result.success) {
+                Swal.fire("Success", "Profile updated", "success").then(() => location.reload());
+              } else {
+                Swal.fire("Error", result.message || "Update failed", "error");
+              }
+            } catch (err) {
+              Swal.fire("Error", "Something went wrong", "error");
+            }
+          });
         }
 
-      } catch (err) {
-        Swal.fire("Error", "Something went wrong", "error");
-      }
-    });
-  }
-  const copyRefCodeBtn = document.getElementById("refCodeField");
-  window.copyRefCode = function() {
-    const input = document.getElementById("refCodeField");
-    input.select();
-    document.execCommand("copy");
-    Swal.fire("Copied!", "Referral code copied to clipboard", "success");
-  };
+        const logoutBtn = document.getElementById("logoutBtn");
+        if (logoutBtn && !logoutBtn.dataset.listenerAdded) {
+          logoutBtn.dataset.listenerAdded = "true";
 
-  const editBtn = document.getElementById("editProfileBtn");
-  const saveBtn = document.getElementById("saveProfileBtn");
-
-  if (editBtn && saveBtn) {
-    editBtn.addEventListener("click", () => {
-      document.querySelector("input[name='name']").disabled = false;
-      document.querySelector("input[name='phone']").disabled = false;
-      document.getElementById("genderSelect").disabled = false;
-
-      editBtn.classList.add("hidden");
-      saveBtn.classList.remove("hidden");
-    });
-
-    saveBtn.addEventListener("click", async () => {
-      const data = {
-        name: document.querySelector("input[name='name']").value,
-        phone: document.querySelector("input[name='phone']").value,
-        gender: document.getElementById("genderSelect").value
-      };
-
-      try {
-        const res = await fetch("/profile/update", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
-        });
-
-        const result = await res.json();
-
-        if (result.success) {
-          Swal.fire("Success", "Profile updated", "success").then(() => location.reload());
-        } else {
-          Swal.fire("Error", result.message || "Update failed", "error");
+          logoutBtn.addEventListener("click", () => {
+            Swal.fire({
+              title: "Are you sure?",
+              text: "You will be logged out of your account",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonText: "Yes, Logout"
+            }).then((result) => {
+              if (result.isConfirmed) {
+                window.location.href = "/logout";
+              }
+            });
+          });
         }
-      } catch (err) {
-        Swal.fire("Error", "Something went wrong", "error");
-      }
-    });
-  }
 
-  const logoutBtn = document.getElementById("logoutBtn");
-  if (logoutBtn && !logoutBtn.dataset.listenerAdded) {
-    logoutBtn.dataset.listenerAdded = "true";
 
-    logoutBtn.addEventListener("click", () => {
-      Swal.fire({
-        title: "Are you sure?",
-        text: "You will be logged out of your account",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes, Logout"
-      }).then((result) => {
-        if (result.isConfirmed) {
-          window.location.href = "/logout";
-        }
       });
-    });
-  }
-
-
-});
-</script>
+    </script>
   </body>
 
   </html>

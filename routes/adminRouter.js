@@ -42,7 +42,7 @@ router.post("/addProduct", adminAuth, upload.array("images", 4), productControll
 
 router.get("/products",adminAuth, productController.getProductpage);
 router.get("/products/data", adminAuth, productController.getProductsData);
-router.delete("/products/:id", adminAuth, productController.deleteProduct);
+
 router.get("/editproduct/:id", adminAuth, productController.getEditProductPage);
 
 router.post("/products/edit/:id", adminAuth, upload.array("images", 4), productController.updateProduct)

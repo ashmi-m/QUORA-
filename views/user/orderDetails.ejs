@@ -10,12 +10,16 @@
 
     <div class="order-container">
       <aside class="sidebar">
-        <div class="user-info">
-          <img src="<%= user.profileImage || '/images/default-avatar.png' %>" alt="user">
-          <p>Hello, <strong>
-              <%= user.name %>
-            </strong></p>
-        </div>
+      <div class="user-info">
+  <% if (user.profileImage && user.profileImage.trim() !== "") { %>
+    <img src="<%= user.profileImage %>" alt="user"
+      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+    <div class="avatar-placeholder" style="display:none;"><%= user.name.charAt(0).toUpperCase() %></div>
+  <% } else { %>
+    <div class="avatar-placeholder"><%= user.name.charAt(0).toUpperCase() %></div>
+  <% } %>
+  <p>Hello, <strong><%= user.name %></strong></p>
+</div>
 
        <nav class="sidebar-menu">
   <a href="/orders" class="menu-item active">My Orders</a>

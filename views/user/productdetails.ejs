@@ -27,13 +27,12 @@
       color: var(--deep);
     }
 
-    /* ── Top accent bar ── */
     .top-accent {
       height: 3px;
       background: linear-gradient(90deg, var(--blush), var(--rose), var(--gold));
     }
 
-    /* ── Breadcrumb ── */
+  
     .breadcrumb {
       padding: 14px 60px;
       font-size: 12px;
@@ -44,8 +43,6 @@
     .breadcrumb a { color: var(--muted); text-decoration: none; }
     .breadcrumb a:hover { color: var(--rose); }
     .breadcrumb span { margin: 0 8px; }
-
-    /* ── Main layout ── */
     .product-wrapper {
       max-width: 1100px;
       margin: 0 auto;
@@ -58,8 +55,6 @@
       gap: 60px;
       align-items: start;
     }
-
-    /* ── Image Gallery ── */
     .gallery {
       position: sticky;
       top: 30px;
@@ -114,8 +109,6 @@
       border-color: var(--rose);
       opacity: 1;
     }
-
-    /* ── Product Info ── */
     .product-info {
       padding-top: 10px;
     }
@@ -150,8 +143,6 @@
       background: linear-gradient(90deg, var(--rose), transparent);
       margin: 20px 0;
     }
-
-    /* Wishlist */
     .wishlist-row {
       display: flex;
       align-items: center;
@@ -186,8 +177,6 @@
       letter-spacing: 0.06em;
       color: var(--muted);
     }
-
-    /* Description box */
     .desc-box {
       background: var(--warm-white);
       border: 1px solid var(--border);
@@ -211,8 +200,6 @@
       line-height: 1.85;
       color: #5a4e49;
     }
-
-    /* Pricing */
     .price-block {
       margin: 28px 0 10px;
     }
@@ -255,8 +242,6 @@
       color: var(--success);
       font-weight: 500;
     }
-
-    /* Stock */
     .stock-row {
       display: flex;
       align-items: center;
@@ -287,8 +272,6 @@
       color: var(--muted);
       letter-spacing: 0.04em;
     }
-
-    /* Add to Cart */
     #addToCartBtn {
       display: inline-flex;
       align-items: center;
@@ -327,8 +310,6 @@
     #addToCartBtn:active { transform: translateY(0); }
 
     .cart-icon { font-size: 16px; }
-
-    /* Reviews */
     .reviews-row {
       display: flex;
       align-items: center;
@@ -353,8 +334,6 @@
       font-size: 13px;
       color: var(--muted);
     }
-
-    /* ─── Related Products ─── */
     .related-section {
       margin-top: 70px;
       padding-top: 40px;
@@ -464,8 +443,6 @@
       color: var(--muted);
       text-decoration: line-through;
     }
-
-    /* ── Page fade-in ── */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(18px); }
       to { opacity: 1; transform: translateY(0); }
@@ -496,8 +473,6 @@
 
   <div class="product-wrapper">
     <div class="product-grid">
-
-      <!-- Gallery -->
       <div class="gallery">
         <div class="main-img-wrap">
           <img src="<%= product.productImage[0] %>" alt="<%= product.productName %>" class="main-product-image">
@@ -508,8 +483,6 @@
           <% }) %>
         </div>
       </div>
-
-      <!-- Info -->
       <div class="product-info">
         <div class="product-category">Eau de Parfum · Luxury Fragrance</div>
 
@@ -518,8 +491,6 @@
         </h1>
 
         <div class="divider"></div>
-
-        <!-- Wishlist -->
         <div class="wishlist-row">
           <button id="wishlistBtn" data-id="<%= product._id %>" style="color:<%= isWishlisted ? '#e05c5c' : '#bbb' %>;" class="<%= isWishlisted ? 'active' : '' %>">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -528,14 +499,10 @@
           </button>
           <span class="wishlist-label"><%= isWishlisted ? 'Saved to Wishlist' : 'Add to Wishlist' %></span>
         </div>
-
-        <!-- Description -->
         <div class="desc-box">
           <div class="desc-label">About this fragrance</div>
           <p class="desc-text"><%= product.description %></p>
         </div>
-
-        <!-- Price -->
         <div class="price-block">
           <% if (product.effectiveOffer > 0) { %>
             <div class="offer-badge">
@@ -550,8 +517,6 @@
             <span class="price-main">₹<%= product.regularPrice %></span>
           <% } %>
         </div>
-
-        <!-- Stock -->
         <div class="stock-row">
           <div class="stock-dot <%= product.quantity <= 3 ? 'low' : '' %> <%= product.quantity === 0 ? 'out' : '' %>"></div>
           <span class="stock-text">
@@ -561,14 +526,10 @@
             <% } %>
           </span>
         </div>
-
-        <!-- Add to Cart -->
         <button id="addToCartBtn" data-id="<%= product._id %>">
           <span class="cart-icon">🛒</span>
           Add to Cart
         </button>
-
-        <!-- Reviews -->
         <div class="reviews-row">
           <div class="stars">
             <% for(let i = 0; i < 5; i++) { %>
@@ -582,8 +543,6 @@
 
       </div>
     </div>
-
-    <!-- Related Products -->
     <div class="related-section">
       <div class="section-header">
         <h3 class="section-title">You Might Also Love</h3>
@@ -617,7 +576,6 @@
   <%- include('../partials/user/footer') %>
 
   <script>
-    // ── Add to Cart ──
     document.getElementById("addToCartBtn").addEventListener("click", async () => {
       const productId = document.getElementById("addToCartBtn").dataset.id;
       try {
@@ -638,8 +596,6 @@
         Swal.fire("Login Required", "Please login first", "warning");
       }
     });
-
-    // ── Image Gallery ──
     document.addEventListener("DOMContentLoaded", function () {
       const mainImage = document.querySelector(".main-product-image");
       const thumbnails = document.querySelectorAll(".thumbnail-image");
@@ -664,8 +620,6 @@
           this.classList.add("active");
         });
       });
-
-      // ── Wishlist ──
       const wishlistBtn = document.getElementById("wishlistBtn");
       if (wishlistBtn) {
         wishlistBtn.addEventListener("click", async () => {

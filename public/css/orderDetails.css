@@ -251,6 +251,19 @@ body {
   color: #fff;
   box-shadow: 0 3px 10px rgba(245, 124, 0, 0.3);
 }
+.user-info .avatar-placeholder {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background-color: #020202;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: bold;
+  border: 2px solid #eee;
+}
 
 @media (max-width: 900px) {
   .order-container {

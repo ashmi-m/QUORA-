@@ -22,10 +22,16 @@ body {
   font-weight: bold;
 }
 
-.wishlist-container {
+/* .wishlist-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 25px;
+} */
+ .wishlist-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 260px));
+  gap: 25px;
+  justify-content: start;
 }
 .wishlist-item {
   background: #fff;
