@@ -9,26 +9,15 @@ const { creditWallet } = require("./walletController");
 const env = require("dotenv").config();
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
-
-
 const Order = require("../../models/orderSchema");
-
-
 const loadHomepage = async (req, res) => {
   try {
-    // const products = await Product.find()
-    //   .sort({ createdOn: -1 })
-    //   .limit(4)
-    //   .lean();
-
     const products = await Product.find({ isBlocked: false })
   .sort({ createdAt: -1 })
   .limit(4)
   .lean();
-
     let wishlistIds = [];
     let cartCount = 0;
-
     if (req.session.user) {
       const wishlist = await Wishlist.findOne({ userId: req.session.user._id }).lean();
       if (wishlist && wishlist.items) {
@@ -54,10 +43,6 @@ const loadHomepage = async (req, res) => {
 
 const loadlandingpage = async (req, res) => {
   try {
-    // const products = await Product.find()
-    //   .sort({ createdOn: -1 })
-    //   .limit(4)
-    //   .lean();
     const products = await Product.find({ isBlocked: false })
   .sort({ createdAt: -1 })
   .limit(4)
@@ -100,9 +85,6 @@ const loadlandingpage = async (req, res) => {
     res.redirect("/pageNotFound");
   }
 };
-
-
-
 const pageNotFound = (req, res) => {
   res.status(404).render("page 404");
 };
@@ -118,14 +100,9 @@ const loadSignup = async (req, res) => {
     res.status(500).send("Server error");
   }
 };
-
-
-
 function generateOtp() {
   return Math.floor(1000 + Math.random() * 9000).toString();
 }
-
-
 async function sendVerificationEmail(email, otp) {
   try {
     const transporter = nodemailer.createTransport({
@@ -183,8 +160,6 @@ const signup = async (req, res) => {
     if (!emailSent) {
       return res.render("signup", { message: "Failed to send OTP" });
     }
-
-   
     req.session.userOtp = otp;
     req.session.userOtpExpiry = Date.now() + 2 * 60 * 1000; // 2 minutes
 
@@ -548,67 +523,6 @@ const logout = async (req, res) => {
   }
 };
 
-const loadProfilePage = async (req, res) => {
-  try {
-
-    if (!req.session.user) {
-      return res.redirect("/login");
-    }
-
-    const userId = req.session.user._id;
-
-    const addressDoc = await Address.findOne({ userId }).lean();
-    const addresses = addressDoc?.addresses || [];
-
-    const user = await User.findById(userId).lean();
-    const orders = await Order.find({
-      userId: req.session.user._id
-    })
-      .populate("products.productId")
-      .populate("address")
-      .sort({ createdAt: -1 });
-
-    res.render("profile", { user, orders, addresses });
-  } catch (error) {
-    console.log("Error loading profile:", error);
-    res.redirect("/pageNotFound");
-  }
-};
-const updateProfile = async (req, res) => {
-  try {
-    if (!req.session.user) {
-      return res.status(401).json({ success: false });
-    }
-
-    const { name, phone, gender } = req.body;
-
-    await User.findByIdAndUpdate(req.session.user._id, {
-      name,
-      phone,
-      gender
-    });
-
-    req.session.user.name = name;
-
-    res.json({ success: true });
-  } catch (error) {
-    res.json({ success: false, error: "Update failed" });
-  }
-};
-
-const loadAddAddressPage = async (req, res) => {
-  try {
-    if (!req.session.user) {
-      return res.redirect("/login");
-    }
-
-    res.render("addAddress");
-  } catch (error) {
-    console.error("Load add address error:", error);
-    res.redirect("/pageNotFound");
-  }
-};
-
 const loadAddAddressPageProfile = async (req, res) => {
   try {
     if (!req.session.user) {
@@ -720,151 +634,7 @@ const addAddressFromProfile = async (req, res) => {
     });
   }
 };
-const loadManageAddressPage = async (req, res) => {
-  try {
-    if (!req.session.user) {
-      return res.redirect("/login");
-    }
 
-    const userId = req.session.user._id;
-   const user = await User.findById(userId)
-   console.log(user)
-    const addressDoc = await Address.findOne({ userId }).lean();
-
-    res.render("manageAddress", {
-      user,
-      addresses: addressDoc ? addressDoc.addresses : []
-    });
-
-  } catch (error) {
-    console.error("Load manage address error:", error);
-    res.redirect("/pageNotFound");
-  }
-};
-const loadEditAddressPage = async (req, res) => {
-  try {
-    const userId = req.session.user._id;
-    const addressId = req.params.id;
-
-    const addressDoc = await Address.findOne(
-      { userId, "addresses._id": addressId },
-      { "addresses.$": 1 }
-    );
-
-    if (!addressDoc || !addressDoc.addresses.length) {
-      return res.redirect("/manage-address");
-    }
-
-    const address = addressDoc.addresses[0];
-
-    res.render("editAddress", { address });
-
-  } catch (error) {
-    console.error("Edit address load error:", error);
-    res.redirect("/manage-address");
-  }
-};
-const updateAddress = async (req, res) => {
-  try {
-    const userId = req.session.user._id;
-    const addressId = req.params.id;
-    const {
-      name,
-      phone,
-      address,
-      city,
-      state,
-      pincode,
-      type
-    } = req.body;
-
-    const result = await Address.updateOne(
-      { userId, "addresses._id": addressId },
-      {
-        $set: {
-          "addresses.$.name": name,
-          "addresses.$.phone": phone,
-          "addresses.$.address": address,
-          "addresses.$.city": city,
-          "addresses.$.state": state,
-          "addresses.$.pincode": pincode,
-          "addresses.$.type": type
-        }
-      }
-    );
-
-    if (result.modifiedCount === 0) {
-      return res.status(404).send("Address not found");
-    }
-
-    res.redirect("/manage-address");
-
-  } catch (error) {
-    console.error("Update address error:", error);
-    res.status(500).send("Server error");
-  }
-};
-const deleteAddress = async (req, res) => {
-  try {
-    const userId = req.session.user._id;
-    const addressId = req.params.id;
-
-    const result = await Address.updateOne(
-      { userId },
-      { $pull: { addresses: { _id: addressId } } }
-    );
-
-    if (result.modifiedCount === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "Address not found"
-      });
-    }
-
-    res.json({
-      success: true,
-      message: "Address deleted successfully"
-    });
-
-  } catch (error) {
-    console.error("Delete address error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Server error"
-    });
-  }
-};
-
-const updateProfileImage = async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.json({ success: false });
-    }
-
-    const imageUrl = req.file.path;
-
-    await User.findByIdAndUpdate(req.session.user._id, {
-      profileImage: imageUrl
-    });
-    req.session.user.profileImage = imageUrl;
-
-    res.json({
-      success: true,
-      image: imageUrl
-    });
-  } catch (error) {
-    console.error("Profile image error:", error);
-    res.json({ success: false });
-  }
-};
-const loadAboutPage = async (req, res) => {
-  try {
-    res.render('about');
-  } catch (error) {
-    console.log("About page error:", error);
-    res.redirect('/pageNotFound');
-  }
-};
 module.exports = {
   loadHomepage,
   pageNotFound,
@@ -872,7 +642,7 @@ module.exports = {
   signup,
   conformOtp,
   resendOtp,
-   loadResetOtpPage,   
+  loadResetOtpPage,   
   resendResetOtp  ,
   loadLogin,
   login,
@@ -882,16 +652,7 @@ module.exports = {
   verifyResetOtp,
   resetPassword,
   loadlandingpage,
-  loadProfilePage,
-  updateProfile,
-  loadAddAddressPage,
   addAddress,
   addAddressFromProfile,
-  loadEditAddressPage,
-  updateAddress,
-  deleteAddress,
-  updateProfileImage,
   loadAddAddressPageProfile,
-  loadManageAddressPage,
-  loadAboutPage
 };

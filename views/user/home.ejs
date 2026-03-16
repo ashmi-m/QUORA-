@@ -48,7 +48,7 @@
       }
 
       .wishlist-icon.active {
-        color: red;
+        color: rgb(250, 127, 127);
       }
 
       .product-card img {
@@ -71,19 +71,23 @@
 
       .btn-view-details,
       .btn-see-more {
-        background: #4f46e5;
+        background: #fe595f;
         color: #fff;
         padding: 8px 12px;
         border: none;
         border-radius: 6px;
-        cursor: pointer;
-        margin-top: 5px;
+        /* cursor: pointer;
+        margin-top: 5px; */
+        text-underline-offset: none;
       }
+      a {
+  text-decoration: none;
+}
 
-      .btn-view-details:hover,
+      /* .btn-view-details:hover,
       .btn-see-more:hover {
         background: #3730a3;
-      }
+      } */
 
 
       .offers-section {
@@ -146,11 +150,11 @@
       }
 
       .cart-icon:hover {
-        color: #4f46e5;
+        color: #f6425d;
       }
 
       .btn-add-cart {
-        background: #dc2626;
+        background: #f87b7b;
         color: white;
         border: none;
         padding: 10px;
@@ -294,7 +298,7 @@
                 <p>No products available</p>
                 <% } %>
       </div>
-      <a href="/shop"><button class="btn-see-more">SEE MORE</button></a>
+      <a href="/shop"><button class="btn-see-more">View All Products</button></a>
     </section>
 
 

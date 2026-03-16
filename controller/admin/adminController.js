@@ -415,7 +415,7 @@ const rejectReturn = async (req, res) => {
     }
 
     product.returnRequested = false;
-    product.returnReason = "";
+    product.returnReason = "Rejected by admin";
 
     await order.save();
 

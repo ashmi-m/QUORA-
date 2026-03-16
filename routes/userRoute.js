@@ -61,23 +61,23 @@ router.get("/brands", productController.getAllBrands);
 
 
 
-router.get("/userprofile", userAuth, userController.loadProfilePage);
-router.put("/profile/update", userAuth, userController.updateProfile);
+router.get("/userprofile", userAuth, addressController.loadProfilePage);
+router.put("/profile/update", userAuth, addressController.updateProfile);
 
 router.post("/address/add", userAuth, userController.addAddress);
 
-router.get( "/manage-address",userAuth, userController.loadManageAddressPage);
+router.get( "/manage-address",userAuth, addressController.loadManageAddressPage);
 
-router.get("/add-address", userAuth, userController.loadAddAddressPage);
+router.get("/add-address", userAuth, addressController.loadAddAddressPage);
 router.get("/add-address-profile", userAuth, userController.loadAddAddressPageProfile);
 
 
 router.post( "/profile/address/add", userAuth, addressController.addAddressFromProfile);
 
-router.get("/edit-address/:id", userAuth, userController.loadEditAddressPage);
-router.post("/address/edit/:id", userAuth, userController.updateAddress);
+router.get("/edit-address/:id", userAuth, addressController.loadEditAddressPage);
+router.post("/address/edit/:id", userAuth, addressController.updateAddress);
 
-router.delete("/address/delete/:id", userAuth, userController.deleteAddress);
+router.delete("/address/delete/:id", userAuth, addressController.deleteAddress);
 
 router.get("/cart", userAuth, cartController.loadCartPage);
 router.post("/cart/add", userAuth, cartController.addToCart);
@@ -101,7 +101,7 @@ router.post("/place-order", userAuth, orderController.placeOrder);
 router.put("/user/cancel/:id", userAuth, orderController.cancelOrder);
 
 router.get("/orders/:id", userAuth, orderController.loadOrderDetails);
-router.put("/profile/upload-image",userAuth,upload.single("profileImage"),userController.updateProfileImage);
+router.put("/profile/upload-image",userAuth,upload.single("profileImage"),addressController.updateProfileImage);
 router.put("/orders/cancel-product",userAuth,orderController.cancelSingleProduct);
 router.put("/orders/return/:id",userAuth,orderController.returnOrder);
 router.put("/orders/return-product",userAuth,orderController.returnSingleProduct);
@@ -131,7 +131,7 @@ router.post("/remove-coupon", userAuth, userCouponController.removeCoupon);
 router.get("/wallet", walletController.loadWallet);
 router.post("/wallet/create-order", walletController.createWalletOrder);
 router.post("/wallet/add", walletController.addMoneyToWallet);
-router.get('/about', userController.loadAboutPage);
+router.get('/about', addressController.loadAboutPage);
 
 module.exports = router;
 

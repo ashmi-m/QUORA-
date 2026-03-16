@@ -10,24 +10,30 @@
 
     <div class="order-container">
       <aside class="sidebar">
-      <div class="user-info">
-  <% if (user.profileImage && user.profileImage.trim() !== "") { %>
-    <img src="<%= user.profileImage %>" alt="user"
-      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-    <div class="avatar-placeholder" style="display:none;"><%= user.name.charAt(0).toUpperCase() %></div>
-  <% } else { %>
-    <div class="avatar-placeholder"><%= user.name.charAt(0).toUpperCase() %></div>
-  <% } %>
-  <p>Hello, <strong><%= user.name %></strong></p>
-</div>
+        <div class="user-info">
+          <% if (user.profileImage && user.profileImage.trim() !=="" ) { %>
+            <img src="<%= user.profileImage %>" alt="user"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="avatar-placeholder" style="display:none;">
+              <%= user.name.charAt(0).toUpperCase() %>
+            </div>
+            <% } else { %>
+              <div class="avatar-placeholder">
+                <%= user.name.charAt(0).toUpperCase() %>
+              </div>
+              <% } %>
+                <p>Hello, <strong>
+                    <%= user.name %>
+                  </strong></p>
+        </div>
 
-       <nav class="sidebar-menu">
-  <a href="/orders" class="menu-item active">My Orders</a>
-  <a href="/userprofile" class="menu-item">Account Settings</a>
-  <a href="/manage-address" class="menu-item">Manage Addresses</a>
-  <a href="/wallet" class="menu-item">My Wallet</a>
-  <a href="/logout" class="menu-item logout">Log out</a>
-</nav>
+        <nav class="sidebar-menu">
+          <a href="/orders" class="menu-item active">My Orders</a>
+          <a href="/userprofile" class="menu-item">Account Settings</a>
+          <a href="/manage-address" class="menu-item">Manage Addresses</a>
+          <a href="/wallet" class="menu-item">My Wallet</a>
+          <a href="/logout" class="menu-item logout">Log out</a>
+        </nav>
       </aside>
 
       <main class="order-main">
@@ -74,56 +80,64 @@
                 </p>
                 <p>Quantity: <%= item.quantity %>
                 </p>
-                <%
-let itemSubtotal = item.salePrice * item.quantity;
+                <% let itemSubtotal=item.salePrice * item.quantity; if(order.couponDiscount){ itemSubtotal=itemSubtotal
+                  - order.couponDiscount; } %>
 
-if(order.couponDiscount){
-  itemSubtotal = itemSubtotal - order.couponDiscount;
-}
-%>
-
-<p class="subtotal">
-  Subtotal: ₹ <%= itemSubtotal %>
-</p>
+                  <p class="subtotal">
+                    Subtotal: ₹ <%= itemSubtotal %>
+                  </p>
 
 
 
 
-                <p>
-                  Status:
-<strong class="
-  <%= item.status === 'Cancelled' ? 'text-danger' :
-      item.status === 'Returned' ? 'text-warning' :
-      item.status === 'Delivered' ? 'text-success' : '' %>
-">
+                  <p>
+                    Status:
 
-                    <%= item.status || "Active" %>
-                  </strong>
+                    <% if(item.status==="Cancelled" ){ %>
 
-                  <% if (item.returnRequested) { %>
-                    <span class="text-warning"> • Return Requested</span>
+                      <strong class="text-danger">Cancelled</strong>
+
+                      <% } else if(item.status==="Returned" ){ %>
+
+                        <strong class="text-warning">Returned</strong>
+
+                        <% } else if(item.returnRequested){ %>
+
+                          <strong class="text-warning">Return Requested</strong>
+
+                          <% } else if(item.returnReason && item.status==="Delivered" ){ %>
+
+                            <strong class="text-danger">Return Rejected</strong>
+
+                            <% } else { %>
+
+                              <strong class="text-success">
+                                <%= item.status %>
+                              </strong>
+
+                              <% } %>
+
+                  </p>
+
+
+                  <% if ((order.status==="Placed" || order.status==="Paid" ) && item.status==="Placed" ) { %>
+                    <button class="cancel-product-btn" onclick="cancelSingleProduct(
+    '<%= order._id %>',
+    '<%= item.productId._id %>'
+  )">
+                      Cancel Product
+                    </button>
                     <% } %>
-                </p>
 
 
-                <% if ((order.status==="Placed" || order.status==="Paid" ) && item.status==="Placed" ) { %>
-                  <button class="cancel-product-btn" onclick="cancelSingleProduct(
+                      <% if (item.status==="Delivered" && !item.returnRequested && !item.returnReason) { %>
+                        <button class="return-product-btn" onclick="returnSingleProduct(
     '<%= order._id %>',
     '<%= item.productId._id %>'
   )">
-                    Cancel Product
-                  </button>
-                  <% } %>
-
-
-                    <% if (item.status==="Delivered" && !item.returnRequested) { %>
-                      <button class="return-product-btn" onclick="returnSingleProduct(
-    '<%= order._id %>',
-    '<%= item.productId._id %>'
-  )">
-                        Return Product
-                      </button>
-                      <% } %>
+                          Return Product
+                        </button>
+                        <% } %>
 
 
 
@@ -161,24 +175,28 @@ if(order.couponDiscount){
           </div>
 
 
-         <div class="details-box">
-  <h3>Price Details</h3>
+          <div class="details-box">
+            <h3>Price Details</h3>
 
-  <p>Items Total: ₹ <%= order.totalAmount + (order.couponDiscount || 0) %></p>
+            <p>Items Total: ₹ <%= order.totalAmount + (order.couponDiscount || 0) %>
+            </p>
 
-  <% if(order.couponDiscount && order.couponDiscount > 0){ %>
-    <p>Coupon Discount: - ₹ <%= order.couponDiscount %></p>
-  <% } %>
+            <% if(order.couponDiscount && order.couponDiscount> 0){ %>
+              <p>Coupon Discount: - ₹ <%= order.couponDiscount %>
+              </p>
+              <% } %>
 
-  <p>Delivery Charges: ₹ <%= order.deliveryCharges || 0 %></p>
-  <p>Platform Fee: ₹ <%= order.platformFee || 0 %></p>
+                <p>Delivery Charges: ₹ <%= order.deliveryCharges || 0 %>
+                </p>
+                <p>Platform Fee: ₹ <%= order.platformFee || 0 %>
+                </p>
 
-  <hr>
+                <hr>
 
-  <p class="grand-total">
-    Total Amount: ₹ <%= order.totalAmount %>
-  </p>
-</div>
+                <p class="grand-total">
+                  Total Amount: ₹ <%= order.totalAmount %>
+                </p>
+          </div>
         </section>
 
         <div class="order-actions">
@@ -198,7 +216,7 @@ if(order.couponDiscount){
                     <% } %>
         </div>
 
-      </main>  
+      </main>
     </div>
   </div>
 
@@ -326,17 +344,17 @@ if(order.couponDiscount){
             body: JSON.stringify({ reason: result.value })
           })
             .then(res => res.json())
-           .then(data => {
-  if (data.success) {
-    Swal.fire(
-      "Request Sent",
-      "Order return request submitted. Awaiting approval.",
-      "success"
-    ).then(() => location.reload());
-  } else {
-    Swal.fire("Error", data.message || "Failed", "error");
-  }
-});
+            .then(data => {
+              if (data.success) {
+                Swal.fire(
+                  "Request Sent",
+                  "Order return request submitted. Awaiting approval.",
+                  "success"
+                ).then(() => location.reload());
+              } else {
+                Swal.fire("Error", data.message || "Failed", "error");
+              }
+            });
 
         }
       });
