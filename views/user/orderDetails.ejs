@@ -82,14 +82,6 @@
                 </p>
                 <% let itemSubtotal=item.salePrice * item.quantity; if(order.couponDiscount){ itemSubtotal=itemSubtotal
                   - order.couponDiscount; } %>
-
-                  <p class="subtotal">
-                    Subtotal: ₹ <%= itemSubtotal %>
-                  </p>
-
-
-
-
                   <p>
                     Status:
 

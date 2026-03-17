@@ -212,11 +212,8 @@ const { salePrice, effectiveOffer } = applyOffer(updatedProduct);
         status: "Placed"
       });
     }
-    // const couponData = req.session.appliedCoupon || null;
-    // const couponDiscount = couponData ? couponData.discountAmount : 0;
+    
 
-    // const totalDiscount = totalProductDiscount + couponDiscount;
-    // const finalTotal = total - couponDiscount;
 const couponData = req.session.appliedCoupon || null;
 const couponDiscount = couponData ? couponData.discountAmount : 0;
 

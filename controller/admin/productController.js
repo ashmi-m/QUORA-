@@ -277,7 +277,6 @@ if (req.files && req.files.length > 0) {
       const product = await Product.findById(productId);
       if(!product) return res.json({success:false,message:'Product not found'})
 
-         
     product.productImage = product.productImage.filter((img)=> img !== image);
     console.log(product)
     await product.save();

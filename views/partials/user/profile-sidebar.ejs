@@ -45,7 +45,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const preview = document.getElementById("profilePreview");
     const logoutBtn = document.getElementById("logoutBtn");
 
-    /* ---- Prevent event duplication ---- */
     if (changeBtn && !changeBtn.dataset.listenerAdded) {
 
         changeBtn.dataset.listenerAdded = "true";
@@ -97,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    /* ---- Logout ---- */
+   
 
     if (logoutBtn && !logoutBtn.dataset.listenerAdded) {
 
