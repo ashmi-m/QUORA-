@@ -35,6 +35,19 @@ const addCoupon = async (req, res) => {
       minimumPurchase
     } = req.body;
 
+
+     const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const expiry = new Date(expiryDate);
+    expiry.setHours(0, 0, 0, 0);
+    
+    if (!expiryDate || isNaN(expiry.getTime()) || expiry < today) {
+      return res.status(400).json({
+        success: false,
+        message: "Expiry date must be today or a future date"
+      });
+    }
+
     if (!code || !discountValue || !limit || !expiryDate) {
       return res.status(400).json({
         success: false,
@@ -95,6 +108,19 @@ const updateCoupon = async (req, res) => {
       minimumPurchase,
       description
     } = req.body;
+
+      const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const expiry = new Date(expiryDate);
+    expiry.setHours(0, 0, 0, 0);
+    if (!expiryDate || isNaN(expiry.getTime()) || expiry < today) {
+      return res.status(400).json({
+        success: false,
+        message: "Expiry date must be today or a future date"
+      });
+    }
+
+
 
     if (!code || !discountValue || !limit || !expiryDate) {
       return res.status(400).json({
@@ -158,6 +184,14 @@ const applyCoupon = async (req, res) => {
 
     const userId = req.session.user._id;
     const { code } = req.body;
+
+     if (req.session.appliedCoupon) {
+      return res.json({
+        success: false,
+        message: "A coupon is already applied. Remove it first."
+      });
+    }
+
 
     const coupon = await Coupon.findOne({
       code: code.toUpperCase(),

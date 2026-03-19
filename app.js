@@ -1,17 +1,13 @@
-
 const express = require('express');
 const session = require("express-session");
 const app = express();
 
-// const morgan = require('morgan');
-// app.use(morgan('dev'))
 const path = require("path");
-// const env = require("dotenv").config();
 require("dotenv").config({ path: "./.env" });
 const passport = require("./config/passport");
 const db = require("./config/db");
 const userRouter = require("./routes/userRoute");
-const adminRouter=require('./routes/adminRouter');
+const adminRouter = require('./routes/adminRouter');
 const setUser = require("./middlewares/setUser");
 
 db()
@@ -48,21 +44,16 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use(setUser);
 app.use("/", userRouter);
-app.use("/admin",adminRouter);
+app.use("/admin", adminRouter);
 
-app.use((req,res)=>{
-    res.status(404).send('Page not found');
-})
+app.use((req, res) => {
+    res.status(404).render("page 404.ejs");
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-     console.log(`Server running on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
     console.log(`Admin panel: http://localhost:${PORT}/admin`);
-    
-})
-
-app.use((req,res,next)=>{
-    res.status(404).render("error","Page not found")
-})
+});
 
 module.exports = app;

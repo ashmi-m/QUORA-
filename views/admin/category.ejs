@@ -393,10 +393,12 @@ async function removeCategoryOffer(id) {
     try {
         const url = id ? `/admin/editCategory/${id}` : '/admin/addCategory';
       const method = id ? 'PUT' : 'POST';
-      const response = await fetch('/admin/addCategory',{
-        method:"POST",
-        headers:{ 'Content-Type':'application/json' },
-        body:JSON.stringify({ name, description })
+      const body = id ? { id, name, description } : { name, description };
+
+      const response = await fetch(url, {
+        method: method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
       });
       const data = await response.json();
 

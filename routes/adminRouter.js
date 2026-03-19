@@ -24,10 +24,11 @@ router.get("/categories", adminAuth, categoryController.categoryInfo);
 router.post("/addCategory", adminAuth, categoryController.addCategory);
 
 router.get("/editCategory/:id", categoryController.geteditCategory);
-router.post("/editCategory", categoryController.postEditCategory)
+router.put("/editCategory/:id", categoryController.postEditCategory);
 
 router.get("/listCategory", adminAuth, categoryController.getListCategory);
 router.get("/unlistCategory", adminAuth, categoryController.getUnlistCategory);
+router.patch("/toggleCategoryStatus/:id", adminAuth, categoryController.toggleCategoryStatus);
 //Brand Management//
 router.get("/brands", brandController.getBrandPage);
 

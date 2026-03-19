@@ -44,7 +44,8 @@
           </div>
           <div class="form-group">
             <label>Expiry Date</label>
-            <input type="date" name="expiryDate" required />
+            <!-- FIX: changed id from "editExpiryDate" to "expiryDate" and added name="expiryDate" so FormData picks it up -->
+            <input type="date" id="expiryDate" name="expiryDate" required />
           </div>
           <div class="form-group">
             <label>Minimum Purchase</label>
@@ -120,9 +121,9 @@
                       <circle cx="12" cy="12" r="10" stroke="#9e9e9e" stroke-width="2" fill="none" />
                       <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" stroke="#9e9e9e" stroke-width="2" />
                     </svg>
-                    </a>
+                  </button>
 
-                    <button class="btn-edit" title="Edit" onclick="openEditModal(
+                  <button class="btn-edit" title="Edit" onclick="openEditModal(
                     '<%= coupon._id %>',
                     '<%= coupon.code %>',
                     '<%= coupon.discountValue %>',
@@ -132,11 +133,11 @@
                     '<%= coupon.minimumPurchase %>',
                     '<%= coupon.description %>'
                   )">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="#f0a500" viewBox="0 0 24 24">
-                        <path
-                          d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
-                      </svg>
-                    </button>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="#f0a500" viewBox="0 0 24 24">
+                      <path
+                        d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                    </svg>
+                  </button>
                 </td>
               </tr>
               <% }) %>
@@ -152,24 +153,26 @@
       </table>
 
 
-<% if (totalPages > 1) { %>
-  <div class="pagination">
-    <% if (currentPage > 1) { %>
-      <a href="/admin/coupons?page=<%= currentPage - 1 %>" class="page-btn">← Previous</a>
-    <% } %>
-    <% for (let i = 1; i <= totalPages; i++) { %>
-      <a href="/admin/coupons?page=<%= i %>" class="page-btn <%= i === currentPage ? 'page-active' : '' %>">
-        <%= i %>
-      </a>
-    <% } %>
-    <% if (currentPage < totalPages) { %>
-      <a href="/admin/coupons?page=<%= currentPage + 1 %>" class="page-btn">Next →</a>
-    <% } %>
-  </div>
-<% } %>
+      <% if (totalPages > 1) { %>
+        <div class="pagination">
+          <% if (currentPage > 1) { %>
+            <a href="/admin/coupons?page=<%= currentPage - 1 %>" class="page-btn">← Previous</a>
+          <% } %>
+          <% for (let i = 1; i <= totalPages; i++) { %>
+            <a href="/admin/coupons?page=<%= i %>" class="page-btn <%= i === currentPage ? 'page-active' : '' %>">
+              <%= i %>
+            </a>
+          <% } %>
+          <% if (currentPage < totalPages) { %>
+            <a href="/admin/coupons?page=<%= currentPage + 1 %>" class="page-btn">Next →</a>
+          <% } %>
+        </div>
+      <% } %>
     </div>
 
   </div>
+
+  <!-- Edit Modal -->
   <div id="editModal" class="modal-overlay" style="display:none;">
     <div class="modal-box">
       <div class="modal-header">
@@ -222,36 +225,66 @@
   </div>
 
   <script>
+    // ── Helpers ──────────────────────────────────────────────────────────────
+
+    // Returns today's date string as "YYYY-MM-DD" in local time (no timezone shift)
+    function getTodayString() {
+      const d = new Date();
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const dd = String(d.getDate()).padStart(2, "0");
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    // Returns true if the given "YYYY-MM-DD" string is today or in the future
+    function isFutureOrToday(dateStr) {
+      if (!dateStr) return false;
+      return dateStr >= getTodayString();   // string compare works for ISO dates
+    }
+
+    // ── Set min dates on page load ────────────────────────────────────────────
+    const today = getTodayString();
+    document.getElementById("expiryDate").setAttribute("min", today);
+    document.getElementById("editExpiryDate").setAttribute("min", today);
+
+    // ── Toggle coupon active/inactive ─────────────────────────────────────────
     async function toggleCoupon(id) {
       const res = await fetch(`/admin/coupons/toggle/${id}`, { method: "POST" });
       const data = await res.json();
       if (data.success) location.reload();
     }
+
+    // ── Delete coupon ─────────────────────────────────────────────────────────
     async function deleteCoupon(id) {
       if (!confirm("Delete this coupon?")) return;
-
-      const res = await fetch(`/admin/coupons/${id}`, {
-        method: "DELETE"
-      });
-
+      const res = await fetch(`/admin/coupons/${id}`, { method: "DELETE" });
       const data = await res.json();
       if (data.success) {
         document.getElementById(`row-${id}`).remove();
       }
     }
 
+    // ── Add coupon form ───────────────────────────────────────────────────────
     document.getElementById("couponForm").addEventListener("submit", async function (e) {
       e.preventDefault();
       const data = Object.fromEntries(new FormData(this).entries());
 
-      if (!data.code || data.code.length < 3)
+      // Frontend validations
+      if (!data.code || data.code.trim().length < 3)
         return Swal.fire({ icon: "warning", title: "Invalid Code", text: "Coupon code must be at least 3 characters" });
-      if (!data.discountValue || data.discountValue <= 0)
+
+      if (!data.discountValue || Number(data.discountValue) <= 0)
         return Swal.fire({ icon: "warning", title: "Invalid Discount", text: "Discount must be greater than 0" });
-      if (!data.limit || data.limit < 1)
+
+      if (!data.limit || Number(data.limit) < 1)
         return Swal.fire({ icon: "warning", title: "Invalid Limit", text: "Usage limit must be at least 1" });
+
+      // FIX: proper future-date check
       if (!data.expiryDate)
-        return Swal.fire({ icon: "warning", title: "Expiry Required", text: "Please select expiry date" });
+        return Swal.fire({ icon: "warning", title: "Expiry Required", text: "Please select an expiry date" });
+
+      if (!isFutureOrToday(data.expiryDate))
+        return Swal.fire({ icon: "warning", title: "Invalid Date", text: "Expiry date must be today or a future date" });
 
       try {
         const res = await fetch("/admin/coupons/add", {
@@ -272,39 +305,41 @@
       }
     });
 
+    // ── Append new coupon row to table ────────────────────────────────────────
     function addCouponToTable(c) {
       const tbody = document.getElementById("couponTableBody");
       const emptyRow = tbody.querySelector(".no-data");
       if (emptyRow) emptyRow.closest("tr").remove();
 
       tbody.insertAdjacentHTML("afterbegin", `
-    <tr id="row-${c._id}">
-      <td class="td-bold">${c.code}</td>
-      <td>${c.discountType}</td>
-      <td>${c.minimumPurchase || 0}</td>
-      <td>${c.discountValue}</td>
-      <td>${c.limit}</td>
-      <td>${new Date(c.createdAt).toLocaleDateString("en-GB")}</td>
-      <td>${new Date(c.expiryDate).toLocaleDateString("en-GB")}</td>
-      <td><span class="badge-true">Active</span></td>
-      <td>${c.description || ""}</td>
-      <td class="action-cell">
-        <a href="/admin/coupon/toggle/${c._id}" class="btn-block">
-          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="#9e9e9e" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10" stroke="#9e9e9e" stroke-width="2" fill="none"/>
-            <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" stroke="#9e9e9e" stroke-width="2"/>
-          </svg>
-        </a>
-        <button class="btn-edit" onclick="openEditModal('${c._id}','${c.code}','${c.discountValue}','${c.maxDiscount}','${c.limit}','${new Date(c.expiryDate).toISOString().split('T')[0]}','${c.minimumPurchase}','${c.description}')">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="#f0a500" viewBox="0 0 24 24">
-            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
-          </svg>
-        </button>
-      </td>
-    </tr>
-  `);
+        <tr id="row-${c._id}">
+          <td class="td-bold">${c.code}</td>
+          <td>${c.discountType}</td>
+          <td>${c.minimumPurchase || 0}</td>
+          <td>${c.discountValue}</td>
+          <td>${c.limit}</td>
+          <td>${new Date(c.createdAt).toLocaleDateString("en-GB")}</td>
+          <td>${new Date(c.expiryDate).toLocaleDateString("en-GB")}</td>
+          <td><span class="badge-true">Active</span></td>
+          <td>${c.description || ""}</td>
+          <td class="action-cell">
+            <button onclick="toggleCoupon('${c._id}')" class="btn-block">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="#9e9e9e" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" stroke="#9e9e9e" stroke-width="2" fill="none"/>
+                <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" stroke="#9e9e9e" stroke-width="2"/>
+              </svg>
+            </button>
+            <button class="btn-edit" onclick="openEditModal('${c._id}','${c.code}','${c.discountValue}','${c.maxDiscount}','${c.limit}','${new Date(c.expiryDate).toISOString().split('T')[0]}','${c.minimumPurchase}','${c.description}')">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="#f0a500" viewBox="0 0 24 24">
+                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+              </svg>
+            </button>
+          </td>
+        </tr>
+      `);
     }
 
+    // ── Edit modal open/close ─────────────────────────────────────────────────
     function openEditModal(id, code, discountValue, maxDiscount, limit, expiryDate, minimumPurchase, description) {
       document.getElementById("editId").value = id;
       document.getElementById("editCode").value = code;
@@ -328,6 +363,7 @@
       if (e.target === this) closeEditModal();
     });
 
+    // ── Edit coupon form ──────────────────────────────────────────────────────
     document.getElementById("editCouponForm").addEventListener("submit", async function (e) {
       e.preventDefault();
       const id = document.getElementById("editId").value;
@@ -341,14 +377,23 @@
         minimumPurchase: Number(document.getElementById("editMinimumPurchase").value),
         description: document.getElementById("editDescription").value.trim(),
       };
+
+      // Frontend validations
       if (!data.code || data.code.length < 3)
         return Swal.fire({ icon: "warning", title: "Invalid Code", text: "Coupon code must be at least 3 characters" });
+
       if (!data.discountValue || data.discountValue <= 0)
         return Swal.fire({ icon: "warning", title: "Invalid Discount", text: "Discount must be greater than 0" });
+
       if (!data.limit || data.limit < 1)
         return Swal.fire({ icon: "warning", title: "Invalid Limit", text: "Usage limit must be at least 1" });
+
+      // FIX: proper future-date check
       if (!data.expiryDate)
         return Swal.fire({ icon: "warning", title: "Missing Date", text: "Please select an expiry date" });
+
+      if (!isFutureOrToday(data.expiryDate))
+        return Swal.fire({ icon: "warning", title: "Invalid Date", text: "Expiry date must be today or a future date" });
 
       try {
         const res = await fetch(`/admin/coupons/edit/${id}`, {
