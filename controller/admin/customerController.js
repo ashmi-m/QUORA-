@@ -14,24 +14,24 @@ const customerInfo = async (req, res) => {
         };
 
         const userData = await User.find(query)
-        .sort({_id:-1})
-        .limit(limit)
-        .skip((page - 1)*limit)
-        .exec();
+            .sort({ _id: -1 })
+            .limit(limit)
+            .skip((page - 1) * limit)
+            .exec();
         const count = await User.countDocuments(query);
-        res.render("customer",{
-            data:userData,
-            totalUsers:count,
-            currentPage:page,
-            totalPages:Math.ceil(count/limit),
+        res.render("customer", {
+            data: userData,
+            totalUsers: count,
+            currentPage: page,
+            totalPages: Math.ceil(count / limit),
             search,
         });
 
-        }catch(error){
-            console.error("Error in customerInfo:",error.message);
-            res.status(500).send("Internal  Server Error");
-        }
-    };
+    } catch (error) {
+        console.error("Error in customerInfo:", error.message);
+        res.status(500).send("Internal  Server Error");
+    }
+};
 const customerBlocked = async (req, res) => {
     try {
         let id = req.query.id;

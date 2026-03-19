@@ -81,6 +81,20 @@ else sortQuery = { createdAt: -1 };
     ]);
 
 products.forEach(applyOffer);
+if (sortOption === "low-high") {
+      products.sort((a, b) => {
+        const priceA = a.salePrice ?? a.regularPrice;
+        const priceB = b.salePrice ?? b.regularPrice;
+        return priceA - priceB;
+      });
+    } else if (sortOption === "high-low") {
+      products.sort((a, b) => {
+        const priceA = a.salePrice ?? a.regularPrice;
+        const priceB = b.salePrice ?? b.regularPrice;
+        return priceB - priceA;
+      });
+    }
+    
     if (req.user) {
       const wishlist = await Wishlist.findOne({ userId: req.user._id }).lean();
       const wishlistedIds = wishlist ? wishlist.items.map(i => i.productId.toString()) : [];
