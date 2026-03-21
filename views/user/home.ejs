@@ -3,249 +3,301 @@
   <head>
     <link rel="stylesheet" href="../../css/home.css">
     <title>Home - Quora</title>
+<style>
+  body {
+    background: #fbfafa;
+  }
 
-    <style>
-     body{
-  background: #fbfafa;
-}
-      .products {
-        text-align: center;
-      }
+  .products {
+    text-align: center;
+  }
 
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+    justify-items: center;
+  }
 
-      .product-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  .product-card {
+    position: relative;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    width: 220px;
+    background: #fff;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
 
-        gap: 20px;
-        margin-top: 20px;
-        justify-items: center;
-      }
+  .wishlist-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 22px;
+    cursor: pointer;
+    color: white;
+    transition: 0.3s;
+    z-index: 10;
+  }
 
+  .wishlist-icon.active {
+    color: rgb(250, 127, 127);
+  }
 
-      .product-card {
-        position: relative;
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        padding: 15px;
-        width: 220px;
-        background: #fff;
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-      }
+  .product-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 6px;
+  }
 
-      .wishlist-icon {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        font-size: 22px;
-        cursor: pointer;
-        color: white; 
-        transition: 0.3s;
-        z-index: 10;
-      }
+  .product-card h4 {
+    font-size: 16px;
+    margin: 10px 0;
+  }
 
-      .wishlist-icon.active {
-        color: rgb(250, 127, 127);
-      }
+  .product-card p {
+    font-weight: bold;
+    color: #333;
+    margin: 5px 0;
+  }
 
-      .product-card img {
-        width: 100%;
-        height: 200px;
-        object-fit: cover;
-        border-radius: 6px;
-      }
+  .btn-view-details,
+  .btn-see-more {
+    background: #fe595f;
+    color: #fff;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+  }
 
-      .product-card h4 {
-        font-size: 16px;
-        margin: 10px 0;
-      }
+  a {
+    text-decoration: none;
+  }
 
-      .product-card p {
-        font-weight: bold;
-        color: #333;
-        margin: 5px 0;
-      }
+  .offers-section {
+    width: 100%;
+    background-color: #fff;
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+  }
 
-      .btn-view-details,
-      .btn-see-more {
-        background: #fe595f;
-        color: #fff;
-        padding: 8px 12px;
-        border: none;
-        border-radius: 6px;
-        /* cursor: pointer;
-        margin-top: 5px; */
-        text-underline-offset: none;
-      }
-      a {
-  text-decoration: none;
-}
+  .offers-container {
+    background-image: url('/images/Flowers brushes cosmetics highlighter Candle Mac.jpeg');
+    background-size: cover;
+    background-position: center;
+    width: 100%;
+    max-width: 1200px;
+    border-radius: 20px;
+    padding: 140px 60px;
+    color: #a15e3f;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
 
-      /* .btn-view-details:hover,
-      .btn-see-more:hover {
-        background: #3730a3;
-      } */
+  .offers-container h2 {
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
 
+  .offers-container p {
+    font-size: 18px;
+    margin-bottom: 20px;
+    color: rgba(255, 255, 255, 0.9);
+  }
 
-      .offers-section {
-        width: 100%;
-        background-color: #fff;
-        display: flex;
-        justify-content: center;
-        padding: 40px 20px;
-      }
+  .offers-container .explore-btn {
+    background-color: #a15e3f;
+    color: white;
+    padding: 12px 24px;
+    font-weight: bold;
+    border-radius: 10px;
+    text-decoration: none;
+    display: inline-block;
+    width: fit-content;
+    transition: background-color 0.3s ease;
+  }
 
-      .offers-container {
-        background-image: url('/images/Flowers brushes cosmetics highlighter Candle Mac.jpeg');
-       
-        background-size: cover;
-        background-position: center;
-        width: 100%;
-        max-width: 1200px;
-        border-radius: 20px;
-        padding: 140px 60px;
-        color: #a15e3f;
-        text-align: left;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-      }
+  .cart-icon {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 20px;
+    cursor: pointer;
+    color: #555;
+    transition: 0.3s;
+    z-index: 10;
+  }
 
-      .offers-container h2 {
-        font-size: 36px;
-        font-weight: bold;
-        margin-bottom: 10px;
-      }
+  .cart-icon:hover {
+    color: #f6425d;
+  }
 
-      .offers-container p {
-        font-size: 18px;
-        margin-bottom: 20px;
-        color: rgba(255, 255, 255, 0.9);
-      }
+  .btn-add-cart {
+    background: #f87b7b;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
 
-      .offers-container .explore-btn {
-        background-color: #a15e3f;
-        color: white;
-        padding: 12px 24px;
-        font-weight: bold;
-        border-radius: 10px;
-        text-decoration: none;
-        display: inline-block;
-        width: fit-content;
-        transition: background-color 0.3s ease;
-      }
+  .btn-add-cart:hover {
+    background: #b91c1c;
+  }
 
-      .cart-icon {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        font-size: 20px;
-        cursor: pointer;
-        color: #555;
-        transition: 0.3s;
-        z-index: 10;
-      }
+  .offers-container .explore-btn:hover {
+    background-color: #8a4b2f;
+  }
 
-      .cart-icon:hover {
-        color: #f6425d;
-      }
+  /* ABOUT SECTION */
+  .about-hero {
+    text-align: center;
+    padding: 70px 20px 40px;
+  }
 
-      .btn-add-cart {
-        background: #f87b7b;
-        color: white;
-        border: none;
-        padding: 10px;
-        border-radius: 8px;
-        cursor: pointer;
-        margin-top: 10px;
-      }
+  .about-hero h1 {
+    font-size: 42px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #1a1a1a;
+  }
 
-      .btn-add-cart:hover {
-        background: #b91c1c;
-      }
+  .about-image-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 40px 60px;
+  }
 
+  .about-image-grid .img-wrap {
+    border-radius: 10px;
+    overflow: hidden;
+  }
 
+  .about-image-grid .img-wrap:nth-child(1) {
+    margin-top: 30px;
+  }
 
-      .offers-container .explore-btn:hover {
-        background-color: #8a4b2f;
-      }
+  .about-image-grid .img-wrap:nth-child(3) {
+    margin-top: 50px;
+  }
 
-      @media (max-width: 768px) {
-        .offers-container {
-          padding: 40px 20px;
-          text-align: center;
-        }
+  .about-image-grid img {
+    width: 100%;
+    height: 320px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+  }
 
-        .offers-container h2 {
-          font-size: 28px;
-        }
+  .about-image-grid .img-wrap:hover img {
+    transform: scale(1.04);
+  }
 
-        .offers-container p {
-          font-size: 16px;
-        }
-      }
+  /* ========================= */
+  /* ✅ MOBILE RESPONSIVE FIXES */
+  /* ========================= */
 
-      
-      .about-hero {
-        text-align: center;
-        padding: 70px 20px 40px;
-      }
+  @media (max-width: 768px) {
 
-      .about-hero h1 {
-        font-size: 42px;
-        font-weight: 800;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        color: #1a1a1a;
-      }
+    .about-image-grid {
+      grid-template-columns: repeat(2, 1fr);
+      padding: 0 20px 40px;
+    }
 
-      .about-image-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 18px;
-        max-width: 1100px;
-        margin: 0 auto;
-        padding: 0 40px 60px;
-      }
+    .offers-container {
+      padding: 60px 20px;
+      text-align: center;
+    }
 
-      .about-image-grid .img-wrap {
-        border-radius: 10px;
-        overflow: hidden;
-      }
+    .offers-container h2 {
+      font-size: 28px;
+    }
 
-      .about-image-grid .img-wrap:nth-child(1) { margin-top: 30px; }
-      .about-image-grid .img-wrap:nth-child(3) { margin-top: 50px; }
+    .offers-container p {
+      font-size: 16px;
+    }
+  }
 
-      .about-image-grid img {
-        width: 100%;
-        height: 320px;
-        object-fit: cover;
-        display: block;
-        transition: transform 0.4s ease;
-      }
+  @media (max-width: 480px) {
 
-      .about-image-grid .img-wrap:hover img {
-        transform: scale(1.04);
-      }
+    /* PRODUCTS */
+    .product-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
 
-      @media (max-width: 768px) {
-        .about-image-grid {
-          grid-template-columns: 1fr;
-          padding: 0 20px 40px;
-        }
+    .product-card {
+      width: 100%;
+      padding: 10px;
+    }
 
-        .about-image-grid .img-wrap:nth-child(n) {
-          margin-top: 0;
-        }
+    .product-card img {
+      height: 150px;
+    }
 
-        .about-hero h1 {
-          font-size: 28px;
-        }
-      }
-    </style>
+    .product-card h4 {
+      font-size: 14px;
+    }
+
+    .product-card p {
+      font-size: 14px;
+    }
+
+    .btn-add-cart {
+      font-size: 12px;
+      padding: 8px;
+    }
+
+    .wishlist-icon {
+      font-size: 18px;
+    }
+
+    .cart-icon {
+      font-size: 16px;
+    }
+
+    /* ABOUT */
+    .about-image-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .about-image-grid img {
+      height: 220px;
+    }
+
+    /* OFFERS */
+    .offers-container {
+      padding: 40px 15px;
+    }
+
+    .offers-container h2 {
+      font-size: 22px;
+    }
+
+    .offers-container p {
+      font-size: 14px;
+    }
+
+    /* BUTTON */
+    .btn-see-more {
+      margin-top: 15px;
+    }
+  }
+</style>
   </head>
 
   <body>
