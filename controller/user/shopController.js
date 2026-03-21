@@ -171,7 +171,7 @@ const loadProductDetails = async (req, res) => {
       });
       isWishlisted = !!wishlist;
     }
-    res.render("productDetails", { product, relatedProducts, isWishlisted });
+    res.render("productdetails", { product, relatedProducts, isWishlisted });
   } catch (error) {
     console.error(error);
     res.redirect("/pageNotFound");
