@@ -44,7 +44,6 @@
           </div>
           <div class="form-group">
             <label>Expiry Date</label>
-            <!-- FIX: changed id from "editExpiryDate" to "expiryDate" and added name="expiryDate" so FormData picks it up -->
             <input type="date" id="expiryDate" name="expiryDate" required />
           </div>
           <div class="form-group">
@@ -172,7 +171,6 @@
 
   </div>
 
-  <!-- Edit Modal -->
   <div id="editModal" class="modal-overlay" style="display:none;">
     <div class="modal-box">
       <div class="modal-header">
@@ -225,9 +223,6 @@
   </div>
 
   <script>
-    // ── Helpers ──────────────────────────────────────────────────────────────
-
-    // Returns today's date string as "YYYY-MM-DD" in local time (no timezone shift)
     function getTodayString() {
       const d = new Date();
       const yyyy = d.getFullYear();
@@ -235,26 +230,21 @@
       const dd = String(d.getDate()).padStart(2, "0");
       return `${yyyy}-${mm}-${dd}`;
     }
-
-    // Returns true if the given "YYYY-MM-DD" string is today or in the future
     function isFutureOrToday(dateStr) {
       if (!dateStr) return false;
-      return dateStr >= getTodayString();   // string compare works for ISO dates
+      return dateStr >= getTodayString();   
     }
 
-    // ── Set min dates on page load ────────────────────────────────────────────
     const today = getTodayString();
     document.getElementById("expiryDate").setAttribute("min", today);
     document.getElementById("editExpiryDate").setAttribute("min", today);
 
-    // ── Toggle coupon active/inactive ─────────────────────────────────────────
     async function toggleCoupon(id) {
       const res = await fetch(`/admin/coupons/toggle/${id}`, { method: "POST" });
       const data = await res.json();
       if (data.success) location.reload();
     }
 
-    // ── Delete coupon ─────────────────────────────────────────────────────────
     async function deleteCoupon(id) {
       if (!confirm("Delete this coupon?")) return;
       const res = await fetch(`/admin/coupons/${id}`, { method: "DELETE" });
@@ -264,12 +254,11 @@
       }
     }
 
-    // ── Add coupon form ───────────────────────────────────────────────────────
+   
     document.getElementById("couponForm").addEventListener("submit", async function (e) {
       e.preventDefault();
       const data = Object.fromEntries(new FormData(this).entries());
 
-      // Frontend validations
       if (!data.code || data.code.trim().length < 3)
         return Swal.fire({ icon: "warning", title: "Invalid Code", text: "Coupon code must be at least 3 characters" });
 
@@ -279,7 +268,7 @@
       if (!data.limit || Number(data.limit) < 1)
         return Swal.fire({ icon: "warning", title: "Invalid Limit", text: "Usage limit must be at least 1" });
 
-      // FIX: proper future-date check
+
       if (!data.expiryDate)
         return Swal.fire({ icon: "warning", title: "Expiry Required", text: "Please select an expiry date" });
 
@@ -305,7 +294,7 @@
       }
     });
 
-    // ── Append new coupon row to table ────────────────────────────────────────
+
     function addCouponToTable(c) {
       const tbody = document.getElementById("couponTableBody");
       const emptyRow = tbody.querySelector(".no-data");
@@ -339,7 +328,6 @@
       `);
     }
 
-    // ── Edit modal open/close ─────────────────────────────────────────────────
     function openEditModal(id, code, discountValue, maxDiscount, limit, expiryDate, minimumPurchase, description) {
       document.getElementById("editId").value = id;
       document.getElementById("editCode").value = code;
@@ -363,7 +351,7 @@
       if (e.target === this) closeEditModal();
     });
 
-    // ── Edit coupon form ──────────────────────────────────────────────────────
+
     document.getElementById("editCouponForm").addEventListener("submit", async function (e) {
       e.preventDefault();
       const id = document.getElementById("editId").value;
@@ -378,7 +366,7 @@
         description: document.getElementById("editDescription").value.trim(),
       };
 
-      // Frontend validations
+     
       if (!data.code || data.code.length < 3)
         return Swal.fire({ icon: "warning", title: "Invalid Code", text: "Coupon code must be at least 3 characters" });
 
@@ -388,7 +376,6 @@
       if (!data.limit || data.limit < 1)
         return Swal.fire({ icon: "warning", title: "Invalid Limit", text: "Usage limit must be at least 1" });
 
-      // FIX: proper future-date check
       if (!data.expiryDate)
         return Swal.fire({ icon: "warning", title: "Missing Date", text: "Please select an expiry date" });
 

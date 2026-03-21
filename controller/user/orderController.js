@@ -387,7 +387,7 @@ const cancelSingleProduct = async (req, res) => {
 
     await order.save();
 if (order.paymentMethod !== "COD") {
-  const refundAmount = product.price * product.quantity;
+  const refundAmount = (product.salePrice ?? product.price) * product.quantity;
 
   await walletController.creditWallet(
     order.userId,

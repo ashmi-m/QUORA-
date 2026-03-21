@@ -41,7 +41,7 @@ const addCategory = async (req, res) => {
 
     name = name.trim();
 
-    // ✅ Case-insensitive duplicate check
+    
     const existing = await Category.findOne({
       name: { $regex: `^${name}$`, $options: "i" }
     });
@@ -53,7 +53,6 @@ const addCategory = async (req, res) => {
       });
     }
 
-    // ✅ Store in lowercase (good practice)
     const newCat = new Category({
       name: name.toLowerCase(),
       description,
@@ -110,7 +109,7 @@ const postEditCategory = async (req, res) => {
 
 } catch (error) {
     console.error("Error updating category:", error);
-    res.status(500).json({ success: false, error: "Internal server error" });  // ✅
+    res.status(500).json({ success: false, error: "Internal server error" });  
   }
 };
 const getListCategory=async(req,res)=>{

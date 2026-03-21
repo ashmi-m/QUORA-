@@ -216,16 +216,19 @@ const applyCoupon = async (req, res) => {
 
     let subtotal = 0;
 
-    cart.items.forEach(item => {
-      const product = item.productId;
+cart.items.forEach(item => {
+  const product = item.productId;
+  const regularPrice = Number(product.regularPrice || 0);
+  const categoryOffer = product.category?.categoryOffer || 0;
+  const productOffer = Number(product.productOffer || 0);
+  const effectiveOffer = Math.max(productOffer, categoryOffer);
+  const price = effectiveOffer > 0
+    ? Math.round(regularPrice - (regularPrice * effectiveOffer) / 100)
+    : regularPrice;
+  subtotal += price * item.quantity;
+});
 
-      const regularPrice = Number(product.regularPrice || 0);
-      const discount = Number(product.productOffer || 0);
 
-      const price = regularPrice - (regularPrice * discount) / 100;
-
-      subtotal += price * item.quantity;
-    });
 
     if (subtotal < coupon.minimumPurchase) {
       return res.json({
