@@ -186,6 +186,7 @@ const loadEditAddressPage = async (req, res) => {
 
 const updateAddress = async (req, res) => {
   try {
+    console.log("this controller")
     const userId = req.session.user._id;
     const addressId = req.params.id;
     const {
@@ -198,17 +199,20 @@ const updateAddress = async (req, res) => {
       type
     } = req.body;
 
+    const existAddress = await Address.findOne({userId,"addresses._id": addressId});
+    console.log("check the address",existAddress)
+
     const result = await Address.updateOne(
       { userId, "addresses._id": addressId },
       {
         $set: {
           "addresses.$.name": name,
           "addresses.$.phone": phone,
-          "addresses.$.address": address,
+          "addresses.$.landMark": address,
           "addresses.$.city": city,
           "addresses.$.state": state,
           "addresses.$.pincode": pincode,
-          "addresses.$.type": type
+          "addresses.$.addressType": type
         }
       }
     );

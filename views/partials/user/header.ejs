@@ -96,7 +96,7 @@
     </nav>
 
     <div class="right-section">
-
+ <% if (user) { %>
        <a href="/wishlist" class="header-icon">
     <i class="fa fa-heart"></i>
     <% if (typeof wishlistCount !== "undefined" && wishlistCount > 0) { %>
@@ -112,7 +112,7 @@
   </a>
 
 
-        <% if (user) { %>
+       
           <div class="dropdown">
             <a href="#" class="sign-in-link text-dark">
                <%= user.name || "Username" %>
