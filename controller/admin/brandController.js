@@ -25,14 +25,17 @@ const getBrandPage = async (req, res) => {
 };
 const addBrand = async (req, res) => {
   try {
+    console.log("add brand",req.body)
     const { brandName } = req.body;
+
+
     if (!brandName || !req.file) {
       return res.status(400).json({
         success:false,
         error:"Brand name and logo are required"
       });
     }
-    brandName = brandName.trim();
+   
        const existingBrand = await Brand.findOne({
       brandName: { $regex: `^${brandName}$`, $options: "i" },
     });
