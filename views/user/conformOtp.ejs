@@ -399,7 +399,7 @@
                         });
                     });
                 });
-                let time = 60;
+                let time = 30;
                 let timerInterval;
                 const countdownElement = document.getElementById("countdown");
                 const resendBtn = document.getElementById("resendBtn");
@@ -448,9 +448,9 @@
                                     icon: "success",
                                     title: 'Success',
                                     text: res.message || "OTP Verified Successfully!"
-                                }).then(() => {
-                                    window.location.href = '/login';
-                                });
+                               }).then(() => {
+    window.location.href = '/';  
+});
                             } else {
                                 Swal.fire({
                                     icon: "error",
@@ -469,43 +469,47 @@
                         });
                 }
                 function ResendOTP() {
-                    if (time > 0) {
-                        Swal.fire({
-                            icon: "warning",
-                            title: "Please wait",
-                            text: "You can resend OTP only after the timer ends."
-                        });
-                        return;
-                    }
+    // ✅ REMOVED the if(time > 0) guard - button disabled state already handles this
+    resendBtn.disabled = true;
+    clearInterval(timerInterval);
+    time = 120;
+    startTimer();
 
-                    resendBtn.disabled = true;
-                    clearInterval(timerInterval);
-                    time = 60;
-                    startTimer();
-
-                    fetch('/resend-otp', {
-                        method: 'POST',
-                        headers: {
-                            'Content-type': 'application/json'
-                        }
-                    })
-                        .then(res => res.json())
-                        .then(data => {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'OTP Sent',
-                                text: data.message || "Resend OTP called!"
-                            });
-                        })
-                        .catch(err => {
-                            console.error(err);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: 'Failed to resend OTP. Please try again.'
-                            });
-                        });
-                }
+ fetch('/resend-otp', {
+    method: 'POST',
+    credentials: 'same-origin',   // ✅ THIS FIXES YOUR ISSUE
+    headers: {
+        'Content-type': 'application/json'
+    }
+})
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'OTP Sent',
+                    text: data.message || "OTP resent successfully!"
+                });
+            } else {
+                // ✅ ADDED - handle failure case too
+                resendBtn.disabled = false; // re-enable if send failed
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed',
+                    text: data.message || "Failed to resend OTP."
+                });
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            resendBtn.disabled = false; // ✅ re-enable on network error too
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to resend OTP. Please try again.'
+            });
+        });
+}
             </script>
 </body>
 

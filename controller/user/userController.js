@@ -10,6 +10,7 @@ const env = require("dotenv").config();
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const Order = require("../../models/orderSchema");
+
 const loadHomepage = async (req, res) => {
   try {
     const products = await Product.find({ isBlocked: false })
@@ -136,9 +137,9 @@ function generateRefCode(name) {
   const random = Math.random().toString(36).substring(2, 7).toUpperCase();
   return prefix + random;
 }
+
 const signup = async (req, res) => {
   try {
-
     const { name, email, password, confirmPassword, phone, refCode } = req.body;
 
     if (password !== confirmPassword) {
@@ -146,23 +147,20 @@ const signup = async (req, res) => {
     }
 
     const findUser = await User.findOne({ email });
-
     if (findUser) {
       return res.render("signup", { message: "User already exists" });
     }
 
     const otp = generateOtp();
-
     console.log("🟢 Generated OTP for", email, "is:", otp);
 
     const emailSent = await sendVerificationEmail(email, otp);
-
     if (!emailSent) {
       return res.render("signup", { message: "Failed to send OTP" });
     }
-    req.session.userOtp = otp;
-    req.session.userOtpExpiry = Date.now() + 2 * 60 * 1000; // 2 minutes
 
+    req.session.userOtp = otp;
+    req.session.userOtpExpiry = Date.now() + 1 * 30 * 1000;
     req.session.userData = {
       name,
       email,
@@ -171,7 +169,13 @@ const signup = async (req, res) => {
       referredBy: refCode || null
     };
 
-    res.render("conformOtp");
+    req.session.save((err) => {
+      if (err) {
+        console.error("Session save error:", err);
+        return res.render("signup", { message: "Something went wrong. Please try again." });
+      }
+      return res.render("conformOtp");  
+    });
 
   } catch (error) {
     console.error(error);
@@ -190,24 +194,18 @@ const securePassword = async (password) => {
 const conformOtp = async (req, res) => {
   try {
     const { otp } = req.body;
-    if (!req.session.userOtp || !req.session.userOtpExpiry) {
-      return res.status(400).json({
-        success: false,
-        message: "OTP expired. Please signup again"
-      });
-    }
-    if (Date.now() > req.session.userOtpExpiry) {
+
+    if (!req.session.userOtp || !req.session.userOtpExpiry || Date.now() > req.session.userOtpExpiry) {
       delete req.session.userOtp;
       delete req.session.userOtpExpiry;
-      delete req.session.userData;
-
+      // delete req.session.userData;
       return res.status(400).json({
         success: false,
         message: "OTP expired. Please signup again"
       });
     }
-    if (String(otp) === String(req.session.userOtp)) {
 
+    if (String(otp) === String(req.session.userOtp)) {
       const user = req.session.userData;
 
       if (!user) {
@@ -221,7 +219,6 @@ const conformOtp = async (req, res) => {
 
       let newRefCode;
       let isUnique = false;
-
       while (!isUnique) {
         newRefCode = generateRefCode(user.name);
         const exists = await User.findOne({ refCode: newRefCode });
@@ -242,13 +239,8 @@ const conformOtp = async (req, res) => {
 
       if (user.referredBy) {
         const referrer = await User.findOne({ refCode: user.referredBy });
-
         if (referrer && referrer._id.toString() !== saveUserData._id.toString()) {
-          await creditWallet(
-            referrer._id,
-            50,
-            `Referral bonus for ${user.name} joining`
-          );
+          await creditWallet(referrer._id, 50, `Referral bonus for ${user.name} joining`);
         }
       }
 
@@ -268,46 +260,53 @@ const conformOtp = async (req, res) => {
       });
 
     } else {
-
       return res.status(400).json({
         success: false,
         message: "Invalid OTP. Please try again"
       });
-
     }
 
   } catch (error) {
     console.error("Error verifying OTP", error);
-    res.status(500).json({
-      success: false,
-      message: "Server error"
-    });
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
 const resendOtp = async (req, res) => {
   try {
-    const { email } = req.session.userData || req.body;
-    if (!email) {
-      return res.status(400).json({ success: false, message: "Email not found in session" })
+    if (!req.session.userData || !req.session.userData.email) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Session expired. Please signup again." 
+      });
     }
 
+    const email = req.session.userData.email;
     const otp = generateOtp();
     req.session.userOtp = otp;
+    req.session.userOtpExpiry = Date.now() + 2 * 60 * 1000;
 
-    const emailSent = await sendVerificationEmail(email, otp);
-    console.log(emailSent)
-    if (emailSent) {
-      console.log("Resent OTP", otp);
-      res.status(200).json({ success: true, message: "OTP Resend Successfully" })
-    } else {
-      res.status(500).json({ success: false, message: "Failed to resend OTP.Please try again" });
-    }
+   
+    req.session.save(async (err) => {
+      if (err) {
+        console.error("Session save error:", err);
+        return res.status(500).json({ success: false, message: "Session error. Please try again." });
+      }
+
+      const emailSent = await sendVerificationEmail(email, otp);
+      console.log("Resent OTP:", otp);
+
+      if (emailSent) {
+        return res.status(200).json({ success: true, message: "OTP Resent Successfully" });
+      } else {
+        return res.status(500).json({ success: false, message: "Failed to resend OTP. Please try again." });
+      }
+    });
+
   } catch (error) {
     console.error("Error resending OTP", error);
-    res.status(500).json({ success: false, message: "Internal Server Error.Please try again" })
+    res.status(500).json({ success: false, message: "Internal Server Error. Please try again." });
   }
-}
-
+};
 const loadLogin = async (req, res) => {
   try {
     if (req.session.user) {
