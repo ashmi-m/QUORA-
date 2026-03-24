@@ -219,8 +219,32 @@ const verifyEmail = async (req, res) => {
 const updateProfile = async(req,res)=>{
   try{
     const userId = req.session.user._id;
-    const{name,phone,gender}=req.body
+    let { name, phone, gender } = req.body;
      name = name ? name.trim() : ""
+     phone = phone ? phone.trim() : "";
+if (!/^\d{10}$/.test(phone)) {
+  return res.json({
+    success: false,
+    message: "Phone must be exactly 10 digits"
+  });
+}
+
+if (/^(\d)\1{9}$/.test(phone)) {
+  return res.json({
+    success: false,
+    message: "Repeated digits are not allowed"
+  });
+}
+
+const asc = "01234567890123456789";
+const desc = "98765432109876543210";
+
+if (asc.includes(phone) || desc.includes(phone)) {
+  return res.json({
+    success: false,
+    message: "Sequential numbers are not allowed"
+  });
+}
      const namePattern = /^[A-Za-z\s]{3,20}$/;
     if (!namePattern.test(name)) {
       return res.json({
