@@ -83,6 +83,7 @@
 
     <script>
       document.addEventListener("DOMContentLoaded", () => {
+
         const changeBtn = document.getElementById("changeImageBtn");
         const imageInput = document.getElementById("profileImageInput");
 
@@ -126,6 +127,18 @@
           document.execCommand("copy");
           Swal.fire("Copied!", "Referral code copied to clipboard", "success");
         };
+    function validateProfileName() {
+      const nameInput = document.querySelector("input[name='name']");
+      const nameVal = nameInput.value.trim();
+
+      const pattern = /^[A-Za-z\s]{3,20}$/;
+
+      if (!pattern.test(nameVal)) {
+        Swal.fire("Invalid Name", "Name must be 3–20 characters and contain only alphabets", "warning");
+        return false;
+      }
+      return true;
+    }
 
         const editBtn = document.getElementById("editProfileBtn");
         const saveBtn = document.getElementById("saveProfileBtn");
@@ -141,6 +154,7 @@
           });
 
           saveBtn.addEventListener("click", async () => {
+             if (!validateProfileName()) return;
             const data = {
               name: document.querySelector("input[name='name']").value,
               phone: document.querySelector("input[name='phone']").value,

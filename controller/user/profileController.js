@@ -220,6 +220,14 @@ const updateProfile = async(req,res)=>{
   try{
     const userId = req.session.user._id;
     const{name,phone,gender}=req.body
+     name = name ? name.trim() : ""
+     const namePattern = /^[A-Za-z\s]{3,20}$/;
+    if (!namePattern.test(name)) {
+      return res.json({
+        success: false,
+        message: "Name must be 3–20 characters and contain only alphabets"
+      });
+    }
     await User.findByIdAndUpdate(userId,{
       name,
       phone,
