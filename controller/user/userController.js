@@ -141,7 +141,12 @@ function generateRefCode(name) {
 const signup = async (req, res) => {
   try {
     const { name, email, password, confirmPassword, phone, refCode } = req.body;
-
+const namePattern = /^[A-Za-z\s]{3,20}$/;
+if (!namePattern.test(name)) {
+  return res.render("signup", {
+    message: "Name must be 3–20 characters and contain only alphabets"
+  });
+}
     if (password !== confirmPassword) {
       return res.render("signup", { message: "Passwords do not match" });
     }

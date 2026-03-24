@@ -117,21 +117,23 @@
     const error4 = document.getElementById("error4");
     const error5 = document.getElementById("error5");
 
-    function nameValidate() {
-      const nameVal = nameid.value.trim();
-      const pattern = /^[A-Za-z\s]+$/;
-      if (nameVal === "") {
-        error1.textContent = "Please enter a valid name";
-        error1.style.display = "block";
-        return false;
-      } else if (!pattern.test(nameVal)) {
-        error1.textContent = "Name can only contain alphabets and spaces";
-        error1.style.display = "block";
-        return false;
-      }
-      error1.style.display = "none";
-      return true;
-    }
+function nameValidate() {
+  const nameVal = nameid.value.trim();
+  const pattern = /^[A-Za-z\s]{3,20}$/;
+
+  if (nameVal === "") {
+    error1.textContent = "Name is required";
+    error1.style.display = "block";
+    return false;
+  } else if (!pattern.test(nameVal)) {
+    error1.textContent = "Name must be 3–20 characters and contain only alphabets";
+    error1.style.display = "block";
+    return false;
+  }
+
+  error1.style.display = "none";
+  return true;
+}
 
      function emailValidate() {
     const emailVal = document.getElementById("email").value.trim();
