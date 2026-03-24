@@ -80,22 +80,7 @@ const loadShopPage = async (req, res) => {
     }else if (selectedPriceRange === "above15000") {
       query.regularPrice = { $gt: 15000 };
     }
-// let sortQuery = {};
-// if (sortOption === "low-high") sortQuery = { regularPrice: 1 };
-// else if (sortOption === "high-low") sortQuery = { regularPrice: -1 };
-// // else if (sortOption === "a-z") sortQuery = { productName: 1 };
-// // else if (sortOption === "z-a") sortQuery = { productName: -1 };
-// // else sortQuery = { createdAt: -1 };
 
-// sort
-
-// if (sortOption === "low-high") {
-//   products.sort((a, b) => (a.salePrice ?? a.regularPrice) - (b.salePrice ?? b.regularPrice));
-// } 
-// else if (sortOption === "high-low") {
-//   products.sort((a, b) => (b.salePrice ?? b.regularPrice) - (a.salePrice ?? a.regularPrice));
-// }
-       // ✅ SORT (FULL FIX)
     let sortQuery = { createdAt: -1 };
 
     if (sort === "low-high") {
