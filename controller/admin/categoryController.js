@@ -144,10 +144,10 @@ const addCategoryOffer = async (req, res) => {
   try {
     const categoryId = req.params.id;
     const percentage = Number(req.body.percentage);
-    if (isNaN(percentage) || percentage < 1 || percentage > 100) {
+    if (isNaN(percentage) || percentage < 1 || percentage > 99) {
       return res.status(400).json({
         success: false,
-        error: "Enter a valid percentage between 1 and 100",
+        error: "Enter a valid percentage between 1 and 99",
       });
     }
     const category = await Category.findById(categoryId);

@@ -258,13 +258,31 @@
     document.getElementById("couponForm").addEventListener("submit", async function (e) {
       e.preventDefault();
       const data = Object.fromEntries(new FormData(this).entries());
+if (data.discountType === "percentage") {
 
+  if (Number(data.discountValue) > 100) {
+    return Swal.fire({
+      icon: "warning",
+      title: "Invalid Percentage",
+      text: "Percentage cannot exceed 100"
+    });
+  }
+
+  if (!data.maxDiscount || Number(data.maxDiscount) <= 0) {
+    return Swal.fire({
+      icon: "warning",
+      title: "Max Discount Required",
+      text: "Enter max discount for percentage coupon"
+    });
+  }
+}
       if (!data.code || data.code.trim().length < 3)
         return Swal.fire({ icon: "warning", title: "Invalid Code", text: "Coupon code must be at least 3 characters" });
 
       if (!data.discountValue || Number(data.discountValue) <= 0)
         return Swal.fire({ icon: "warning", title: "Invalid Discount", text: "Discount must be greater than 0" });
 
+        
       if (!data.limit || Number(data.limit) < 1)
         return Swal.fire({ icon: "warning", title: "Invalid Limit", text: "Usage limit must be at least 1" });
 

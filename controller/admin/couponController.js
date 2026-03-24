@@ -54,7 +54,27 @@ const addCoupon = async (req, res) => {
         message: "Required fields missing"
       });
     }
-
+if (discountType === "percentage") {
+  if (discountValue <= 0 || discountValue > 100) {
+    return res.status(400).json({
+      success: false,
+      message: "Percentage must be between 1 and 100"
+    });
+  }
+ if (!maxDiscount || maxDiscount <= 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Max discount required for percentage coupon"
+    });
+  }
+} else {
+  if (discountValue <= 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Fixed discount must be greater than 0"
+    });
+  }
+}
     const existing = await Coupon.findOne({
       code: code.toUpperCase()
     });
@@ -109,16 +129,18 @@ const updateCoupon = async (req, res) => {
       description
     } = req.body;
 
-      const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const expiry = new Date(expiryDate);
-    expiry.setHours(0, 0, 0, 0);
-    if (!expiryDate || isNaN(expiry.getTime()) || expiry < today) {
-      return res.status(400).json({
-        success: false,
-        message: "Expiry date must be today or a future date"
-      });
-    }
+     const today = new Date();
+today.setHours(0, 0, 0, 0);
+
+const expiry = new Date(expiryDate);
+expiry.setHours(0, 0, 0, 0);
+
+if (!expiryDate || isNaN(expiry.getTime()) || expiry <= today) {
+  return res.status(400).json({
+    success: false,
+    message: "Expiry date must be a future date (not today or past)"
+  });
+}
 
 
 
