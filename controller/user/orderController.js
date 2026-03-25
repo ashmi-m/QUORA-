@@ -295,6 +295,7 @@ if (paymentMethod === "COD" && finalTotal > 1000) {
   }
 };
 
+
 const cancelOrder = async (req, res) => {
   try {
     const reason = req.body?.reason || "";
@@ -316,7 +317,6 @@ const cancelOrder = async (req, res) => {
       return res.json({ success: false, message: "Cannot cancel now" });
     }
 
-    // Restore stock
     for (let item of order.products) {
       if (!item.productId) continue;
 
@@ -334,35 +334,15 @@ const cancelOrder = async (req, res) => {
 
     await order.save();
 
-    // ✅ Refund only for non-COD
     if (order.paymentMethod !== "COD") {
-
-      const couponDiscount = order.couponDiscount || 0;
-
-      // Total of all products (before coupon)
-      const totalProductAmount = order.products.reduce(
-        (sum, p) => sum + (p.salePrice * p.quantity),
-        0
-      );
-
-     
-      const refundAmount = order.products.reduce((total, p) => {
-        const productTotal = p.salePrice * p.quantity;
-
-        const couponShare = totalProductAmount > 0
-          ? (productTotal / totalProductAmount) * couponDiscount
-          : 0;
-
-        return total + (productTotal - couponShare);
-      }, 0);
-
       await walletController.creditWallet(
         order.userId,
-        Math.round(refundAmount),
+        order.totalAmount,
         "Refund for cancelled order",
         order._id
       );
     }
+
 
     res.json({ success: true });
 
@@ -371,6 +351,7 @@ const cancelOrder = async (req, res) => {
     res.status(500).json({ success: false });
   }
 };
+
 const cancelSingleProduct = async (req, res) => {
   try {
     const { orderId, productId, reason } = req.body;
@@ -406,29 +387,7 @@ const cancelSingleProduct = async (req, res) => {
 
     await order.save();
 if (order.paymentMethod !== "COD") {
- const couponDiscount = order.couponDiscount || 0;
-
-// Total active product amount
-const totalProductAmount = order.products.reduce(
-  (sum, p) => sum + (p.salePrice * p.quantity),
-  0
-);
-
-const productTotal = product.salePrice * product.quantity;
-
-// Coupon share for this product
-const couponShare = totalProductAmount > 0
-  ? (productTotal / totalProductAmount) * couponDiscount
-  : 0;
-
-const refundAmount = productTotal - couponShare;
-
-await walletController.creditWallet(
-  order.userId,
-  Math.round(refundAmount),
-  "Refund for cancelled product",
-  order._id
-);
+  const refundAmount = (product.salePrice ?? product.price) * product.quantity;
 
   await walletController.creditWallet(
     order.userId,
@@ -678,6 +637,7 @@ const viewOrderDetails = async (req, res) => {
     res.status(500).render("error", { message: "Something went wrong" });
   }
 };
+
 module.exports = {
   loadOrders,
   placeOrder,
