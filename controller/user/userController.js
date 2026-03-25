@@ -200,7 +200,12 @@ const conformOtp = async (req, res) => {
   try {
     const { otp } = req.body;
 
-    if (!req.session.userOtp || !req.session.userOtpExpiry || Date.now() > req.session.userOtpExpiry) {
+console.log("OTP:", req.session.userOtp);
+console.log("Expiry:", req.session.userOtpExpiry);
+console.log("Type:", typeof req.session.userOtpExpiry);
+console.log("Now:", Date.now());
+
+    if (!req.session.userOtp || !req.session.userOtpExpiry || Date.now() > Number(req.session.userOtpExpiry)) {
       delete req.session.userOtp;
       delete req.session.userOtpExpiry;
       // delete req.session.userData;
