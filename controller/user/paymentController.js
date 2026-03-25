@@ -91,6 +91,10 @@ const loadPayment = async (req, res) => {
        
         if (coupon.discountType === "percentage") {
           discount = (subtotal * coupon.discountValue) / 100;
+          if(discount >coupon.maxDiscount){
+            discount = coupon.maxDiscount
+            
+          }
         } else {
           discount = coupon.discountValue;
         }
