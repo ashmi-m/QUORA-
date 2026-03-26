@@ -387,7 +387,21 @@ const cancelSingleProduct = async (req, res) => {
 
     await order.save();
 if (order.paymentMethod !== "COD") {
-  const refundAmount = (product.salePrice ?? product.price) * product.quantity;
+ 
+const activeTotal = order.products
+  .filter(p => p.status !== "Cancelled")
+  .reduce((sum, p) => sum + ((p.salePrice ?? p.price) * p.quantity), 0);
+
+
+const productTotal = (product.salePrice ?? product.price) * product.quantity;
+
+const couponDiscount = order.couponDiscount || 0;
+
+const productCouponShare = activeTotal > 0
+  ? (productTotal / activeTotal) * couponDiscount
+  : 0;
+
+const refundAmount = productTotal - productCouponShare;
 
   await walletController.creditWallet(
     order.userId,
@@ -557,7 +571,6 @@ drawLabel("Order ID", `${order.orderId}`, margin, y);
 let rowNum = 0;
 const couponDiscount = order.couponDiscount || 0;
 
-// Calculate total of non-cancelled items to distribute coupon proportionally
 const activeTotal = order.products
   .filter(p => p.status !== "Cancelled")
   .reduce((sum, p) => sum + (p.salePrice * p.quantity), 0);
@@ -569,7 +582,6 @@ order.products.forEach((item, index) => {
   const qty = item.quantity;
   const rawSubtotal = item.salePrice * qty;
 
-  // Distribute coupon discount proportionally across items
   const itemCouponShare = activeTotal > 0 
     ? Math.round((rawSubtotal / activeTotal) * couponDiscount) 
     : 0;
