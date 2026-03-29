@@ -1,140 +1,140 @@
-
-
 <%- include("../partials/user/header") %>
 
-<link rel="stylesheet" href="/css/wishlist.css">
+  <link rel="stylesheet" href="/css/wishlist.css">
 
-<div class="breadcrumbs">
-  Home &gt; <strong>Wishlist</strong>
-</div>
+  <div class="breadcrumbs">
+    Home &gt; <strong>Wishlist</strong>
+  </div>
 
-<section class="wishlist-wrapper">
-  <h2 class="wishlist-title">My Wishlist</h2>
+  <section class="wishlist-wrapper">
+    <h2 class="wishlist-title">My Wishlist</h2>
 
-  <% if (!wishlist || wishlist.length === 0) { %>
-    <p class="empty">Your wishlist is empty ❤️</p>
-  <% } else { %>
-    <div class="wishlist-container">
-      <% wishlist.forEach(item => { %>
-        <% if (!item.productId) return; %>
-        <% const product = item.productId; %>
+    <% if (!wishlist || wishlist.length===0) { %>
+      <p class="empty">Your wishlist is empty ❤️</p>
+      <% } else { %>
+        <div class="wishlist-container">
+          <% wishlist.forEach(item=> { %>
+            <% if (!item.productId) return; %>
+              <% const product=item.productId; %>
 
-        <div class="wishlist-item">
-          <span class="heart wishlist-remove" data-id="<%= product._id %>">❤</span>
-          <img src="<%= product.productImage?.[0] || '/images/default.jpg' %>" alt="<%= product.productName %>">
+                <div class="wishlist-item">
+                  <span class="heart wishlist-remove" data-id="<%= product._id %>">❤</span>
+                  <img src="<%= product.productImage?.[0] || '/images/default.jpg' %>" alt="<%= product.productName %>">
 
-          <div class="details">
-            <h3><%= product.productName %></h3>
-            <div class="rating">
-              ★★★★☆ (<%= product.rating || 4.0 %>)
-            </div>
-            <div class="price">₹<%= product.regularPrice %></div>
-            <button class="add-to-cart-btn" data-id="<%= product._id %>">
-              Add to Cart
-            </button>
-          </div>
+                  <div class="details">
+                    <h3>
+                      <%= product.productName %>
+                    </h3>
+                    <div class="rating">
+                      ★★★★☆ (<%= product.rating || 4.0 %>)
+                    </div>
+                    <div class="price">₹<%= product.regularPrice %>
+                    </div>
+                    <button class="add-to-cart-btn" data-id="<%= product._id %>">
+                      Add to Cart
+                    </button>
+                  </div>
+                </div>
+                <% }) %>
         </div>
-      <% }) %>
-    </div>
-  <% } %>
-</section>
+        <% } %>
+  </section>
 
-<%- include("../partials/user/footer") %>
+  <%- include("../partials/user/footer") %>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<script>
-document.addEventListener("DOMContentLoaded", () => {
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
 
 
-  document.querySelectorAll(".add-to-cart-btn").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      const productId = btn.dataset.id;
-      if (!productId) return;
+        document.querySelectorAll(".add-to-cart-btn").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            const productId = btn.dataset.id;
+            if (!productId) return;
 
-      try {
-        const res = await fetch("/cart/add", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ productId })
+            try {
+              const res = await fetch("/cart/add", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ productId })
+              });
+
+              const data = await res.json();
+
+              if (res.ok) {
+                Swal.fire({
+                  icon: "success",
+                  title: "Added to Cart",
+                  text: `${data.productName || "Product"} added successfully!`,
+                  timer: 1200,
+                  showConfirmButton: false
+                });
+                btn.closest(".wishlist-item").remove();
+
+              } else {
+
+                Swal.fire({
+                  icon: "info",
+                  title: "Action Not Allowed",
+                  text: data.message || "Product already in cart"
+                });
+              }
+
+
+            } catch (err) {
+              console.error(err);
+              Swal.fire("Error", "Server error", "error");
+            }
+          });
         });
 
-        const data = await res.json();
+        document.querySelectorAll(".wishlist-remove").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            const productId = btn.dataset.id;
+            if (!productId) return;
 
-        if (res.ok) {
-          Swal.fire({
-            icon: "success",
-            title: "Added to Cart",
-            text: `${data.productName || "Product"} added successfully!`,
-            timer: 1200,
-            showConfirmButton: false
+            try {
+              const res = await fetch("/wishlist/toggle", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ productId })
+              });
+
+              const data = await res.json();
+
+              if (data.success) {
+
+                if (data.action === "removed") {
+                  Swal.fire({
+                    icon: "success",
+                    title: "Removed from Wishlist",
+                    timer: 1000,
+                    showConfirmButton: false
+                  });
+
+                  btn.closest(".wishlist-item").remove();
+                }
+
+                if (data.action === "added") {
+                  Swal.fire({
+                    icon: "success",
+                    title: "Added to Wishlist",
+                    timer: 1000,
+                    showConfirmButton: false
+                  });
+                }
+
+              } else {
+                Swal.fire("Error", data.message || "Action failed", "error");
+              }
+
+            } catch (err) {
+              console.error(err);
+              Swal.fire("Error", "Server error", "error");
+            }
           });
-           btn.closest(".wishlist-item").remove();
+        });
 
-       } else {
-  // 🔥 SMART FEEDBACK
-  Swal.fire({
-    icon: "info",
-    title: "Action Not Allowed",
-    text: data.message || "Product already in cart"
-  });
-}
-        
-
-      } catch (err) {
-        console.error(err);
-        Swal.fire("Error", "Server error", "error");
-      }
-    });
-  });
-
-document.querySelectorAll(".wishlist-remove").forEach(btn => {
-  btn.addEventListener("click", async () => {
-    const productId = btn.dataset.id;
-    if (!productId) return;
-
-    try {
-      const res = await fetch("/wishlist/toggle", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId })
       });
-
-      const data = await res.json();
-
-      if (data.success) {
-
-        if (data.action === "removed") {
-          Swal.fire({
-            icon: "success",
-            title: "Removed from Wishlist",
-            timer: 1000,
-            showConfirmButton: false
-          });
-
-          btn.closest(".wishlist-item").remove();
-        }
-
-        if (data.action === "added") {
-          Swal.fire({
-            icon: "success",
-            title: "Added to Wishlist",
-            timer: 1000,
-            showConfirmButton: false
-          });
-        }
-
-      } else {
-        Swal.fire("Error", data.message || "Action failed", "error");
-      }
-
-    } catch (err) {
-      console.error(err);
-      Swal.fire("Error", "Server error", "error");
-    }
-  });
-});
-
-});
-</script>
-
+    </script>

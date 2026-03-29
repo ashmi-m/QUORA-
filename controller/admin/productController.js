@@ -4,7 +4,7 @@ const Brand = require("../../models/brandSchema");
 const fs = require("fs").promises;
 const path = require("path");
 const sharp = require("sharp");
-const cloudinary = require("../../config/cloudinary"); 
+const cloudinary = require("../../config/cloudinary");
 const Wishlist = require("../../models/wishlistSchema");
 
 const getProductAddPage = async (req, res) => {
@@ -22,11 +22,11 @@ const getProductAddPage = async (req, res) => {
   }
 };
 
-const loadShopPage = async(req,res)=>{
+const loadShopPage = async (req, res) => {
   try {
     res.render("shop");
   } catch (error) {
-    console.error("Error loading shop page",error);
+    console.error("Error loading shop page", error);
     res.status(500).send("Server Error");
   }
 };
@@ -77,11 +77,11 @@ const getProductsData = async (req, res) => {
 const getProductpage = async (req, res) => {
   try {
     const products = await Product.find()
-     const brands = await Brand.find(); 
-    console.log("product is",products)
-   return res.render("products",{brands,products}); 
+    const brands = await Brand.find();
+    console.log("product is", products)
+    return res.render("products", { brands, products });
   } catch (error) {
-    console.log("error  in the get product page",error);
+    console.log("error  in the get product page", error);
     res.redirect("/admin/pageerror");
   }
 };
@@ -116,43 +116,43 @@ const addProducts = async (req, res) => {
     }
 
     const imageUrls = [];
-const productImages = [];
+    const productImages = [];
 
-if (req.files && req.files.length > 0) {
-  for (const file of req.files) {
-    if (file.path && file.path.startsWith("http")) {
-      productImages.push(file.path);
-      continue;
-    }
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        if (file.path && file.path.startsWith("http")) {
+          productImages.push(file.path);
+          continue;
+        }
 
-    if (file.path) {
-      try {
-        const resizedBuffer = await sharp(file.path)
-          .resize(440, 440, { fit: "inside" })
-          .toBuffer();
+        if (file.path) {
+          try {
+            const resizedBuffer = await sharp(file.path)
+              .resize(440, 440, { fit: "inside" })
+              .toBuffer();
 
-        const uploadResponse = await new Promise((resolve, reject) => {
-          const uploadStream = cloudinary.uploader.upload_stream(
-            { folder: "products" },
-            (error, result) => {
-              if (error) return reject(error);
-              else resolve(result);
-            }
-          );
-          uploadStream.end(resizedBuffer);
-        });
+            const uploadResponse = await new Promise((resolve, reject) => {
+              const uploadStream = cloudinary.uploader.upload_stream(
+                { folder: "products" },
+                (error, result) => {
+                  if (error) return reject(error);
+                  else resolve(result);
+                }
+              );
+              uploadStream.end(resizedBuffer);
+            });
 
-        productImages.push(uploadResponse.secure_url);
-      } catch (error) {
-        console.error("Sharp processing failed:", error.message);
+            productImages.push(uploadResponse.secure_url);
+          } catch (error) {
+            console.error("Sharp processing failed:", error.message);
+          }
+        }
       }
-    }
-  }
- } else {
+    } else {
       return res
         .status(400)
         .json({ ok: false, error: "At least one image is required" });
-    } 
+    }
 
 
     const categoryDoc = await Category.findById(products.category);
@@ -163,7 +163,7 @@ if (req.files && req.files.length > 0) {
     }
 
     const regularPrice = parseFloat(products.regularPrice) || 0;
-    const  quantity= parseInt(products.quantity, 10) || 0;
+    const quantity = parseInt(products.quantity, 10) || 0;
     const stock = quantity;
 
     const newProduct = new Product({
@@ -173,7 +173,7 @@ if (req.files && req.files.length > 0) {
       category: categoryDoc._id,
       regularPrice,
       createdOn: new Date(),
-       quantity,
+      quantity,
       //  stock,
       size: products.size,
       color: products.color,
@@ -193,61 +193,61 @@ if (req.files && req.files.length > 0) {
 };
 
 
-   const getEditProductPage = async(req,res)=>{
-    try{
-      console.log("req.params getEditProductPage",req.params)
-      const {id}=req.params;
-      const product = await Product.findById(id)
+const getEditProductPage = async (req, res) => {
+  try {
+    console.log("req.params getEditProductPage", req.params)
+    const { id } = req.params;
+    const product = await Product.findById(id)
       .populate("category", "name")
       .populate("brand", "brandName")
       .lean();
 
-       if (!product) return res.redirect("/admin/products");
+    if (!product) return res.redirect("/admin/products");
 
     const categories = await Category.find({ isListed: true });
     const brands = await Brand.find({ isBlocked: false });
 
-    res.render("editProduct",{
-       product,
+    res.render("editProduct", {
+      product,
       categories,
       brands,
     });
 
-    }catch(err){
-      console.error("Error loading edit product page:",err);
-      res.redirect("/admin/pageerror");
-    }
-   };
+  } catch (err) {
+    console.error("Error loading edit product page:", err);
+    res.redirect("/admin/pageerror");
+  }
+};
 
-   const updateProduct = async(req,res)=>{
-    try{
-      console.log("req.params",req.params)
-      const {id}=req.params;
-      const updates = req.body;
+const updateProduct = async (req, res) => {
+  try {
+    console.log("req.params", req.params)
+    const { id } = req.params;
+    const updates = req.body;
 
-      let imageUrls =[];
-      if(req.files && req.files.length>0){
-        for(const file of req.files){
-           const resizedBuffer = await sharp(file.buffer)
+    let imageUrls = [];
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const resizedBuffer = await sharp(file.buffer)
           .resize(440, 440, { fit: "inside" })
           .toBuffer();
 
-           const uploadResult = await new Promise((resolve, reject) => {
+        const uploadResult = await new Promise((resolve, reject) => {
           const stream = cloudinary.uploader.upload_stream(
             { folder: "quora_products" },
             (err, result) => {
               if (err) return reject(err);
               resolve(result);
-        }
+            }
           );
-       stream.end(resizedBuffer);
-    });
+          stream.end(resizedBuffer);
+        });
 
-     imageUrls.push(uploadResult.secure_url);
-   }
-  }
+        imageUrls.push(uploadResult.secure_url);
+      }
+    }
 
-      const product = await Product.findById(id);
+    const product = await Product.findById(id);
     if (!product) return res.redirect("/admin/products");
 
     product.productName = updates.productName;
@@ -260,35 +260,35 @@ if (req.files && req.files.length > 0) {
     product.brand = updates.brand;
     product.quantity = parseInt(updates.quantity, 10) || 0;
 
-      if (imageUrls.length > 0) {
+    if (imageUrls.length > 0) {
       product.productImage = imageUrls;
     }
 
-      await product.save();
-     res.redirect("/admin/products?editSuccess=true");
+    await product.save();
+    res.redirect("/admin/products?editSuccess=true");
   } catch (err) {
     console.error("Error updating product:", err);
     res.redirect("/admin/pageerror");
   }
 };
-   const deleteImage =async(req,res)=>{
-    try {
-      const{ productId, image} = req.body;
-      const product = await Product.findById(productId);
-      if(!product) return res.json({success:false,message:'Product not found'})
+const deleteImage = async (req, res) => {
+  try {
+    const { productId, image } = req.body;
+    const product = await Product.findById(productId);
+    if (!product) return res.json({ success: false, message: 'Product not found' })
 
-    product.productImage = product.productImage.filter((img)=> img !== image);
+    product.productImage = product.productImage.filter((img) => img !== image);
     console.log(product)
     await product.save();
 
     res.json({ success: true });
-    } catch (error) {
-     console.error(error);
+  } catch (error) {
+    console.error(error);
     res.json({ success: false });
-    }
-   }
+  }
+}
 
-   const getProductsByBrand = async (req, res) => {
+const getProductsByBrand = async (req, res) => {
   try {
     const { brandId } = req.params;
 
@@ -335,7 +335,7 @@ const getProductDetails = async (req, res) => {
       });
       isWishlisted = !!wishlist;
     }
-    
+
     res.render("user/productDetails", {
       product,
       relatedProducts,
@@ -418,17 +418,16 @@ module.exports = {
   getProductAddPage,
   addProducts,
   getProductpage,
-   getProductsData, 
-   getEditProductPage,
-    updateProduct,
-    loadShopPage ,
-    deleteImage,
-    getProductsByBrand,
-     getAllBrands,
-     getProductDetails,
-     toggleProductBlock,
-     addProductOffer,
-     removeProductOffer
+  getProductsData,
+  getEditProductPage,
+  updateProduct,
+  loadShopPage,
+  deleteImage,
+  getProductsByBrand,
+  getAllBrands,
+  getProductDetails,
+  toggleProductBlock,
+  addProductOffer,
+  removeProductOffer
 
 };
- 

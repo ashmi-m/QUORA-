@@ -14,9 +14,9 @@ const Order = require("../../models/orderSchema");
 const loadHomepage = async (req, res) => {
   try {
     const products = await Product.find({ isBlocked: false })
-  .sort({ createdAt: -1 })
-  .limit(4)
-  .lean();
+      .sort({ createdAt: -1 })
+      .limit(4)
+      .lean();
     let wishlistIds = [];
     let cartCount = 0;
     if (req.session.user) {
@@ -45,9 +45,9 @@ const loadHomepage = async (req, res) => {
 const loadlandingpage = async (req, res) => {
   try {
     const products = await Product.find({ isBlocked: false })
-  .sort({ createdAt: -1 })
-  .limit(4)
-  .lean();
+      .sort({ createdAt: -1 })
+      .limit(4)
+      .lean();
 
     let cart = null;
     let cartCount = 0;
@@ -141,12 +141,12 @@ function generateRefCode(name) {
 const signup = async (req, res) => {
   try {
     const { name, email, password, confirmPassword, phone, refCode } = req.body;
-const namePattern = /^[A-Za-z\s]{3,20}$/;
-if (!namePattern.test(name)) {
-  return res.render("signup", {
-    message: "Name must be 3–20 characters and contain only alphabets"
-  });
-}
+    const namePattern = /^[A-Za-z\s]{3,20}$/;
+    if (!namePattern.test(name)) {
+      return res.render("signup", {
+        message: "Name must be 3–20 characters and contain only alphabets"
+      });
+    }
     if (password !== confirmPassword) {
       return res.render("signup", { message: "Passwords do not match" });
     }
@@ -179,7 +179,7 @@ if (!namePattern.test(name)) {
         console.error("Session save error:", err);
         return res.render("signup", { message: "Something went wrong. Please try again." });
       }
-      return res.render("conformOtp");  
+      return res.render("conformOtp");
     });
 
   } catch (error) {
@@ -200,10 +200,10 @@ const conformOtp = async (req, res) => {
   try {
     const { otp } = req.body;
 
-console.log("OTP:", req.session.userOtp);
-console.log("Expiry:", req.session.userOtpExpiry);
-console.log("Type:", typeof req.session.userOtpExpiry);
-console.log("Now:", Date.now());
+    console.log("OTP:", req.session.userOtp);
+    console.log("Expiry:", req.session.userOtpExpiry);
+    console.log("Type:", typeof req.session.userOtpExpiry);
+    console.log("Now:", Date.now());
 
     if (!req.session.userOtp || !req.session.userOtpExpiry || Date.now() > Number(req.session.userOtpExpiry)) {
       delete req.session.userOtp;
@@ -284,9 +284,9 @@ console.log("Now:", Date.now());
 const resendOtp = async (req, res) => {
   try {
     if (!req.session.userData || !req.session.userData.email) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Session expired. Please signup again." 
+      return res.status(400).json({
+        success: false,
+        message: "Session expired. Please signup again."
       });
     }
 
@@ -295,7 +295,7 @@ const resendOtp = async (req, res) => {
     req.session.userOtp = otp;
     req.session.userOtpExpiry = Date.now() + 2 * 60 * 1000;
 
-   
+
     req.session.save(async (err) => {
       if (err) {
         console.error("Session save error:", err);
@@ -331,7 +331,7 @@ const login = async (req, res) => {
   try {
     console.log("req ", req.body);
     const { email, password } = req.body;
-   
+
     const findUser = await User.findOne({ isAdmin: false, email: email });
     console.log("find user", findUser)
     if (!findUser) {
@@ -342,7 +342,7 @@ const login = async (req, res) => {
     }
 
     const passwordMatch = await bcrypt.compare(password, findUser.password);
-    
+
     if (!passwordMatch) {
       return res.render("login", { message: "Incorrect Password" })
     }
@@ -353,7 +353,7 @@ const login = async (req, res) => {
       email: findUser.email
     };
 
-   return res.redirect("/");
+    return res.redirect("/");
 
 
   } catch (error) {
@@ -384,7 +384,7 @@ const forgotPassword = async (req, res) => {
 
     req.session.resetOtp = otp;
     req.session.resetEmail = email;
-    req.session.resetOtpExpiry = Date.now() + 2 * 60 * 1000; 
+    req.session.resetOtpExpiry = Date.now() + 2 * 60 * 1000;
 
     const emailSent = await sendVerificationEmail(email, otp);
     if (!emailSent) {
@@ -403,23 +403,23 @@ const loadResetOtpPage = (req, res) => {
     return res.redirect("/forgot-password");
   }
   if (Date.now() > req.session.resetOtpExpiry) {
-  delete req.session.resetOtp;
-  delete req.session.resetOtpExpiry;
-  delete req.session.resetEmail;
+    delete req.session.resetOtp;
+    delete req.session.resetOtpExpiry;
+    delete req.session.resetEmail;
 
-  return res.render("forgotPassword", {
-    message: "OTP has expired. Please request a new one."
-  });
-}
+    return res.render("forgotPassword", {
+      message: "OTP has expired. Please request a new one."
+    });
+  }
 
- 
+
   const remainingMs = req.session.resetOtpExpiry - Date.now();
   const remainingSec = Math.floor(remainingMs / 1000);
 
   return res.render("resetOtp", {
     message: "",
     email: req.session.resetEmail,
-    remainingSec  
+    remainingSec
   });
 };
 const verifyResetOtp = async (req, res) => {
@@ -430,26 +430,26 @@ const verifyResetOtp = async (req, res) => {
         message: "OTP expired or session lost. Please request a new OTP."
       });
     }
-   
+
     if (Date.now() > req.session.resetOtpExpiry) {
-  delete req.session.resetOtp;
-  delete req.session.resetOtpExpiry;
-  delete req.session.resetEmail;
+      delete req.session.resetOtp;
+      delete req.session.resetOtpExpiry;
+      delete req.session.resetEmail;
       return res.render("forgotPassword", {
         message: "OTP has expired. Please request a new one."
       });
     }
- 
-     if (String(otp) === String(req.session.resetOtp)) {
+
+    if (String(otp) === String(req.session.resetOtp)) {
       delete req.session.resetOtp;
       delete req.session.resetOtpExpiry;
       return res.render("resetPassword", { message: "" });
     }
     return res.render("resetOtp", {
-  message: "Invalid OTP. Try again.",
-  email: req.session.resetEmail || "",
-  remainingSec: Math.floor((req.session.resetOtpExpiry - Date.now()) / 1000)
-});
+      message: "Invalid OTP. Try again.",
+      email: req.session.resetEmail || "",
+      remainingSec: Math.floor((req.session.resetOtpExpiry - Date.now()) / 1000)
+    });
 
   } catch (error) {
     console.error("Error verifying reset OTP", error);
@@ -467,24 +467,24 @@ const resetPassword = async (req, res) => {
     }
 
     const email = req.session.resetEmail;
-  
+
     if (!email) {
-      return res.render("forgotPassword", { 
-        message: "Session expired. Please request a new OTP." 
+      return res.render("forgotPassword", {
+        message: "Session expired. Please request a new OTP."
       });
     }
 
 
     const passwordHash = await bcrypt.hash(newPassword, 10);
-   const updatedUser= await User.findOneAndUpdate({ email }, { $set: { password: passwordHash } },{new:true});
-    if(!updatedUser){
-      return res.render("resetPassword",{message:"User not found"});
+    const updatedUser = await User.findOneAndUpdate({ email }, { $set: { password: passwordHash } }, { new: true });
+    if (!updatedUser) {
+      return res.render("resetPassword", { message: "User not found" });
     }
 
-  
- delete req.session.resetOtp;
-delete req.session.resetEmail;
-delete req.session.resetOtpExpiry;
+
+    delete req.session.resetOtp;
+    delete req.session.resetEmail;
+    delete req.session.resetOtpExpiry;
 
     return res.redirect("/login");
   } catch (error) {
@@ -502,7 +502,7 @@ const resendResetOtp = async (req, res) => {
 
     const otp = generateOtp();
     req.session.resetOtp = otp;
-    req.session.resetOtpExpiry = Date.now() + 2 * 60 * 1000; 
+    req.session.resetOtpExpiry = Date.now() + 2 * 60 * 1000;
 
     const emailSent = await sendVerificationEmail(email, otp);
     if (emailSent) {
@@ -567,8 +567,8 @@ const addAddress = async (req, res) => {
       altPhone: mobile,
       city,
       state,
-      locality,   
-  address,  
+      locality,
+      address,
       landMark: landmark,
       pincode
     };
@@ -592,7 +592,7 @@ const addAddressFromProfile = async (req, res) => {
   try {
     console.log("fghjkl");
 
-    const { name, mobile, pincode, locality, address, city, state, type, landmark ,from } = req.body;
+    const { name, mobile, pincode, locality, address, city, state, type, landmark, from } = req.body;
     const userId = req.session.user._id;
 
     if (!name || !mobile || !pincode || !locality || !address || !city || !state) {
@@ -630,7 +630,7 @@ const addAddressFromProfile = async (req, res) => {
     } else {
       await Address.create({ userId, addresses: [newAddress] });
     }
-   let redirectUrl = "/userprofile#addressSection"; 
+    let redirectUrl = "/userprofile#addressSection";
     if (from === "checkout") redirectUrl = "/checkout";
 
     return res.json({ success: true, redirect: redirectUrl });
@@ -651,8 +651,8 @@ module.exports = {
   signup,
   conformOtp,
   resendOtp,
-  loadResetOtpPage,   
-  resendResetOtp  ,
+  loadResetOtpPage,
+  resendResetOtp,
   loadLogin,
   login,
   logout,

@@ -1,4 +1,3 @@
-
 footer {
   background: #FFDBC3;
   color: #f8f6f3;
@@ -7,6 +6,7 @@ footer {
   position: relative;
   overflow: hidden;
 }
+
 footer::before {
   content: '';
   position: absolute;
@@ -15,7 +15,7 @@ footer::before {
   right: 0;
   bottom: 0;
   background-image: radial-gradient(circle at 20% 50%, rgba(255, 192, 203, 0.1) 0%, transparent 50%),
-                    radial-gradient(circle at 80% 20%, rgba(255, 182, 193, 0.1) 0%, transparent 50%);
+    radial-gradient(circle at 80% 20%, rgba(255, 182, 193, 0.1) 0%, transparent 50%);
   pointer-events: none;
 }
 
@@ -138,27 +138,27 @@ footer::before {
   footer {
     padding: 40px 0 0;
   }
-  
+
   .footer-top {
     grid-template-columns: 1fr;
     gap: 40px;
     padding: 0 20px 30px;
     text-align: center;
   }
-  
+
   .about h2 {
     font-size: 2rem;
   }
-  
+
   .about p {
-    
+
     font-size: 1rem;
   }
-  
+
   .contact p {
     justify-content: center;
   }
-  
+
   .links a:hover {
     transform: none;
   }
@@ -169,16 +169,16 @@ footer::before {
     padding: 0 15px 20px;
     gap: 30px;
   }
-  
+
   .about h2 {
     font-size: 1.8rem;
     letter-spacing: 2px;
   }
-  
+
   .footer-bottom {
     padding: 20px 15px;
   }
-  
+
   .footer-bottom p {
     font-size: 0.9rem;
   }

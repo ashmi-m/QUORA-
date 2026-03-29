@@ -1,378 +1,389 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Wallet | QUORA</title>
   <link rel="stylesheet" href="/css/wallet.css">
   <link rel="stylesheet" href="/css/profile.css">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@600&display=swap"
+    rel="stylesheet">
 </head>
+
 <body>
 
   <%- include("../partials/user/header", { user }) %>
 
-  <main class="layout">
-    <aside class="sidebar">
-      <%- include("../partials/user/profile-sidebar", { user, activePage: 'wallet' }) %>
-    </aside>
+    <main class="layout">
+      <aside class="sidebar">
+        <%- include("../partials/user/profile-sidebar", { user, activePage: 'wallet' }) %>
+      </aside>
 
-    <section class="wallet-section">
+      <section class="wallet-section">
 
-      <h2 class="wallet-title">
-        <span class="wallet-icon">💳</span> My QUORA Wallet
-      </h2>
+        <h2 class="wallet-title">
+          <span class="wallet-icon">💳</span> My QUORA Wallet
+        </h2>
 
-      <div class="wallet-grid">
-        <div class="card balance-card">
-          <div class="balance-top">
-            <div>
-              <div class="balance-header">Current Balance</div>
-              <div class="balance-amount">₹ <%= (walletBalance.total || 0).toFixed(2) %></div>
+        <div class="wallet-grid">
+          <div class="card balance-card">
+            <div class="balance-top">
+              <div>
+                <div class="balance-header">Current Balance</div>
+                <div class="balance-amount">₹ <%= (walletBalance.total || 0).toFixed(2) %>
+                </div>
+              </div>
+              <div class="balance-badge">Active</div>
             </div>
-            <div class="balance-badge">Active</div>
+
+            <div class="balance-breakdown">
+              <div class="balance-row">
+                <span>💰 Wallet Balance</span>
+                <span class="amt-green">₹ <%= (walletBalance.total || 0).toFixed(2) %></span>
+              </div>
+            </div>
+
+            <div class="add-money">
+              <label>Add Money to Wallet</label>
+              <div class="amount-input">
+                <span class="rupee">₹</span>
+                <input type="number" id="addAmount" placeholder="Enter amount" min="1">
+              </div>
+              <div class="quick-amounts">
+                <% [500, 1000, 1500, 2000].forEach(amount=> { %>
+                  <button type="button" onclick="setAmount(<%= amount %>)">+<%= amount %></button>
+                  <% }) %>
+              </div>
+              <button class="btn-add" onclick="addMoney()">
+                <span id="addBtnText">Add Money to Wallet</span>
+                <span id="addBtnLoader" style="display:none">Adding...</span>
+              </button>
+            </div>
           </div>
 
-          <div class="balance-breakdown">
-            <div class="balance-row">
-              <span>💰 Wallet Balance</span>
-              <span class="amt-green">₹ <%= (walletBalance.total || 0).toFixed(2) %></span>
-            </div>
-          </div>
 
-          <div class="add-money">
-            <label>Add Money to Wallet</label>
-            <div class="amount-input">
-              <span class="rupee">₹</span>
-              <input type="number" id="addAmount" placeholder="Enter amount" min="1">
-            </div>
-            <div class="quick-amounts">
-              <% [500, 1000, 1500, 2000].forEach(amount => { %>
-                <button type="button" onclick="setAmount(<%= amount %>)">+<%= amount %></button>
-              <% }) %>
-            </div>
-            <button class="btn-add" onclick="addMoney()">
-              <span id="addBtnText">Add Money to Wallet</span>
-              <span id="addBtnLoader" style="display:none">Adding...</span>
-            </button>
-          </div>
-        </div>
+          <div class="right-panel">
+            <div class="card stats-card">
+              <div class="stats-heading">Wallet Overview</div>
 
-      
-        <div class="right-panel">
-          <div class="card stats-card">
-            <div class="stats-heading">Wallet Overview</div>
-
-            <div class="stat-item">
-              <div class="stat-icon-label">
-                <span class="stat-icon">🔢</span>
-                <span class="stat-label">Total Transactions</span>
-              </div>
-              <span class="stat-value neutral-stat">
-                <%= user.walletTransactions ? user.walletTransactions.length : 0 %>
-              </span>
-            </div>
-
-            <div class="stat-item">
-              <div class="stat-icon-label">
-                <span class="stat-icon">⬆️</span>
-                <span class="stat-label">Total Credited</span>
-              </div>
-              <span class="stat-value credit-stat">
-                <%
-                  const credits = user.walletTransactions
-                    ? user.walletTransactions.filter(t => t.type === 'credit')
-                    : [];
-                  const totalCredit = credits.reduce((sum, t) => sum + t.amount, 0);
-                %>
-                +₹<%= totalCredit.toFixed(2) %>
-              </span>
-            </div>
-
-            <div class="stat-item">
-              <div class="stat-icon-label">
-                <span class="stat-icon">⬇️</span>
-                <span class="stat-label">Total Debited</span>
-              </div>
-              <span class="stat-value debit-stat">
-                <%
-                  const debits = user.walletTransactions
-                    ? user.walletTransactions.filter(t => t.type === 'debit')
-                    : [];
-                  const totalDebit = debits.reduce((sum, t) => sum + t.amount, 0);
-                %>
-                ₹<%= totalDebit.toFixed(2) %>
-              </span>
-            </div>
-
-            <div class="stat-item">
-              <div class="stat-icon-label">
-                <span class="stat-icon">🕒</span>
-                <span class="stat-label">Last Credited</span>
-              </div>
-              <span class="stat-value credit-stat">
-                <% if (credits.length > 0) {
-                    const last = credits[credits.length - 1]; %>
-                  +₹<%= last.amount.toFixed(2) %>
-                <% } else { %>
-                  —
-                <% } %>
-              </span>
-            </div>
-
-          </div>
-        </div>
-
-      </div>
-<div class="transaction-section">
-  <div class="transaction-header">
-    <h3>💳 Wallet Transaction History</h3>
-    <% if(user.walletTransactions && user.walletTransactions.length > 0) { %>
-      <span class="txn-count"><%= user.walletTransactions.length %> Transactions</span>
-    <% } %>
-  </div>
-
-  <div class="table-wrapper">
-    <table class="txn-table">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Order ID</th>
-          <th>Type</th>
-          <th>Amount</th>
-          <th>Payment Method</th>
-          <th>Description</th>
-          <th>Date</th>
-        </tr>
-      </thead>
-      <tbody id="txnTableBody">
-        <% if(user.walletTransactions && user.walletTransactions.length > 0) { %>
-          <% user.walletTransactions.slice().reverse().forEach((txn, index) => { %>
-            <tr class="txn-row" data-index="<%= index %>">
-              <td class="txn-num"><%= index + 1 %></td>
-              <td class="txn-orderid">
-                <%= txn.orderId ? '#' + txn.orderId.toString().slice(-6).toUpperCase() : '—' %>
-              </td>
-              <td>
-                <span class="badge badge-<%= txn.type === 'credit' ? 'credit' : 'debit' %>">
-                  <%= txn.type === 'credit' ? '⬆ Credit' : '⬇ Debit' %>
+              <div class="stat-item">
+                <div class="stat-icon-label">
+                  <span class="stat-icon">🔢</span>
+                  <span class="stat-label">Total Transactions</span>
+                </div>
+                <span class="stat-value neutral-stat">
+                  <%= user.walletTransactions ? user.walletTransactions.length : 0 %>
                 </span>
-              </td>
-              <td class="txn-amount <%= txn.type === 'credit' ? 'credit-amt' : 'debit-amt' %>">
-                <%= txn.type === 'credit' ? '+' : '-' %>₹<%= txn.amount.toFixed(2) %>
-              </td>
-              <td><%= txn.paymentMethod || 'Wallet' %></td>
-              <td class="txn-desc"><%= txn.reason || txn.description || 'Wallet Transaction' %></td>
-              <td class="txn-date">
-                <%= new Date(txn.date).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) %>
-              </td>
-            </tr>
-          <% }) %>
-        <% } else { %>
-          <tr>
-            <td colspan="7" class="no-txn">
-              <div class="no-txn-inner">
-                <span class="no-txn-icon">📭</span>
-                <p>No transactions found</p>
-                <small>Your transaction history will appear here</small>
               </div>
-            </td>
-          </tr>
-        <% } %>
-      </tbody>
-    </table>
-  </div>
 
-  <div class="txn-pagination" id="txnPagination"></div>
-</div>
+              <div class="stat-item">
+                <div class="stat-icon-label">
+                  <span class="stat-icon">⬆️</span>
+                  <span class="stat-label">Total Credited</span>
+                </div>
+                <span class="stat-value credit-stat">
+                  <% const credits=user.walletTransactions ? user.walletTransactions.filter(t=> t.type === 'credit')
+                    : [];
+                    const totalCredit = credits.reduce((sum, t) => sum + t.amount, 0);
+                    %>
+                    +₹<%= totalCredit.toFixed(2) %>
+                </span>
+              </div>
 
-      <div class="wallet-footer">
-        <a href="/help">Help &amp; FAQs</a>
-        <span>|</span>
-        <a href="/terms">Conditions of Use</a>
-      </div>
+              <div class="stat-item">
+                <div class="stat-icon-label">
+                  <span class="stat-icon">⬇️</span>
+                  <span class="stat-label">Total Debited</span>
+                </div>
+                <span class="stat-value debit-stat">
+                  <% const debits=user.walletTransactions ? user.walletTransactions.filter(t=> t.type === 'debit')
+                    : [];
+                    const totalDebit = debits.reduce((sum, t) => sum + t.amount, 0);
+                    %>
+                    ₹<%= totalDebit.toFixed(2) %>
+                </span>
+              </div>
 
-    </section>
-  </main>
+              <div class="stat-item">
+                <div class="stat-icon-label">
+                  <span class="stat-icon">🕒</span>
+                  <span class="stat-label">Last Credited</span>
+                </div>
+                <span class="stat-value credit-stat">
+                  <% if (credits.length> 0) {
+                    const last = credits[credits.length - 1]; %>
+                    +₹<%= last.amount.toFixed(2) %>
+                      <% } else { %>
+                        —
+                        <% } %>
+                </span>
+              </div>
 
-  <div id="toast" class="toast hidden"></div>
-  <script src="/js/wallet.js"></script>
+            </div>
+          </div>
+
+        </div>
+        <div class="transaction-section">
+          <div class="transaction-header">
+            <h3>💳 Wallet Transaction History</h3>
+            <% if(user.walletTransactions && user.walletTransactions.length> 0) { %>
+              <span class="txn-count">
+                <%= user.walletTransactions.length %> Transactions
+              </span>
+              <% } %>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="txn-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Order ID</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                  <th>Payment Method</th>
+                  <th>Description</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="txnTableBody">
+                <% if(user.walletTransactions && user.walletTransactions.length> 0) { %>
+                  <% user.walletTransactions.slice().reverse().forEach((txn, index)=> { %>
+                    <tr class="txn-row" data-index="<%= index %>">
+                      <td class="txn-num">
+                        <%= index + 1 %>
+                      </td>
+                      <td class="txn-orderid">
+                        <%= txn.orderId ? '#' + txn.orderId.toString().slice(-6).toUpperCase() : '—' %>
+                      </td>
+                      <td>
+                        <span class="badge badge-<%= txn.type === 'credit' ? 'credit' : 'debit' %>">
+                          <%= txn.type==='credit' ? '⬆ Credit' : '⬇ Debit' %>
+                        </span>
+                      </td>
+                      <td class="txn-amount <%= txn.type === 'credit' ? 'credit-amt' : 'debit-amt' %>">
+                        <%= txn.type==='credit' ? '+' : '-' %>₹<%= txn.amount.toFixed(2) %>
+                      </td>
+                      <td>
+                        <%= txn.paymentMethod || 'Wallet' %>
+                      </td>
+                      <td class="txn-desc">
+                        <%= txn.reason || txn.description || 'Wallet Transaction' %>
+                      </td>
+                      <td class="txn-date">
+                        <%= new Date(txn.date).toLocaleDateString('en-IN', { day:'2-digit', month:'short',
+                          year:'numeric' }) %>
+                      </td>
+                    </tr>
+                    <% }) %>
+                      <% } else { %>
+                        <tr>
+                          <td colspan="7" class="no-txn">
+                            <div class="no-txn-inner">
+                              <span class="no-txn-icon">📭</span>
+                              <p>No transactions found</p>
+                              <small>Your transaction history will appear here</small>
+                            </div>
+                          </td>
+                        </tr>
+                        <% } %>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="txn-pagination" id="txnPagination"></div>
+        </div>
+
+        <div class="wallet-footer">
+          <a href="/help">Help &amp; FAQs</a>
+          <span>|</span>
+          <a href="/terms">Conditions of Use</a>
+        </div>
+
+      </section>
+    </main>
+
+    <div id="toast" class="toast hidden"></div>
+    <script src="/js/wallet.js"></script>
 </body>
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <script>
-  
-const ITEMS_PER_PAGE = 5;
-let currentPage = 1;
 
-const allRows = Array.from(document.querySelectorAll("#txnTableBody .txn-row"));
-const pagination = document.getElementById("txnPagination");
+  const ITEMS_PER_PAGE = 5;
+  let currentPage = 1;
 
-function showPage(page) {
-  const totalPages = Math.ceil(allRows.length / ITEMS_PER_PAGE);
-  currentPage = Math.max(1, Math.min(page, totalPages));
+  const allRows = Array.from(document.querySelectorAll("#txnTableBody .txn-row"));
+  const pagination = document.getElementById("txnPagination");
 
-  const start = (currentPage - 1) * ITEMS_PER_PAGE;
-  const end = start + ITEMS_PER_PAGE;
+  function showPage(page) {
+    const totalPages = Math.ceil(allRows.length / ITEMS_PER_PAGE);
+    currentPage = Math.max(1, Math.min(page, totalPages));
 
-  allRows.forEach((row, index) => {
-    row.style.display = index >= start && index < end ? "" : "none";
-  });
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    const end = start + ITEMS_PER_PAGE;
 
-  renderPagination(totalPages);
-}
-
-function renderPagination(totalPages) {
-  pagination.innerHTML = "";
-
-  if (totalPages <= 1) return;
-
-  
-  const prevBtn = document.createElement("button");
-  prevBtn.textContent = "← Prev";
-  prevBtn.disabled = currentPage === 1;
-  prevBtn.addEventListener("click", () => showPage(currentPage - 1));
-  pagination.appendChild(prevBtn);
-  let lastAdded = null;
-  for (let i = 1; i <= totalPages; i++) {
-    const isVisible =
-      i === 1 ||
-      i === totalPages ||
-      (i >= currentPage - 1 && i <= currentPage + 1);
-
-    if (isVisible) {
-      if (lastAdded && i - lastAdded > 1) {
-        const dots = document.createElement("button");
-        dots.textContent = "...";
-        dots.disabled = true;
-        pagination.appendChild(dots);
-      }
-
-      const btn = document.createElement("button");
-      btn.textContent = i;
-      if (i === currentPage) btn.classList.add("active");
-      btn.addEventListener("click", () => showPage(i));
-      pagination.appendChild(btn);
-      lastAdded = i;
-    }
-  }
-  const nextBtn = document.createElement("button");
-  nextBtn.textContent = "Next →";
-  nextBtn.disabled = currentPage === totalPages;
-  nextBtn.addEventListener("click", () => showPage(currentPage + 1));
-  pagination.appendChild(nextBtn);
-}
-if (allRows.length > 0) {
-  showPage(1);
-}
-
-function setAmount(value) {
-  document.getElementById("addAmount").value = value;
-}
-
-function showToast(message, type = "success") {
-  const toast = document.getElementById("toast");
-  toast.innerText = message;
-  toast.className = "toast " + type;
-  toast.style.display = "block";
-
-  setTimeout(() => {
-    toast.style.display = "none";
-  }, 3000);
-}
-
-async function addMoney() {
-  const amount = Number(document.getElementById("addAmount").value);
-
-  if (!amount || amount < 1) {
-    showToast("Enter valid amount", "error");
-    return;
-  }
-
-  if (amount > 50000) {
-    showToast("Maximum add limit ₹50,000", "error");
-    return;
-  }
-
-  const btn = document.getElementById("addBtnText");
-  const loader = document.getElementById("addBtnLoader");
-  btn.style.display = "none";
-  loader.style.display = "inline";
-
-  try {
-  
-    const orderRes = await fetch("/wallet/create-order", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount })
+    allRows.forEach((row, index) => {
+      row.style.display = index >= start && index < end ? "" : "none";
     });
 
-    const orderData = await orderRes.json();
+    renderPagination(totalPages);
+  }
 
-    if (!orderData.success) {
-      showToast(orderData.message || "Failed to initiate payment", "error");
-      btn.style.display = "inline";
-      loader.style.display = "none";
+  function renderPagination(totalPages) {
+    pagination.innerHTML = "";
+
+    if (totalPages <= 1) return;
+
+
+    const prevBtn = document.createElement("button");
+    prevBtn.textContent = "← Prev";
+    prevBtn.disabled = currentPage === 1;
+    prevBtn.addEventListener("click", () => showPage(currentPage - 1));
+    pagination.appendChild(prevBtn);
+    let lastAdded = null;
+    for (let i = 1; i <= totalPages; i++) {
+      const isVisible =
+        i === 1 ||
+        i === totalPages ||
+        (i >= currentPage - 1 && i <= currentPage + 1);
+
+      if (isVisible) {
+        if (lastAdded && i - lastAdded > 1) {
+          const dots = document.createElement("button");
+          dots.textContent = "...";
+          dots.disabled = true;
+          pagination.appendChild(dots);
+        }
+
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        if (i === currentPage) btn.classList.add("active");
+        btn.addEventListener("click", () => showPage(i));
+        pagination.appendChild(btn);
+        lastAdded = i;
+      }
+    }
+    const nextBtn = document.createElement("button");
+    nextBtn.textContent = "Next →";
+    nextBtn.disabled = currentPage === totalPages;
+    nextBtn.addEventListener("click", () => showPage(currentPage + 1));
+    pagination.appendChild(nextBtn);
+  }
+  if (allRows.length > 0) {
+    showPage(1);
+  }
+
+  function setAmount(value) {
+    document.getElementById("addAmount").value = value;
+  }
+
+  function showToast(message, type = "success") {
+    const toast = document.getElementById("toast");
+    toast.innerText = message;
+    toast.className = "toast " + type;
+    toast.style.display = "block";
+
+    setTimeout(() => {
+      toast.style.display = "none";
+    }, 3000);
+  }
+
+  async function addMoney() {
+    const amount = Number(document.getElementById("addAmount").value);
+
+    if (!amount || amount < 1) {
+      showToast("Enter valid amount", "error");
       return;
     }
-    const options = {
-      key: orderData.key,
-      amount: orderData.amount,
-      currency: "INR",
-      order_id: orderData.orderId,
-      name: "QUORA Wallet",
-      description: "Add money to wallet",
 
-      handler: async function (response) {
-        const verifyRes = await fetch("/wallet/add", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_signature: response.razorpay_signature,
-            amount: orderData.amount   
-          })
-        });
+    if (amount > 50000) {
+      showToast("Maximum add limit ₹50,000", "error");
+      return;
+    }
 
-        const verifyData = await verifyRes.json();
+    const btn = document.getElementById("addBtnText");
+    const loader = document.getElementById("addBtnLoader");
+    btn.style.display = "none";
+    loader.style.display = "inline";
 
-        if (verifyData.success) {
-          showToast("Money added successfully! ✅");
-          setTimeout(() => location.reload(), 1500);
-        } else {
-          showToast(verifyData.message || "Payment verification failed", "error");
-        }
-      },
+    try {
 
-      modal: {
-        ondismiss: function () {
-          showToast("Payment cancelled", "error");
-          btn.style.display = "inline";
-          loader.style.display = "none";
-        }
-      },
+      const orderRes = await fetch("/wallet/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount })
+      });
 
-      theme: { color: "#2d2d2d" }
-    };
+      const orderData = await orderRes.json();
 
-    const rzp = new Razorpay(options);
+      if (!orderData.success) {
+        showToast(orderData.message || "Failed to initiate payment", "error");
+        btn.style.display = "inline";
+        loader.style.display = "none";
+        return;
+      }
+      const options = {
+        key: orderData.key,
+        amount: orderData.amount,
+        currency: "INR",
+        order_id: orderData.orderId,
+        name: "QUORA Wallet",
+        description: "Add money to wallet",
 
-    rzp.on("payment.failed", function (response) {
-      showToast("Payment failed: " + response.error.description, "error");
+        handler: async function (response) {
+          const verifyRes = await fetch("/wallet/add", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              amount: orderData.amount
+            })
+          });
+
+          const verifyData = await verifyRes.json();
+
+          if (verifyData.success) {
+            showToast("Money added successfully! ✅");
+            setTimeout(() => location.reload(), 1500);
+          } else {
+            showToast(verifyData.message || "Payment verification failed", "error");
+          }
+        },
+
+        modal: {
+          ondismiss: function () {
+            showToast("Payment cancelled", "error");
+            btn.style.display = "inline";
+            loader.style.display = "none";
+          }
+        },
+
+        theme: { color: "#2d2d2d" }
+      };
+
+      const rzp = new Razorpay(options);
+
+      rzp.on("payment.failed", function (response) {
+        showToast("Payment failed: " + response.error.description, "error");
+        btn.style.display = "inline";
+        loader.style.display = "none";
+      });
+
+      rzp.open();
+
+    } catch (err) {
+      console.error(err);
+      showToast("Server error", "error");
       btn.style.display = "inline";
       loader.style.display = "none";
-    });
-
-    rzp.open();
-
-  } catch (err) {
-    console.error(err);
-    showToast("Server error", "error");
-    btn.style.display = "inline";
-    loader.style.display = "none";
+    }
   }
-}
 </script>
+
 </html>

@@ -27,8 +27,8 @@
           </form>
         </div>
         <div class="status-tabs">
-          <% const statuses=["All","Placed","Processing","Out for Delivery","Delivered", "Returned", "Cancelled","Payment Failed"];
-            %>
+          <% const statuses=["All","Placed","Processing","Out for Delivery","Delivered", "Returned" , "Cancelled"
+            ,"Payment Failed"]; %>
             <% statuses.forEach(s=> { %>
               <a href="?status=<%= s %>" class="tab <%= status === s ? 'active' : '' %>">
                 <%= s %>
@@ -72,15 +72,15 @@
                       <td>
                         <%= order.userId?.name || "N/A" %>
                       </td>
-                     <td>
-  <span class="status <%= order.status.toLowerCase().replace(/\s/g,'-') %>">
-    <%= order.status %>
-  </span>
+                      <td>
+                        <span class="status <%= order.status.toLowerCase().replace(/\s/g,'-') %>">
+                          <%= order.status %>
+                        </span>
 
-  <% if (order.hasReturnRequest) { %>
-    <div class="return-badge">Return Requested</div>
-  <% } %>
-</td>
+                        <% if (order.hasReturnRequest) { %>
+                          <div class="return-badge">Return Requested</div>
+                          <% } %>
+                      </td>
                       <td>₹ <%= order.totalAmount %>
                       </td>
                       <td>

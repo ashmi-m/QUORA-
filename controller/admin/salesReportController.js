@@ -41,7 +41,7 @@ const getDateFilter = (query) => {
       break;
 
     default:
-   
+
       start = new Date(now.getFullYear(), now.getMonth(), 1);
       end = new Date();
   }
@@ -55,7 +55,7 @@ const loadSalesReport = async (req, res) => {
     const selectedFilter = req.query.filter || "monthly";
     const startDate = req.query.startDate || "";
     const endDate = req.query.endDate || "";
- const page = parseInt(req.query.page) || 1;
+    const page = parseInt(req.query.page) || 1;
     const limit = 10;
     const skip = (page - 1) * limit;
 
@@ -64,7 +64,7 @@ const loadSalesReport = async (req, res) => {
       status: { $nin: ["Cancelled", "Payment Failed"] }
     });
 
-    const order= await Order.find({
+    const order = await Order.find({
       ...filter,
       status: { $nin: ["Cancelled", "Payment Failed"] }
     })
@@ -87,7 +87,7 @@ const loadSalesReport = async (req, res) => {
       totalRevenue += order.totalAmount || 0;
       totalDiscount += order.discount || 0;
 
-   
+
       if (order.products && order.products.length) {
         order.products.forEach((p) => {
           if (p.status !== "Cancelled") {
@@ -116,8 +116,8 @@ const loadSalesReport = async (req, res) => {
       statusMap[o.status] = (statusMap[o.status] || 0) + 1;
     });
 
-   
-const tableOrders = orders.map((o) => ({
+
+    const tableOrders = orders.map((o) => ({
       orderId: o.orderId || o._id,
       date: new Date(o.createdAt).toLocaleDateString("en-IN"),
       paymentMethod: o.paymentMethod,
@@ -142,7 +142,7 @@ const tableOrders = orders.map((o) => ({
       startDate,
       endDate,
       currentPage: page,
-  totalPages: Math.ceil(totalOrdersCount / limit)
+      totalPages: Math.ceil(totalOrdersCount / limit)
     });
 
   } catch (error) {
@@ -292,7 +292,7 @@ const exportExcel = async (req, res) => {
       });
     });
 
- 
+
     sheet.getRow(7).values = [
       "Order ID", "Date", "Payment Method",
       "Coupon Code", "Discount (₹)", "Total Amount (₹)", "Status"

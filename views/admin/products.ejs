@@ -1,344 +1,354 @@
-<%- include("../../views/partials/admin/header",{active : 'products'}) %>
+<%- include("../../views/partials/admin/header",{active : 'products' }) %>
 
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<style>
-  .content-area {
-    margin-left: 220px; 
-    padding: 20px;
-    background: #f5f5f5;
-    min-height: 100vh;
-  }
+  <style>
+    .content-area {
+      margin-left: 220px;
+      padding: 20px;
+      background: #f5f5f5;
+      min-height: 100vh;
+    }
 
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    background: white;
-    padding: 15px 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      background: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
 
-  .header h1 {
-    font-size: 24px;
-    color: #333;
-    margin: 0;
-  }
+    .header h1 {
+      font-size: 24px;
+      color: #333;
+      margin: 0;
+    }
 
-  .search-box {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-  .search-box input {
-    padding: 8px 15px;
-    border-radius: 5px;
-    border: 1px solid #ddd;
-    width: 200px;
-  }
+    .search-box input {
+      padding: 8px 15px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+      width: 200px;
+    }
 
-  .search-box button {
-    padding: 8px 15px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
+    .search-box button {
+      padding: 8px 15px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
 
-  .search-box button:hover {
-    background-color: #0056b3;
-  }
+    .search-box button:hover {
+      background-color: #0056b3;
+    }
 
-  .table-container {
-    background: white;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  }
+    .table-container {
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
 
-  th, td {
-    text-align: left;
-    padding: 12px 15px;
-    border-bottom: 1px solid #f1f1f1;
-  }
+    th,
+    td {
+      text-align: left;
+      padding: 12px 15px;
+      border-bottom: 1px solid #f1f1f1;
+    }
 
-  th {
-    background-color: #433707;
-    font-weight: 600;
-    color: #f2e9e9;
-  }
+    th {
+      background-color: #433707;
+      font-weight: 600;
+      color: #f2e9e9;
+    }
 
-  tr:hover {
-    background-color: #f8f9fa;
-  }
+    tr:hover {
+      background-color: #f8f9fa;
+    }
 
-  .actions {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-  }
+    .actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
 
-  .actions button {
-    padding: 5px 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
-  }
+    .actions button {
+      padding: 5px 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+    }
 
-  .add-btn {
-    background-color: #28a745;
-    color: white;
-  }
+    .add-btn {
+      background-color: #28a745;
+      color: white;
+    }
 
-  .remove-btn {
-    background-color: #dc3545;
-    color: white;
-  }
+    .remove-btn {
+      background-color: #dc3545;
+      color: white;
+    }
 
-  .edit-icon, .delete-icon {
-    cursor: pointer;
-    padding: 4px;
-  }
+    .edit-icon,
+    .delete-icon {
+      cursor: pointer;
+      padding: 4px;
+    }
 
-  .pagination {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 20px;
-    padding: 15px 20px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    flex-wrap: wrap;
-    gap: 10px;
-  }
+    .pagination {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+      padding: 15px 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
 
-  .pagination select {
-    padding: 6px 10px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-  }
-  .pagination-controls button {
-     padding: 6px 12px;
-     border: none;
-     background: #f1f1f1;
-     border-radius: 6px;
-     cursor: pointer;
-     transition: 0.2s;
-  }
+    .pagination select {
+      padding: 6px 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+    }
+
+    .pagination-controls button {
+      padding: 6px 12px;
+      border: none;
+      background: #f1f1f1;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
     .pagination-controls button:hover {
       background: #007bff;
-      color:#fff;
+      color: #fff;
     }
+
     .pagination-controls button.active-page {
       background: #007bff;
       color: #fff;
       font-weight: bold;
     }
-     .preview-wrapper {
-    position: relative;
-    display: inline-block;
-  }
-  .image-preview {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    border-radius: 8px;
-    margin: 5px;
-    border: 1px solid #ddd;
-  }
 
-  .btn-delete {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    background: transparent;
-    border: none;
-    font-size: 18px;
-    cursor: pointer;
-    color: red;
-    font-weight: bold;
-  }
-  .btn-delete:hover {
-    color: darkred;
-  }
-</style>
-</head>
+    .preview-wrapper {
+      position: relative;
+      display: inline-block;
+    }
 
-<div class="content-area">
-  <div class="header">
-    <h1>Products Management</h1>
-    <div class="search-box">
-      <input type="text"id="searchInput"placeholder="Search products..." />
-      <select id="brandFilter" onchange="filterByBrand()">
-        <option value="">All Brands</option>
-        <% if (brands && brands.length > 0) { %>
-      <% brands.forEach(brand => { %>
-         <option value="<%= brand._id %>"><%= brand.brandName %></option>
-      <% }) %>
-    <% } %>
-      </select>
-      <button type="button" onclick="window.location.href='/admin/addproducts'">New Product</button>
+    .image-preview {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin: 5px;
+      border: 1px solid #ddd;
+    }
+
+    .btn-delete {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      background: transparent;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      color: red;
+      font-weight: bold;
+    }
+
+    .btn-delete:hover {
+      color: darkred;
+    }
+  </style>
+  </head>
+
+  <div class="content-area">
+    <div class="header">
+      <h1>Products Management</h1>
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search products..." />
+        <select id="brandFilter" onchange="filterByBrand()">
+          <option value="">All Brands</option>
+          <% if (brands && brands.length> 0) { %>
+            <% brands.forEach(brand=> { %>
+              <option value="<%= brand._id %>">
+                <%= brand.brandName %>
+              </option>
+              <% }) %>
+                <% } %>
+        </select>
+        <button type="button" onclick="window.location.href='/admin/addproducts'">New Product</button>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Product</th>
+
+            <th>Price</th>
+            <th>Category</th>
+            <th>Offer</th>
+            <th>Stock</th>
+            <th>Added on</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="productTableBody">
+          <tr>
+            <td colspan="8" style="text-align:center;">Loading...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination">
+      <div>
+        <span>Show</span>
+        <select onchange="itemsPerPage=parseInt(this.value); loadProducts(1);">
+          <option>10</option>
+          <option>25</option>
+          <option>50</option>
+        </select>
+        <span>entries</span>
+      </div>
+      <div>
+        <div id="entriesInfo">Showing 0 entries</div>
+      </div>
+      <div class="pagination-controls" id="paginationControls"></div>
     </div>
   </div>
-
-  <div class="table-container">
-    <table>
-      <thead>
-        <tr>
-          <th>Product</th>
-         
-          <th>Price</th>
-          <th>Category</th>
-          <th>Offer</th> 
-          <th>Stock</th>
-          <th>Added on</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="productTableBody">
-        <tr>
-          <td colspan="8" style="text-align:center;">Loading...</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="pagination"> 
-    <div>
-      <span>Show</span>
-      <select onchange="itemsPerPage=parseInt(this.value); loadProducts(1);">
-        <option>10</option>
-        <option>25</option>
-        <option>50</option>
-      </select>
-      <span>entries</span>
-    </div>
-    <div>
-      <div id="entriesInfo">Showing 0 entries</div>
-    </div>
-     <div class="pagination-controls" id="paginationControls"></div>
-  </div>
-</div>
-<script>
-  async function addOffer(id) {
-  const { value: percentage, isConfirmed } = await Swal.fire({
-    title: "Add Product Offer",
-    html: `
+  <script>
+    async function addOffer(id) {
+      const { value: percentage, isConfirmed } = await Swal.fire({
+        title: "Add Product Offer",
+        html: `
       <label style="font-size:14px;color:#555;">Offer Percentage</label>
       <input type="number" id="offerInput" min="1" max="99"
         placeholder="Enter percentage"
         class="swal2-input"
         style="width:80%;margin-top:8px;">
     `,
-    showCancelButton: true,
-    confirmButtonText: "Add Offer",
-    cancelButtonText: "Cancel",
-    confirmButtonColor: "#17a2b8",
-    preConfirm: () => {
-      const val = parseInt(document.getElementById("offerInput").value);
-      if (!val || val < 1 || val > 99) {
-        Swal.showValidationMessage("Please enter a valid percentage between 1 and 99");
-        return false;
+        showCancelButton: true,
+        confirmButtonText: "Add Offer",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: "#17a2b8",
+        preConfirm: () => {
+          const val = parseInt(document.getElementById("offerInput").value);
+          if (!val || val < 1 || val > 99) {
+            Swal.showValidationMessage("Please enter a valid percentage between 1 and 99");
+            return false;
+          }
+          return val;
+        }
+      });
+
+      if (!isConfirmed || !percentage) return;
+
+      try {
+        const res = await fetch(`/admin/products/offer/${id}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ percentage })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          Swal.fire("Success!", data.message, "success");
+          loadProducts(currentPage);
+        } else {
+          Swal.fire("Error", data.message, "error");
+        }
+      } catch (err) {
+        Swal.fire("Error", "Server error", "error");
       }
-      return val;
     }
-  });
 
-  if (!isConfirmed || !percentage) return;
+    async function removeOffer(id) {
+      const result = await Swal.fire({
+        title: "Remove Offer?",
+        text: "This will remove the current offer from this product.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, Remove",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: "#ff9800"
+      });
 
-  try {
-    const res = await fetch(`/admin/products/offer/${id}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ percentage })
-    });
+      if (!result.isConfirmed) return;
 
-    const data = await res.json();
+      try {
+        const res = await fetch(`/admin/products/offer/${id}`, {
+          method: "DELETE"
+        });
 
-    if (data.success) {
-      Swal.fire("Success!", data.message, "success");
-      loadProducts(currentPage);
-    } else {
-      Swal.fire("Error", data.message, "error");
+        const data = await res.json();
+
+        if (data.success) {
+          Swal.fire("Removed!", data.message, "success");
+          loadProducts(currentPage);
+        } else {
+          Swal.fire("Error", data.message, "error");
+        }
+      } catch (err) {
+        Swal.fire("Error", "Server error", "error");
+      }
     }
-  } catch (err) {
-    Swal.fire("Error", "Server error", "error");
-  }
-}
+    let currentPage = 1;
+    let totalPages = 1;
+    let itemsPerPage = 10;
+    let totalItems = 0;
+    let searchQuery = "";
+    let selectedBrand = "";
 
-async function removeOffer(id) {
-  const result = await Swal.fire({
-    title: "Remove Offer?",
-    text: "This will remove the current offer from this product.",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonText: "Yes, Remove",
-    cancelButtonText: "Cancel",
-    confirmButtonColor: "#ff9800"
-  });
+    async function loadProducts(page = 1) {
+      try {
+        const res = await fetch(
+          `/admin/products/data?page=${page}&limit=${itemsPerPage}&search=${encodeURIComponent(searchQuery)}&brand=${selectedBrand}`
+        );
 
-  if (!result.isConfirmed) return;
+        const data = await res.json();
+        const tbody = document.getElementById("productTableBody");
+        tbody.innerHTML = "";
 
-  try {
-    const res = await fetch(`/admin/products/offer/${id}`, {
-      method: "DELETE"
-    });
-
-    const data = await res.json();
-
-    if (data.success) {
-      Swal.fire("Removed!", data.message, "success");
-      loadProducts(currentPage);
-    } else {
-      Swal.fire("Error", data.message, "error");
-    }
-  } catch (err) {
-    Swal.fire("Error", "Server error", "error");
-  }
-}
-let currentPage = 1;
-let totalPages = 1;
-let itemsPerPage = 10;
-let totalItems = 0;
-let searchQuery = "";
-let selectedBrand = "";
-
-async function loadProducts(page = 1) {
-  try {
-    const res = await fetch(
-      `/admin/products/data?page=${page}&limit=${itemsPerPage}&search=${encodeURIComponent(searchQuery)}&brand=${selectedBrand}`
-    );
-
-    const data = await res.json();
-    const tbody = document.getElementById("productTableBody");
-    tbody.innerHTML = "";
-
-    if (data.success && data.products.length > 0) {
-      data.products.forEach((item) => {
-        const tr = document.createElement("tr");
-tr.innerHTML = `
+        if (data.success && data.products.length > 0) {
+          data.products.forEach((item) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
   <td>${item.productName}</td>
   <td>
     ₹${item.regularPrice}
-    ${item.productOffer > 0 
-      ? `<br><small style="color:#28a745;font-weight:600;">Sale: ₹${item.salePrice || Math.round(item.regularPrice - (item.regularPrice * item.productOffer / 100))}</small>` 
-      : ''}
+    ${item.productOffer > 0
+                ? `<br><small style="color:#28a745;font-weight:600;">Sale: ₹${item.salePrice || Math.round(item.regularPrice - (item.regularPrice * item.productOffer / 100))}</small>`
+                : ''}
   </td>
   <td>
     ${item.productOffer > 0
-      ? `<span style="
+                ? `<span style="
             background:#e8f5e9;
             color:#28a745;
             padding:3px 10px;
@@ -346,23 +356,23 @@ tr.innerHTML = `
             font-size:12px;
             font-weight:600;
           ">${item.productOffer}% OFF</span>`
-      : `<span style="color:#aaa;font-size:12px;">No offer</span>`
-    }
+                : `<span style="color:#aaa;font-size:12px;">No offer</span>`
+              }
   </td>
   <td>${item.category?.name || "No Category"}</td>
   <td>${item.quantity ?? 0}</td>
   <td>${item.createdAt ? new Date(item.createdAt).toLocaleDateString() : "-"}</td>
   <td class="actions">
     ${item.productOffer > 0
-      ? `<button onclick="removeOffer('${item._id}')"
+                ? `<button onclick="removeOffer('${item._id}')"
            style="padding:5px 10px;border:none;border-radius:5px;cursor:pointer;background:#ff9800;color:white;font-size:12px;">
            REMOVE OFFER
          </button>`
-      : `<button onclick="addOffer('${item._id}')"
+                : `<button onclick="addOffer('${item._id}')"
            style="padding:5px 10px;border:none;border-radius:5px;cursor:pointer;background:#17a2b8;color:white;font-size:12px;">
            ADD OFFER
          </button>`
-    }
+              }
     <button onclick="toggleBlock('${item._id}')"
       style="padding:5px 10px;border:none;border-radius:5px;cursor:pointer;
         background:${item.isBlocked ? '#28a745' : '#dc3545'};color:white;">
@@ -372,141 +382,141 @@ tr.innerHTML = `
 
   </td>
 `;
-        tbody.appendChild(tr);
+            tbody.appendChild(tr);
+          });
+
+          currentPage = data.page;
+          totalPages = data.totalPages;
+          totalItems = data.total;
+
+          const start = (currentPage - 1) * itemsPerPage + 1;
+          const end = Math.min(currentPage * itemsPerPage, totalItems);
+
+          document.getElementById("entriesInfo").innerText =
+            `Showing ${start} to ${end} of ${totalItems} entries`;
+
+          renderPagination();
+        } else {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No Products Found</td></tr>`;
+          document.getElementById("entriesInfo").innerText = "Showing 0 entries";
+          document.getElementById("paginationControls").innerHTML = "";
+        }
+      } catch (err) {
+        console.error("Error fetching products:", err);
+        Swal.fire("Error", "Could not load products", "error");
+      }
+    }
+
+    function renderPagination() {
+      const container = document.getElementById("paginationControls");
+      container.innerHTML = "";
+
+      if (totalPages <= 1) return;
+
+      const prev = document.createElement("button");
+      prev.innerText = "Prev";
+      prev.disabled = currentPage === 1;
+      prev.onclick = () => loadProducts(currentPage - 1);
+      container.appendChild(prev);
+
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement("button");
+        btn.innerText = i;
+        btn.className = i === currentPage ? "active-page" : "";
+        btn.onclick = () => loadProducts(i);
+        container.appendChild(btn);
+      }
+
+      const next = document.createElement("button");
+      next.innerText = "Next";
+      next.disabled = currentPage === totalPages;
+      next.onclick = () => loadProducts(currentPage + 1);
+      container.appendChild(next);
+    }
+
+
+    async function editProduct(id) {
+      const result = await Swal.fire({
+        title: "Edit Product?",
+        text: "Do you want to edit this product?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Yes, Edit it!"
       });
 
-      currentPage = data.page;
-      totalPages = data.totalPages;
-      totalItems = data.total;
-
-      const start = (currentPage - 1) * itemsPerPage + 1;
-      const end = Math.min(currentPage * itemsPerPage, totalItems);
-
-      document.getElementById("entriesInfo").innerText =
-        `Showing ${start} to ${end} of ${totalItems} entries`;
-
-      renderPagination();
-    } else {
-      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No Products Found</td></tr>`;
-      document.getElementById("entriesInfo").innerText = "Showing 0 entries";
-      document.getElementById("paginationControls").innerHTML = "";
+      if (result.isConfirmed) {
+        window.location.href = `/admin/editproduct/${id}`;
+      }
     }
-  } catch (err) {
-    console.error("Error fetching products:", err);
-    Swal.fire("Error", "Could not load products", "error");
-  }
-}
 
-function renderPagination() {
-  const container = document.getElementById("paginationControls");
-  container.innerHTML = "";
+    async function deleteProduct(id) {
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "This product will be deleted permanently!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete it!"
+      });
 
-  if (totalPages <= 1) return;
+      if (!result.isConfirmed) return;
 
-  const prev = document.createElement("button");
-  prev.innerText = "Prev";
-  prev.disabled = currentPage === 1;
-  prev.onclick = () => loadProducts(currentPage - 1);
-  container.appendChild(prev);
+      try {
+        const res = await fetch(`/admin/products/${id}`, { method: "DELETE" });
+        const data = await res.json();
 
-  for (let i = 1; i <= totalPages; i++) {
-    const btn = document.createElement("button");
-    btn.innerText = i;
-    btn.className = i === currentPage ? "active-page" : "";
-    btn.onclick = () => loadProducts(i);
-    container.appendChild(btn);
-  }
-
-  const next = document.createElement("button");
-  next.innerText = "Next";
-  next.disabled = currentPage === totalPages;
-  next.onclick = () => loadProducts(currentPage + 1);
-  container.appendChild(next);
-}
-
-
-async function editProduct(id) {
-  const result = await Swal.fire({
-    title: "Edit Product?",
-    text: "Do you want to edit this product?",
-    icon: "question",
-    showCancelButton: true,
-    confirmButtonText: "Yes, Edit it!"
-  });
-
-  if (result.isConfirmed) {
-    window.location.href = `/admin/editproduct/${id}`;
-  }
-}
-
-async function deleteProduct(id) {
-  const result = await Swal.fire({
-    title: "Are you sure?",
-    text: "This product will be deleted permanently!",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonText: "Yes, delete it!"
-  });
-
-  if (!result.isConfirmed) return;
-
-  try {
-    const res = await fetch(`/admin/products/${id}`, { method: "DELETE" });
-    const data = await res.json();
-
-    if (data.success) {
-      Swal.fire("Deleted!", "Product has been deleted.", "success");
-      loadProducts(currentPage);
-    } else {
-      Swal.fire("Error", data.message || "Failed to delete", "error");
+        if (data.success) {
+          Swal.fire("Deleted!", "Product has been deleted.", "success");
+          loadProducts(currentPage);
+        } else {
+          Swal.fire("Error", data.message || "Failed to delete", "error");
+        }
+      } catch (err) {
+        console.error(err);
+        Swal.fire("Error", "Could not delete product", "error");
+      }
     }
-  } catch (err) {
-    console.error(err);
-    Swal.fire("Error", "Could not delete product", "error");
-  }
-}
-async function toggleBlock(id) {
-  const result = await Swal.fire({
-    title: "Are you sure?",
-    text: "Change product status?",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonText: "Yes"
-  });
+    async function toggleBlock(id) {
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "Change product status?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes"
+      });
 
-  if (!result.isConfirmed) return;
+      if (!result.isConfirmed) return;
 
-  try {
-    const res = await fetch(`/admin/products/toggle-block/${id}`, {
-      method: "PATCH"
+      try {
+        const res = await fetch(`/admin/products/toggle-block/${id}`, {
+          method: "PATCH"
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          Swal.fire("Success", data.message, "success");
+          loadProducts(currentPage);
+        } else {
+          Swal.fire("Error", data.message, "error");
+        }
+
+      } catch (err) {
+        Swal.fire("Error", "Server error", "error");
+      }
+    }
+
+    function searchProducts(e) {
+      searchQuery = e.target.value.trim();
+      loadProducts(1);
+    }
+
+    function filterByBrand() {
+      selectedBrand = document.getElementById("brandFilter").value;
+      loadProducts(1);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      loadProducts();
+      document.getElementById("searchInput").addEventListener("keyup", searchProducts);
     });
-
-    const data = await res.json();
-
-    if (data.success) {
-      Swal.fire("Success", data.message, "success");
-      loadProducts(currentPage);
-    } else {
-      Swal.fire("Error", data.message, "error");
-    }
-
-  } catch (err) {
-    Swal.fire("Error", "Server error", "error");
-  }
-}
-
-function searchProducts(e) {
-  searchQuery = e.target.value.trim();
-  loadProducts(1);
-}
-
-function filterByBrand() {
-  selectedBrand = document.getElementById("brandFilter").value;
-  loadProducts(1);
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  loadProducts();
-  document.getElementById("searchInput").addEventListener("keyup", searchProducts);
-});
-</script>
+  </script>

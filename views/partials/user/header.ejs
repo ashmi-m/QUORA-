@@ -55,16 +55,17 @@
     display: flex;
     gap: 20px;
   }
-  .header-icon {
-  color: #f14d4d;   
-  font-size: 15px;
-  text-decoration: none;
-  position: relative;
-}
 
-.header-icon:hover {
-  color: #b91c1c;   
-}
+  .header-icon {
+    color: #f14d4d;
+    font-size: 15px;
+    text-decoration: none;
+    position: relative;
+  }
+
+  .header-icon:hover {
+    color: #b91c1c;
+  }
 
   navbar {
     display: flex;
@@ -96,40 +97,44 @@
     </nav>
 
     <div class="right-section">
- <% if (user) { %>
-       <a href="/wishlist" class="header-icon">
-    <i class="fa fa-heart"></i>
-    <% if (typeof wishlistCount !== "undefined" && wishlistCount > 0) { %>
-      <small class="badge"><%= wishlistCount %></small>
-    <% } %>
-  </a>
-
-    <a href="/cart" class="header-icon">
-    <i class="fa fa-shopping-cart"></i>
-    <% if (typeof cartCount !== "undefined" && cartCount > 0) { %>
-      <small class="badge"><%= cartCount %></small>
-    <% } %>
-  </a>
-
-
-       
-          <div class="dropdown">
-            <a href="#" class="sign-in-link text-dark">
-               <%= user.name || "Username" %>
-              
-            </a>
-
-            <div class="dropdown-content">
-              <a href="/userprofile">Profile</a>
-              <a href="/logout">Logout</a>
-            </div>
-          </div>
-          <% } else { %>
-            <a href="/signup" class="sign-in-link text-dark">Sign Up</a>
-            <a href="/login" class="sign-in-link text-dark ">Login</a>
+      <% if (user) { %>
+        <a href="/wishlist" class="header-icon">
+          <i class="fa fa-heart"></i>
+          <% if (typeof wishlistCount !=="undefined" && wishlistCount> 0) { %>
+            <small class="badge">
+              <%= wishlistCount %>
+            </small>
             <% } %>
-      </div>
+        </a>
+
+        <a href="/cart" class="header-icon">
+          <i class="fa fa-shopping-cart"></i>
+          <% if (typeof cartCount !=="undefined" && cartCount> 0) { %>
+            <small class="badge">
+              <%= cartCount %>
+            </small>
+            <% } %>
+        </a>
+
+
+
+        <div class="dropdown">
+          <a href="#" class="sign-in-link text-dark">
+            <%= user.name || "Username" %>
+
+          </a>
+
+          <div class="dropdown-content">
+            <a href="/userprofile">Profile</a>
+            <a href="/logout">Logout</a>
+          </div>
+        </div>
+        <% } else { %>
+          <a href="/signup" class="sign-in-link text-dark">Sign Up</a>
+          <a href="/login" class="sign-in-link text-dark ">Login</a>
+          <% } %>
     </div>
+  </div>
 
 
 </header>

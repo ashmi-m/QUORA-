@@ -59,7 +59,7 @@ const applyCoupon = async (req, res) => {
       discountAmount: discount
     };
 
-    const deliveryCharge = 50; 
+    const deliveryCharge = 50;
     const grandTotal = subtotal + deliveryCharge - discount;
 
     res.json({
@@ -84,8 +84,8 @@ const removeCoupon = (req, res) => {
   });
 };
 
-module.exports = { 
-    applyCoupon ,
-     removeCoupon
+module.exports = {
+  applyCoupon,
+  removeCoupon
 };
 

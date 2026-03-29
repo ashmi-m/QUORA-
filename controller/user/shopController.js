@@ -26,20 +26,20 @@ const loadShopPage = async (req, res) => {
       page = 1,
     } = req.query;
 
-   
+
     let query = { isBlocked: false };
     const limit = 12;
-    const currentPage  = parseInt(req.query.page) || 1;
+    const currentPage = parseInt(req.query.page) || 1;
     const skip = (currentPage - 1) * limit;
 
     //category
-    let selectedCategory  = [];
+    let selectedCategory = [];
     if (category) {
       const categoryArray = Array.isArray(category)
         ? category
         : [category];
 
-      selectedCategory  = categoryArray.filter((id) =>
+      selectedCategory = categoryArray.filter((id) =>
         mongoose.Types.ObjectId.isValid(id)
       );
 
@@ -63,21 +63,21 @@ const loadShopPage = async (req, res) => {
     //search
     const searchQuery = search?.trim() || "";
     if (searchQuery) {
-      query.productName = { $regex: searchQuery, $options: "i" ,};
+      query.productName = { $regex: searchQuery, $options: "i", };
     }
 
     //price rage
     let selectedPriceRange = priceRange || "";
 
-    if (selectedPriceRange === "under500"){
-         query.regularPrice = { $lt: 500 };
-    }else if (selectedPriceRange === "500-1000"){
-        query.regularPrice = { $gte: 500, $lte: 1000 };
-    }else if (selectedPriceRange === "1000-5000") {
+    if (selectedPriceRange === "under500") {
+      query.regularPrice = { $lt: 500 };
+    } else if (selectedPriceRange === "500-1000") {
+      query.regularPrice = { $gte: 500, $lte: 1000 };
+    } else if (selectedPriceRange === "1000-5000") {
       query.regularPrice = { $gte: 1000, $lte: 5000 };
-    }else if (selectedPriceRange === "5000-15000"){
+    } else if (selectedPriceRange === "5000-15000") {
       query.regularPrice = { $gte: 5000, $lte: 15000 };
-    }else if (selectedPriceRange === "above15000") {
+    } else if (selectedPriceRange === "above15000") {
       query.regularPrice = { $gt: 15000 };
     }
 
@@ -107,26 +107,26 @@ const loadShopPage = async (req, res) => {
       Brand.find({ isBlocked: false }).lean(),
     ]);
 
-products.forEach(applyOffer);
+    products.forEach(applyOffer);
 
-// if (sort  === "low-high") {
-//       products.sort((a, b) => {
-//         (a.salePrice ?? a.regularPrice) -
-//         (b.salePrice ?? b.regularPrice)
-//       });
-//     } else if (sort === "high-low") {
-//       products.sort((a, b) => {
-//           (b.salePrice ?? b.regularPrice) -
-//           (a.salePrice ?? a.regularPrice)
-//       });
-//     }
-    
+    // if (sort  === "low-high") {
+    //       products.sort((a, b) => {
+    //         (a.salePrice ?? a.regularPrice) -
+    //         (b.salePrice ?? b.regularPrice)
+    //       });
+    //     } else if (sort === "high-low") {
+    //       products.sort((a, b) => {
+    //           (b.salePrice ?? b.regularPrice) -
+    //           (a.salePrice ?? a.regularPrice)
+    //       });
+    //     }
+
     //whislist
     if (req.user) {
       const wishlist = await Wishlist.findOne({ userId: req.user._id }).lean();
 
       const wishlistedIds = wishlist ? wishlist.items.map(i => i.productId.toString()) : [];
-      
+
       products.forEach((product) => {
         product.isWishlisted = wishlistedIds.includes(product._id.toString());
       });
@@ -140,8 +140,8 @@ products.forEach(applyOffer);
       brands,
       selectedCategory,
       selectedBrand,
-      sortOption : sort || "",
-      priceRange : selectedPriceRange,
+      sortOption: sort || "",
+      priceRange: selectedPriceRange,
       searchQuery,
       totalPages,
       currentPage: page,
@@ -162,13 +162,13 @@ const loadProductDetails = async (req, res) => {
     if (!product) {
       return res.redirect("/pageNotFound");
     }
-     applyOffer(product);
+    applyOffer(product);
 
-   const categoryOffer = product.category?.categoryOffer || 0;
+    const categoryOffer = product.category?.categoryOffer || 0;
     const productOffer = product.productOffer || 0;
     const effectiveOffer = Math.max(productOffer, categoryOffer);
 
-  product.effectiveOffer = effectiveOffer;
+    product.effectiveOffer = effectiveOffer;
     product.salePrice = effectiveOffer > 0
       ? Math.round(product.regularPrice - (product.regularPrice * effectiveOffer / 100))
       : null;
@@ -180,7 +180,7 @@ const loadProductDetails = async (req, res) => {
       isBlocked: false,
     }).limit(4).lean();
 
-       relatedProducts.forEach(rp => {
+    relatedProducts.forEach(rp => {
       const catOffer = rp.category?.categoryOffer || 0;
       const prodOffer = rp.productOffer || 0;
       const effOffer = Math.max(prodOffer, catOffer);

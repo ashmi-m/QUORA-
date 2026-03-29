@@ -41,26 +41,26 @@ router.post("/addBrand", upload.single("brandImage"), adminAuth, brandController
 router.get("/addproducts", adminAuth, productController.getProductAddPage);
 router.post("/addProduct", adminAuth, upload.array("images", 4), productController.addProducts);
 
-router.get("/products",adminAuth, productController.getProductpage);
+router.get("/products", adminAuth, productController.getProductpage);
 router.get("/products/data", adminAuth, productController.getProductsData);
 
 router.get("/editproduct/:id", adminAuth, productController.getEditProductPage);
 
 router.post("/products/edit/:id", adminAuth, upload.array("images", 4), productController.updateProduct)
 
-router.post("/delete-product-image",adminAuth,productController.deleteImage);
+router.post("/delete-product-image", adminAuth, productController.deleteImage);
 router.get("/orders", adminAuth, adminController.loadOrders);
 router.get('/orders/:id', adminAuth, adminController.viewOrderDetails);
 router.post("/orders/status/:id", adminAuth, adminController.updateOrderStatus);
 
-router.post( "/orders/:id/product/:index/status",  adminAuth,   adminController.updateProductStatus);
+router.post("/orders/:id/product/:index/status", adminAuth, adminController.updateProductStatus);
 
 
 router.get("/orders/:id/json", adminAuth, adminController.getOrderDetailsJson);
 
 router.post("/orders/:id/product/:index/return", adminAuth, adminController.requestReturn);
 router.post("/orders/:id/product/:index/return-approve", adminAuth, adminController.approveReturn);
-router.post("/orders/:id/product/:index/return-reject",adminAuth,adminController.rejectReturn);
+router.post("/orders/:id/product/:index/return-reject", adminAuth, adminController.rejectReturn);
 router.patch("/products/toggle-block/:id", productController.toggleProductBlock);
 
 
@@ -84,10 +84,6 @@ router.delete("/products/offer/:id", adminAuth, productController.removeProductO
 router.post("/category/offer/:id", adminAuth, categoryController.addCategoryOffer);
 router.delete("/category/offer/:id", adminAuth, categoryController.removeCategoryOffer);
 
-
-
-
-
 router.get("/sales-report", adminAuth, salesReportController.loadSalesReport);
 router.get("/export-pdf", adminAuth, salesReportController.exportPdf);
 router.get("/export-excel", adminAuth, salesReportController.exportExcel);
@@ -95,8 +91,8 @@ router.get("/export-excel", adminAuth, salesReportController.exportExcel);
 router.get("/dashboard-chart", adminController.getDashboardChart);
 router.get("/dashboard-stats", adminController.getDashboardStats);
 router.get("/top-products", adminController.getTopProducts);
-router.get("/top-categories", adminController.getTopCategories);   
-router.get("/top-brands", adminController.getTopBrands); 
+router.get("/top-categories", adminController.getTopCategories);
+router.get("/top-brands", adminController.getTopBrands);
 module.exports = router;
 
 

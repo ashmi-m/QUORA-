@@ -260,7 +260,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ productId, image, index })
         })
-        
+
         const wrapper = document.getElementById(`previewWrapper${index}`);
         if (wrapper) {
           wrapper.remove();

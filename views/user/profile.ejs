@@ -127,46 +127,46 @@
           document.execCommand("copy");
           Swal.fire("Copied!", "Referral code copied to clipboard", "success");
         };
-    function validateProfileName() {
-      const nameInput = document.querySelector("input[name='name']");
-      const nameVal = nameInput.value.trim();
+        function validateProfileName() {
+          const nameInput = document.querySelector("input[name='name']");
+          const nameVal = nameInput.value.trim();
 
-      const pattern = /^[A-Za-z\s]{3,20}$/;
+          const pattern = /^[A-Za-z\s]{3,20}$/;
 
-      if (!pattern.test(nameVal)) {
-        Swal.fire("Invalid Name", "Name must be 3–20 characters and contain only alphabets", "warning");
-        return false;
-      }
-      return true;
-    }
+          if (!pattern.test(nameVal)) {
+            Swal.fire("Invalid Name", "Name must be 3–20 characters and contain only alphabets", "warning");
+            return false;
+          }
+          return true;
+        }
 
-    function validateProfilePhone() {
-  const phoneInput = document.querySelector("input[name='phone']");
-  const phoneVal = phoneInput.value.trim();
+        function validateProfilePhone() {
+          const phoneInput = document.querySelector("input[name='phone']");
+          const phoneVal = phoneInput.value.trim();
 
-  // ✅ exactly 10 digits
-  if (!/^\d{10}$/.test(phoneVal)) {
-    Swal.fire("Invalid Phone", "Phone number must contain exactly 10 digits", "warning");
-    return false;
-  }
+          // ✅ exactly 10 digits
+          if (!/^\d{10}$/.test(phoneVal)) {
+            Swal.fire("Invalid Phone", "Phone number must contain exactly 10 digits", "warning");
+            return false;
+          }
 
-  // ❌ repeated digits (1111111111)
-  if (/^(\d)\1{9}$/.test(phoneVal)) {
-    Swal.fire("Invalid Phone", "Repeated digits are not allowed", "warning");
-    return false;
-  }
+          // ❌ repeated digits (1111111111)
+          if (/^(\d)\1{9}$/.test(phoneVal)) {
+            Swal.fire("Invalid Phone", "Repeated digits are not allowed", "warning");
+            return false;
+          }
 
-  // ❌ sequential numbers (1234567890 / 9876543210)
-  const asc = "01234567890123456789";
-  const desc = "98765432109876543210";
+          // ❌ sequential numbers (1234567890 / 9876543210)
+          const asc = "01234567890123456789";
+          const desc = "98765432109876543210";
 
-  if (asc.includes(phoneVal) || desc.includes(phoneVal)) {
-    Swal.fire("Invalid Phone", "Sequential numbers are not allowed", "warning");
-    return false;
-  }
+          if (asc.includes(phoneVal) || desc.includes(phoneVal)) {
+            Swal.fire("Invalid Phone", "Sequential numbers are not allowed", "warning");
+            return false;
+          }
 
-  return true;
-}
+          return true;
+        }
 
         const editBtn = document.getElementById("editProfileBtn");
         const saveBtn = document.getElementById("saveProfileBtn");
@@ -182,8 +182,8 @@
           });
 
           saveBtn.addEventListener("click", async () => {
-             if (!validateProfileName()) return;
-               if (!validateProfilePhone()) return;
+            if (!validateProfileName()) return;
+            if (!validateProfilePhone()) return;
             const data = {
               name: document.querySelector("input[name='name']").value,
               phone: document.querySelector("input[name='phone']").value,

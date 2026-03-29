@@ -8,8 +8,8 @@ const categoryInfo = async (req, res) => {
     const skip = (page - 1) * limit;
     const search = req.query.search || "";
 
-      const query = search
-      ? { name: { $regex: search, $options: "i" } } 
+    const query = search
+      ? { name: { $regex: search, $options: "i" } }
       : {};
     const categoryData = await Category.find(query)
       .sort({ createdAt: -1 })
@@ -24,7 +24,7 @@ const categoryInfo = async (req, res) => {
       currentPage: page,
       totalPages: totalPages,
       totalCategories: totalCategories,
-      search: search 
+      search: search
     });
   } catch (error) {
     console.error("Category Info Error:", error);
@@ -41,7 +41,7 @@ const addCategory = async (req, res) => {
 
     name = name.trim();
 
-    
+
     const existing = await Category.findOne({
       name: { $regex: `^${name}$`, $options: "i" }
     });
@@ -91,10 +91,10 @@ const postEditCategory = async (req, res) => {
 
     name = name.trim().toLowerCase();
 
- const existing = await Category.findOne({
-  name: { $regex: `^${name}$`, $options: "i" },
-  _id: { $ne: id }
-});
+    const existing = await Category.findOne({
+      name: { $regex: `^${name}$`, $options: "i" },
+      _id: { $ne: id }
+    });
 
     if (existing) {
       return res.status(400).json({
@@ -105,39 +105,39 @@ const postEditCategory = async (req, res) => {
 
     await Category.findByIdAndUpdate(id, { name, description });
     res.status(200).json({ success: true, message: "Category updated successfully" });
-    
 
-} catch (error) {
+
+  } catch (error) {
     console.error("Error updating category:", error);
-    res.status(500).json({ success: false, error: "Internal server error" });  
+    res.status(500).json({ success: false, error: "Internal server error" });
   }
 };
-const getListCategory=async(req,res)=>{
+const getListCategory = async (req, res) => {
   try {
-    let id=req.query.id;
-    await Category.updateOne({_id:id},{$set:{isListed:true}});
+    let id = req.query.id;
+    await Category.updateOne({ _id: id }, { $set: { isListed: true } });
     res.redirect("/admin/categories");
   } catch (error) {
     res.redirect("admin/pageerror");
   }
 }
-const getUnlistCategory=async(req,res)=>{
+const getUnlistCategory = async (req, res) => {
   try {
-    let id=req.query.id;
-    await Category.updateOne({_id:id},{$set:{isListed:false}});
+    let id = req.query.id;
+    await Category.updateOne({ _id: id }, { $set: { isListed: false } });
     res.redirect("/admin/categories");
   } catch (error) {
     res.redirect("admin/pageerror");
   }
 }
-const toggleCategoryStatus = async(req,res)=>{
-  try{
+const toggleCategoryStatus = async (req, res) => {
+  try {
     const { status } = req.body;
-    await Category.findByIdAndUpdate(req.params.id,{ status });
-    res.status(200).json({success:true,message:"Status updated"});
-  }catch(err){
+    await Category.findByIdAndUpdate(req.params.id, { status });
+    res.status(200).json({ success: true, message: "Status updated" });
+  } catch (err) {
     console.error(err);
-    res.status(500).json({success:false,error:"Failed to update status"});
+    res.status(500).json({ success: false, error: "Failed to update status" });
   }
 }
 const addCategoryOffer = async (req, res) => {
@@ -182,8 +182,8 @@ module.exports = {
   postEditCategory,
   getListCategory,
   getUnlistCategory,
- toggleCategoryStatus,
- addCategoryOffer,
- removeCategoryOffer
+  toggleCategoryStatus,
+  addCategoryOffer,
+  removeCategoryOffer
 
 };

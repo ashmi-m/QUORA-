@@ -92,7 +92,7 @@ const loadPayment = async (req, res) => {
 
     let total = 0;
     const couponDiscount = order.couponDiscount || 0;
-const finalTotal = total - couponDiscount;
+    const finalTotal = total - couponDiscount;
 
     cart.items.forEach(item => {
       const { salePrice } = applyOffer(item.productId);
@@ -177,10 +177,10 @@ const placeOrder = async (req, res) => {
 
     for (const item of cart.items) {
       const updatedProduct = await Product.findOneAndUpdate(
-  { _id: item.productId._id, quantity: { $gte: item.quantity } },
-  { $inc: { quantity: -item.quantity } },
-  { new: true }
-).populate("category");
+        { _id: item.productId._id, quantity: { $gte: item.quantity } },
+        { $inc: { quantity: -item.quantity } },
+        { new: true }
+      ).populate("category");
 
       if (!updatedProduct) {
         return res.status(400).json({
@@ -196,7 +196,7 @@ const placeOrder = async (req, res) => {
 
       const regularPrice = updatedProduct.regularPrice;
 
-const { salePrice, effectiveOffer } = applyOffer(updatedProduct);
+      const { salePrice, effectiveOffer } = applyOffer(updatedProduct);
 
       const itemDiscount = (regularPrice - salePrice) * item.quantity;
       totalProductDiscount += itemDiscount;
@@ -208,28 +208,28 @@ const { salePrice, effectiveOffer } = applyOffer(updatedProduct);
         price: regularPrice,
         salePrice: salePrice,
         discount: itemDiscount,
-      offerApplied: effectiveOffer,
-status: paymentMethod === "Razorpay" ? "Processing" : "Placed"
+        offerApplied: effectiveOffer,
+        status: paymentMethod === "Razorpay" ? "Processing" : "Placed"
       });
     }
-    
 
-const couponData = req.session.appliedCoupon || null;
-const couponDiscount = couponData ? couponData.discountAmount : 0;
 
-const deliveryCharge = total > 1000 ? 0 : 50;
+    const couponData = req.session.appliedCoupon || null;
+    const couponDiscount = couponData ? couponData.discountAmount : 0;
 
-const totalDiscount = totalProductDiscount + couponDiscount;
+    const deliveryCharge = total > 1000 ? 0 : 50;
 
-const finalTotal = total - couponDiscount + deliveryCharge;
+    const totalDiscount = totalProductDiscount + couponDiscount;
 
-    
-if (paymentMethod === "COD" && finalTotal > 1000) {
-  return res.status(400).json({
-    success: false,
-    message: "Cash on Delivery is not allowed for orders above ₹1000. Please choose another payment method."
-  });
-}
+    const finalTotal = total - couponDiscount + deliveryCharge;
+
+
+    if (paymentMethod === "COD" && finalTotal > 1000) {
+      return res.status(400).json({
+        success: false,
+        message: "Cash on Delivery is not allowed for orders above ₹1000. Please choose another payment method."
+      });
+    }
 
 
     if (paymentMethod === "Wallet") {
@@ -274,9 +274,9 @@ if (paymentMethod === "COD" && finalTotal > 1000) {
         altPhone: selectedAddress.altPhone
       },
       products,
-      totalAmount: finalTotal,   
+      totalAmount: finalTotal,
       discount: totalDiscount,
-          couponDiscount: couponDiscount,
+      couponDiscount: couponDiscount,
       couponCode: couponData ? couponData.code : null,
       paymentMethod,
       status: paymentMethod === "COD" ? "Placed" : "Paid"
@@ -386,16 +386,16 @@ const cancelSingleProduct = async (req, res) => {
     }
 
     await order.save();
-if (order.paymentMethod !== "COD") {
-  const refundAmount = (product.salePrice ?? product.price) * product.quantity;
+    if (order.paymentMethod !== "COD") {
+      const refundAmount = (product.salePrice ?? product.price) * product.quantity;
 
-  await walletController.creditWallet(
-    order.userId,
-    refundAmount,
-    "Refund for cancelled product",
-    order._id
-  );
-}
+      await walletController.creditWallet(
+        order.userId,
+        refundAmount,
+        "Refund for cancelled product",
+        order._id
+      );
+    }
 
     res.json({ success: true });
   } catch (error) {
@@ -504,7 +504,7 @@ const downloadInvoice = async (req, res) => {
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
       "Content-Disposition",
-`attachment; filename=invoice-${order.orderId}.pdf`
+      `attachment; filename=invoice-${order.orderId}.pdf`
     );
     const doc = new PDFDocument({ margin: 50 });
     doc.pipe(res);
@@ -531,7 +531,7 @@ const downloadInvoice = async (req, res) => {
         .text(value, x, ty + 11);
     };
 
-drawLabel("Order ID", `${order.orderId}`, margin, y);
+    drawLabel("Order ID", `${order.orderId}`, margin, y);
     drawLabel("Order Date", new Date(order.createdAt).toDateString(), margin, y + 36);
     drawLabel("Payment Method", order.paymentMethod, margin + contentW / 2, y);
     drawLabel("Order Status", order.status, margin + contentW / 2, y + 36);
@@ -553,25 +553,25 @@ drawLabel("Order ID", `${order.orderId}`, margin, y);
         .text(col.header, col.x + 4, y + 8, { width: col.w - 8, align: col.align });
     });
     y += ROW_H;
-   let total = 0;
-let rowNum = 0;
-const couponDiscount = order.couponDiscount || 0;
-const activeTotal = order.products
-  .filter(p => p.status !== "Cancelled")
-  .reduce((sum, p) => sum + (p.salePrice * p.quantity), 0);
+    let total = 0;
+    let rowNum = 0;
+    const couponDiscount = order.couponDiscount || 0;
+    const activeTotal = order.products
+      .filter(p => p.status !== "Cancelled")
+      .reduce((sum, p) => sum + (p.salePrice * p.quantity), 0);
 
-order.products.forEach((item, index) => {
-  if (item.status === "Cancelled") return;
+    order.products.forEach((item, index) => {
+      if (item.status === "Cancelled") return;
 
-  const name = item.productId?.productName || "Product";
-  const qty = item.quantity;
-  const rawSubtotal = item.salePrice * qty;
-  const itemCouponShare = activeTotal > 0 
-    ? Math.round((rawSubtotal / activeTotal) * couponDiscount) 
-    : 0;
-  const price = rawSubtotal > 0 ? ((rawSubtotal - itemCouponShare) / qty) : item.salePrice;
-  const subtotal = rawSubtotal - itemCouponShare;
-  total += subtotal;
+      const name = item.productId?.productName || "Product";
+      const qty = item.quantity;
+      const rawSubtotal = item.salePrice * qty;
+      const itemCouponShare = activeTotal > 0
+        ? Math.round((rawSubtotal / activeTotal) * couponDiscount)
+        : 0;
+      const price = rawSubtotal > 0 ? ((rawSubtotal - itemCouponShare) / qty) : item.salePrice;
+      const subtotal = rawSubtotal - itemCouponShare;
+      total += subtotal;
 
       doc.rect(margin, y, contentW, ROW_H).fill(rowNum % 2 === 0 ? LIGHT_BG : WHITE);
       doc.rect(margin, y, contentW, ROW_H).strokeColor("#dddddd").lineWidth(0.5).stroke();
@@ -596,9 +596,9 @@ order.products.forEach((item, index) => {
 
     doc.fillColor(WHITE).fontSize(10).font("Helvetica-Bold")
       .text("TOTAL", margin + 4, y + 9, { width: contentW - cols[4].w - 60, align: "right" });
-    
-doc.fillColor(ACCENT).fontSize(10).font("Helvetica-Bold")
-  .text(`Rs.${total.toFixed(2)}`, cols[4].x + 4, y + 9, { width: cols[4].w - 8, align: "right" });
+
+    doc.fillColor(ACCENT).fontSize(10).font("Helvetica-Bold")
+      .text(`Rs.${total.toFixed(2)}`, cols[4].x + 4, y + 9, { width: cols[4].w - 8, align: "right" });
     const footerY = doc.page.height - 55;
     doc.moveTo(margin, footerY - 10).lineTo(margin + contentW, footerY - 10)
       .strokeColor("#dddddd").lineWidth(1).stroke();

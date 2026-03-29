@@ -3,12 +3,12 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 const { v4: uuidv4 } = require("uuid");
 const orderSchema = new mongoose.Schema({
-    orderId: {
+  orderId: {
     type: String,
     required: true,
     unique: true,
     index: true,
-     default: () => `ORD-${uuidv4().split("-")[0].toUpperCase()}`
+    default: () => `ORD-${uuidv4().split("-")[0].toUpperCase()}`
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -17,7 +17,7 @@ const orderSchema = new mongoose.Schema({
   },
 
   address: {
-    addressType:String, 
+    addressType: String,
     name: String,
     city: String,
     landMark: String,
@@ -42,25 +42,25 @@ const orderSchema = new mongoose.Schema({
         type: Number,
         required: true
       },
-       salePrice: {           
-      type: Number,
-      default: null
-    },
-    discount: {
-  type: Number,
-  default: 0
-},
-couponCode: {
-  type: String,
-  default: null
-},
-    offerApplied: {        
-      type: Number,
-      default: 0
-    },
- status: {
+      salePrice: {
+        type: Number,
+        default: null
+      },
+      discount: {
+        type: Number,
+        default: 0
+      },
+      couponCode: {
         type: String,
-        enum: [  "Placed",
+        default: null
+      },
+      offerApplied: {
+        type: Number,
+        default: 0
+      },
+      status: {
+        type: String,
+        enum: ["Placed",
           "Processing",
           "Shipped",
           "Out for Delivery",
@@ -80,17 +80,17 @@ couponCode: {
     required: true
   },
   couponDiscount: {
-  type: Number,
-  default: 0
-},
+    type: Number,
+    default: 0
+  },
 
   paymentMethod: {
     type: String,
-    enum: ["COD", "ONLINE", 'Wallet','Razorpay'],
+    enum: ["COD", "ONLINE", 'Wallet', 'Razorpay'],
     required: true
   },
 
-    razorpayOrderId: {
+  razorpayOrderId: {
     type: String,
     default: null
   },
@@ -108,14 +108,14 @@ couponCode: {
 
   status: {
     type: String,
-     enum: [ "Placed",
-       "Paid",
+    enum: ["Placed",
+      "Paid",
       "Processing",
       "Shipped",
       "Out for Delivery",
       "Delivered",
       "Cancelled",
-         "Returned", 
+      "Returned",
       "Payment Failed"],
     default: "Placed"
   }

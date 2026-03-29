@@ -1,4 +1,3 @@
-
 .address-wrapper {
   width: 100%;
 }
@@ -29,6 +28,7 @@
 .add-address-btn:hover {
   background: #445622;
 }
+
 .address-card {
   padding: 22px 0;
   border-bottom: 1px solid #e5e5e5;
@@ -76,6 +76,7 @@
   border-radius: 20px;
   font-size: 12px;
 }
+
 .address-actions {
   position: relative;
 }
@@ -135,6 +136,7 @@
 .delete-btn {
   color: #d32f2f;
 }
+
 .pagination {
   margin-top: 20px;
   display: flex;
@@ -155,11 +157,13 @@
 .page-btn:hover {
   background: #f1f1f1;
 }
+
 .page-btn.active {
   background: #556b2f;
   color: #fff;
   border-color: #556b2f;
 }
+
 .profile-menu a {
   display: block;
   text-decoration: none;

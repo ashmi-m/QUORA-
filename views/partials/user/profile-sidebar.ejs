@@ -1,20 +1,23 @@
 <div class="profile-sidebar">
   <div class="profile-image-box">
-  <% if (user.profileImage && user.profileImage.trim() !== "") { %>
-  <img src="<%= user.profileImage %>" 
-       alt="Profile Image" 
-       id="profilePreview"
-       onerror="this.style.display='none'; document.getElementById('avatarFallback').style.display='flex';">
-  <div class="avatar-placeholder" id="avatarFallback" style="display:none;"><%= user.name.charAt(0).toUpperCase() %></div>
-<% } else { %>
-  <div class="avatar-placeholder" id="profilePreview"><%= user.name.charAt(0).toUpperCase() %></div>
-<% } %>
+    <% if (user.profileImage && user.profileImage.trim() !=="" ) { %>
+      <img src="<%= user.profileImage %>" alt="Profile Image" id="profilePreview"
+        onerror="this.style.display='none'; document.getElementById('avatarFallback').style.display='flex';">
+      <div class="avatar-placeholder" id="avatarFallback" style="display:none;">
+        <%= user.name.charAt(0).toUpperCase() %>
+      </div>
+      <% } else { %>
+        <div class="avatar-placeholder" id="profilePreview">
+          <%= user.name.charAt(0).toUpperCase() %>
+        </div>
+        <% } %>
 
-  <input type="file" id="profileImageInput" hidden>
-  <button type="button" id="changeImageBtn">Change Photo</button>
-</div>
+          <input type="file" id="profileImageInput" hidden>
+          <button type="button" id="changeImageBtn">Change Photo</button>
+  </div>
 
-  <h3>Hello 👋 <%= user?.name %></h3>
+  <h3>Hello 👋 <%= user?.name %>
+  </h3>
 
   <div class="profile-menu">
     <a href="/userprofile">
@@ -38,7 +41,7 @@
   </div>
 </div>
 <script>
-document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("DOMContentLoaded", () => {
 
     const changeBtn = document.getElementById("changeImageBtn");
     const imageInput = document.getElementById("profileImageInput");
@@ -47,79 +50,79 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (changeBtn && !changeBtn.dataset.listenerAdded) {
 
-        changeBtn.dataset.listenerAdded = "true";
+      changeBtn.dataset.listenerAdded = "true";
 
-        changeBtn.addEventListener("click", () => {
-            imageInput.click();
-        });
+      changeBtn.addEventListener("click", () => {
+        imageInput.click();
+      });
 
-        imageInput.addEventListener("change", async () => {
+      imageInput.addEventListener("change", async () => {
 
-            const file = imageInput.files[0];
-            if (!file) return;
+        const file = imageInput.files[0];
+        if (!file) return;
 
-            const formData = new FormData();
-            formData.append("profileImage", file);
+        const formData = new FormData();
+        formData.append("profileImage", file);
 
-            try {
+        try {
 
-                const res = await fetch("/profile/upload-image", {
-                    method: "PUT",
-                    body: formData
-                });
+          const res = await fetch("/profile/upload-image", {
+            method: "PUT",
+            body: formData
+          });
 
-                const result = await res.json();
+          const result = await res.json();
 
-                if (result.success) {
+          if (result.success) {
 
-                    const preview = document.getElementById("profilePreview");
+            const preview = document.getElementById("profilePreview");
 
-                    if (preview.tagName === "IMG") {
-                        preview.src = result.image;
-                    } else {
-                        const img = document.createElement("img");
-                        img.src = result.image;
-                        img.id = "profilePreview";
-                        preview.replaceWith(img);
-                    }
-
-                    Swal.fire("Success", "Profile image updated", "success");
-
-                } else {
-                    Swal.fire("Error", "Upload failed", "error");
-                }
-
-            } catch (err) {
-                Swal.fire("Error", "Something went wrong", "error");
+            if (preview.tagName === "IMG") {
+              preview.src = result.image;
+            } else {
+              const img = document.createElement("img");
+              img.src = result.image;
+              img.id = "profilePreview";
+              preview.replaceWith(img);
             }
 
-        });
+            Swal.fire("Success", "Profile image updated", "success");
+
+          } else {
+            Swal.fire("Error", "Upload failed", "error");
+          }
+
+        } catch (err) {
+          Swal.fire("Error", "Something went wrong", "error");
+        }
+
+      });
     }
 
-   
+
 
     if (logoutBtn && !logoutBtn.dataset.listenerAdded) {
 
-        logoutBtn.dataset.listenerAdded = "true";
+      logoutBtn.dataset.listenerAdded = "true";
 
-        logoutBtn.addEventListener("click", () => {
+      logoutBtn.addEventListener("click", () => {
 
-            Swal.fire({
-                title: "Are you sure?",
-                text: "You will be logged out of your account",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonText: "Yes, Logout"
-            }).then((result) => {
+        Swal.fire({
+          title: "Are you sure?",
+          text: "You will be logged out of your account",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Yes, Logout"
+        }).then((result) => {
 
-                if (result.isConfirmed) {
-                    window.location.href = "/logout";
-                }
-
-            });
+          if (result.isConfirmed) {
+            window.location.href = "/logout";
+          }
 
         });
+
+      });
     }
 
-});
+  });
 </script>

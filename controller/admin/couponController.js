@@ -36,11 +36,11 @@ const addCoupon = async (req, res) => {
     } = req.body;
 
 
-     const today = new Date();
+    const today = new Date();
     today.setHours(0, 0, 0, 0);
     const expiry = new Date(expiryDate);
     expiry.setHours(0, 0, 0, 0);
-    
+
     if (!expiryDate || isNaN(expiry.getTime()) || expiry < today) {
       return res.status(400).json({
         success: false,
@@ -54,27 +54,27 @@ const addCoupon = async (req, res) => {
         message: "Required fields missing"
       });
     }
-if (discountType === "percentage") {
-  if (discountValue <= 0 || discountValue > 100) {
-    return res.status(400).json({
-      success: false,
-      message: "Percentage must be between 1 and 100"
-    });
-  }
- if (!maxDiscount || maxDiscount <= 0) {
-    return res.status(400).json({
-      success: false,
-      message: "Max discount required for percentage coupon"
-    });
-  }
-} else {
-  if (discountValue <= 0) {
-    return res.status(400).json({
-      success: false,
-      message: "Fixed discount must be greater than 0"
-    });
-  }
-}
+    if (discountType === "percentage") {
+      if (discountValue <= 0 || discountValue > 100) {
+        return res.status(400).json({
+          success: false,
+          message: "Percentage must be between 1 and 100"
+        });
+      }
+      if (!maxDiscount || maxDiscount <= 0) {
+        return res.status(400).json({
+          success: false,
+          message: "Max discount required for percentage coupon"
+        });
+      }
+    } else {
+      if (discountValue <= 0) {
+        return res.status(400).json({
+          success: false,
+          message: "Fixed discount must be greater than 0"
+        });
+      }
+    }
     const existing = await Coupon.findOne({
       code: code.toUpperCase()
     });
@@ -129,18 +129,18 @@ const updateCoupon = async (req, res) => {
       description
     } = req.body;
 
-     const today = new Date();
-today.setHours(0, 0, 0, 0);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-const expiry = new Date(expiryDate);
-expiry.setHours(0, 0, 0, 0);
+    const expiry = new Date(expiryDate);
+    expiry.setHours(0, 0, 0, 0);
 
-if (!expiryDate || isNaN(expiry.getTime()) || expiry <= today) {
-  return res.status(400).json({
-    success: false,
-    message: "Expiry date must be a future date (not today or past)"
-  });
-}
+    if (!expiryDate || isNaN(expiry.getTime()) || expiry <= today) {
+      return res.status(400).json({
+        success: false,
+        message: "Expiry date must be a future date (not today or past)"
+      });
+    }
 
 
 
@@ -164,7 +164,7 @@ if (!expiryDate || isNaN(expiry.getTime()) || expiry <= today) {
       },
       {
         new: true,
-        runValidators: true   
+        runValidators: true
       }
     );
 
@@ -207,7 +207,7 @@ const applyCoupon = async (req, res) => {
     const userId = req.session.user._id;
     const { code } = req.body;
 
-     if (req.session.appliedCoupon) {
+    if (req.session.appliedCoupon) {
       return res.json({
         success: false,
         message: "A coupon is already applied. Remove it first."
@@ -238,17 +238,17 @@ const applyCoupon = async (req, res) => {
 
     let subtotal = 0;
 
-cart.items.forEach(item => {
-  const product = item.productId;
-  const regularPrice = Number(product.regularPrice || 0);
-  const categoryOffer = product.category?.categoryOffer || 0;
-  const productOffer = Number(product.productOffer || 0);
-  const effectiveOffer = Math.max(productOffer, categoryOffer);
-  const price = effectiveOffer > 0
-    ? Math.round(regularPrice - (regularPrice * effectiveOffer) / 100)
-    : regularPrice;
-  subtotal += price * item.quantity;
-});
+    cart.items.forEach(item => {
+      const product = item.productId;
+      const regularPrice = Number(product.regularPrice || 0);
+      const categoryOffer = product.category?.categoryOffer || 0;
+      const productOffer = Number(product.productOffer || 0);
+      const effectiveOffer = Math.max(productOffer, categoryOffer);
+      const price = effectiveOffer > 0
+        ? Math.round(regularPrice - (regularPrice * effectiveOffer) / 100)
+        : regularPrice;
+      subtotal += price * item.quantity;
+    });
 
 
 
@@ -313,6 +313,6 @@ module.exports = {
   toggleCoupon,
   updateCoupon,
   deleteCoupon,
-  applyCoupon ,
+  applyCoupon,
   removeCoupon
 };

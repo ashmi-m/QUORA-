@@ -47,13 +47,13 @@ const logout = async (req, res) => {
   try {
     req.session.destroy(err => {
       if (err) {
-      
+
         return res.redirect("/pageerror")
       }
-     return res.redirect("/admin/login")
+      return res.redirect("/admin/login")
     })
   } catch (error) {
-   return res.redirect("/pageerror")
+    return res.redirect("/pageerror")
   }
 }
 const loadOrders = async (req, res) => {
@@ -104,20 +104,20 @@ const loadOrders = async (req, res) => {
       { $limit: limit }
     ];
     const rawOrders = await Order.aggregate(pipeline);
-  const orders = rawOrders.map(order => {
-  const mappedProducts = order.products.map((p, index) => ({
-    ...p,
-    productId: order.productsData[index] || null
-  }));
-  const hasReturnRequest = mappedProducts.some(p => p.returnRequested === true);
+    const orders = rawOrders.map(order => {
+      const mappedProducts = order.products.map((p, index) => ({
+        ...p,
+        productId: order.productsData[index] || null
+      }));
+      const hasReturnRequest = mappedProducts.some(p => p.returnRequested === true);
 
-  return {
-    ...order,
-    userId: order.user,
-    products: mappedProducts,
-    hasReturnRequest
-  };
-});
+      return {
+        ...order,
+        userId: order.user,
+        products: mappedProducts,
+        hasReturnRequest
+      };
+    });
     const countPipeline = pipeline.filter(
       stage => !("$skip" in stage) && !("$limit" in stage)
     );
@@ -176,20 +176,20 @@ function recalculateOrderStatus(order) {
 
   if (statuses.every(s => s === "Cancelled")) {
     order.status = "Cancelled";
-  } 
+  }
   else if (statuses.every(s => s === "Delivered")) {
     order.status = "Delivered";
-  } 
+  }
   else if (statuses.every(s => s === "Returned")) {
     order.status = "Returned";
-  } 
+  }
   else if (statuses.some(s =>
     s === "Processing" ||
     s === "Shipped" ||
     s === "Out for Delivery"
   )) {
     order.status = "Processing";
-  } 
+  }
   else {
     order.status = "Placed";
   }
@@ -203,39 +203,39 @@ const updateProductStatus = async (req, res) => {
       });
     }
     const { status } = req.body;
-   console.log("status is",status)
+    console.log("status is", status)
 
-    const {id}= req.params;
-    const index=Number(req.params.index);
-  
+    const { id } = req.params;
+    const index = Number(req.params.index);
+
     const order = await Order.findById(id);
     if (!order) {
       return res.json({ success: false, message: "Order not found" });
     }
-     const productIndex = Number(index);
-     const product = order.products [index];
-     console.log("product is ",product)
+    const productIndex = Number(index);
+    const product = order.products[index];
+    console.log("product is ", product)
     if (!product) {
       return res.json({ success: false, message: "Product not found" });
     }
-      const currentStatus = product.status;
-    console.log("currentstatus is",currentStatus)
+    const currentStatus = product.status;
+    console.log("currentstatus is", currentStatus)
     if (currentStatus === "Cancelled") {
       return res.json({
         success: false,
         message: "Cancelled product cannot be modified"
       });
     }
-     const allowedTransitions = {
-      "Placed": ["Processing", "Cancelled","Delivered"],
+    const allowedTransitions = {
+      "Placed": ["Processing", "Cancelled", "Delivered"],
       "Processing": ["Shipped", "Cancelled"],
       "Shipped": ["Out for Delivery"],
       "Out for Delivery": ["Delivered"],
       "Delivered": [],
       "Cancelled": [],
-       "Returned": []
+      "Returned": []
     };
-     if (!allowedTransitions[currentStatus]?.includes(status)) {
+    if (!allowedTransitions[currentStatus]?.includes(status)) {
       return res.json({
         success: false,
         message: `Cannot change status from ${currentStatus} to ${status}`
@@ -246,7 +246,7 @@ const updateProductStatus = async (req, res) => {
     recalculateOrderStatus(order);
 
     await order.save();
-      return res.json({ success: true });
+    return res.json({ success: true });
 
   } catch (err) {
     console.error("Update product status error:", err);
@@ -288,7 +288,7 @@ const getOrderDetailsJson = async (req, res) => {
 
         if (addressDoc && addressDoc.addresses?.length > 0) {
           let selectedAddress = addressDoc.addresses[0];
-          
+
           if (order.address && mongoose.Types.ObjectId.isValid(order.address)) {
             const matched = addressDoc.addresses.find(
               a => a._id.toString() === order.address.toString()
@@ -389,7 +389,7 @@ const approveReturn = async (req, res) => {
     }
     product.status = "Returned";
     product.returnRequested = false;
-     recalculateOrderStatus(order);
+    recalculateOrderStatus(order);
     await order.save();
     const User = require("../../models/userSchema");
     const user = await User.findById(order.userId._id);
@@ -592,7 +592,7 @@ const getTopBrands = async (req, res) => {
       { $unwind: "$productData" },
       {
         $lookup: {
-          from: "brands",                        
+          from: "brands",
           localField: "productData.brand",
           foreignField: "_id",
           as: "brandData"
@@ -602,7 +602,7 @@ const getTopBrands = async (req, res) => {
       {
         $group: {
           _id: "$brandData._id",
-          name: { $first: "$brandData.brandName" },  
+          name: { $first: "$brandData.brandName" },
           totalSold: { $sum: "$products.quantity" }
         }
       },
@@ -638,7 +638,7 @@ module.exports = {
   rejectReturn,
   getDashboardChart,
   getDashboardStats,
-  getTopProducts ,
+  getTopProducts,
   getTopCategories,
   getTopBrands
 

@@ -173,6 +173,6 @@ const toggleWishlist = async (req, res) => {
 module.exports = {
   getWishlist,
   addToWishlist,
-   toggleWishlist,
+  toggleWishlist,
   removeFromWishlist
 };

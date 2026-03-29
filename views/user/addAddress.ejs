@@ -19,57 +19,38 @@
 
         <form id="addressForm" action="/address/add" method="POST" novalidate>
 
-         <div class="form-row">
-         <div class="form-group">
-<label>Name</label>
-<input 
-  name="name"
-  id="name"
-  pattern="[A-Za-z ]{3,}"
-  title="Name must contain at least 3 letters"
-  required
->
-<span class="error-text" id="nameError"></span>
-</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Name</label>
+              <input name="name" id="name" pattern="[A-Za-z ]{3,}" title="Name must contain at least 3 letters"
+                required>
+              <span class="error-text" id="nameError"></span>
+            </div>
 
-               <div class="form-group">
-            <label>Mobile Number</label>
-            <input 
-              name="mobile"
-              id="mobile"
-              maxlength="10"
-              pattern="[6-9][0-9]{9}"
-              inputmode="numeric"
-              required
-            >
-             <span class="error-text" id="mobileError"></span>
+            <div class="form-group">
+              <label>Mobile Number</label>
+              <input name="mobile" id="mobile" maxlength="10" pattern="[6-9][0-9]{9}" inputmode="numeric" required>
+              <span class="error-text" id="mobileError"></span>
+            </div>
           </div>
-        </div>
 
-         <div class="form-row">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Pincode</label>
+              <input name="pincode" id="pincode" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" required>
+              <span class="error-text" id="pincodeError"></span>
+            </div>
+            <div class="form-group">
+              <label>Locality</label>
+              <input name="locality" id="locality" required>
+              <span class="error-text" id="localityError"></span>
+            </div>
+          </div>
           <div class="form-group">
-            <label>Pincode</label>
-            <input 
-              name="pincode"
-              id="pincode"
-              maxlength="6"
-              pattern="[0-9]{6}"
-              inputmode="numeric"
-              required
-            >
-            <span class="error-text" id="pincodeError"></span>
+            <label>Address</label>
+            <textarea name="address" id="address" required></textarea>
+            <span class="error-text" id="addressError"></span>
           </div>
-<div class="form-group">
-<label>Locality</label>
-<input name="locality" id="locality" required>
-<span class="error-text" id="localityError"></span>
-</div>
-          </div>
-<div class="form-group">
-<label>Address</label>
-<textarea name="address" id="address" required></textarea>
-<span class="error-text" id="addressError"></span>
-</div>
 
           <div class="form-row">
             <div class="form-group">
@@ -85,11 +66,11 @@
             </div>
           </div>
 
-           <div class="form-group">
-<label>Landmark (optional)</label>
-<input name="landmark" id="landmark">
-<span class="error-text" id="landmarkError"></span>
-</div>
+          <div class="form-group">
+            <label>Landmark (optional)</label>
+            <input name="landmark" id="landmark">
+            <span class="error-text" id="landmarkError"></span>
+          </div>
 
           <div class="address-type">
             <label><input type="radio" name="type" value="Home" checked> Home</label>
@@ -127,68 +108,68 @@
           });
       }
     });
-document.getElementById("addressForm").addEventListener("submit", function(e){
+    document.getElementById("addressForm").addEventListener("submit", function (e) {
 
-let valid = true;
+      let valid = true;
 
-function setError(id,message){
-  const input = document.getElementById(id)
-  const error = document.getElementById(id+"Error")
+      function setError(id, message) {
+        const input = document.getElementById(id)
+        const error = document.getElementById(id + "Error")
 
-  input.classList.add("input-error")
-  error.innerText = message
-  valid=false
-}
+        input.classList.add("input-error")
+        error.innerText = message
+        valid = false
+      }
 
-function clearError(id){
-  const input = document.getElementById(id)
-  const error = document.getElementById(id+"Error")
+      function clearError(id) {
+        const input = document.getElementById(id)
+        const error = document.getElementById(id + "Error")
 
-  input.classList.remove("input-error")
-  error.innerText=""
-}
+        input.classList.remove("input-error")
+        error.innerText = ""
+      }
 
-const name = document.getElementById("name").value.trim()
-const mobile = document.getElementById("mobile").value.trim()
-const pincode = document.getElementById("pincode").value.trim()
-const locality = document.getElementById("locality").value.trim()
-const address = document.getElementById("address").value.trim()
-const city = document.getElementById("city").value.trim()
-const state = document.getElementById("state").value.trim()
+      const name = document.getElementById("name").value.trim()
+      const mobile = document.getElementById("mobile").value.trim()
+      const pincode = document.getElementById("pincode").value.trim()
+      const locality = document.getElementById("locality").value.trim()
+      const address = document.getElementById("address").value.trim()
+      const city = document.getElementById("city").value.trim()
+      const state = document.getElementById("state").value.trim()
 
-clearError("name")
-clearError("mobile")
-clearError("pincode")
-clearError("locality")
-clearError("address")
-clearError("city")
-clearError("state")
+      clearError("name")
+      clearError("mobile")
+      clearError("pincode")
+      clearError("locality")
+      clearError("address")
+      clearError("city")
+      clearError("state")
 
-if(name.length<3){
-  setError("name","Name must contain at least 3 letters")
-}
-if(!/^[6-9]\d{9}$/.test(mobile)){
-  setError("mobile","Enter valid 10 digit mobile number")
-}
-if(!/^\d{6}$/.test(pincode)){
-  setError("pincode","Enter valid 6 digit pincode")
-}
-if(locality===""){
-  setError("locality","Locality is required")
-}
-if(address===""){
-  setError("address","Address is required")
-}
-if(city===""){
-  setError("city","City is required")
-}
-if(state===""){
-  setError("state","State is required")
-}
-if(!valid){
-  e.preventDefault()
-}
-})
+      if (name.length < 3) {
+        setError("name", "Name must contain at least 3 letters")
+      }
+      if (!/^[6-9]\d{9}$/.test(mobile)) {
+        setError("mobile", "Enter valid 10 digit mobile number")
+      }
+      if (!/^\d{6}$/.test(pincode)) {
+        setError("pincode", "Enter valid 6 digit pincode")
+      }
+      if (locality === "") {
+        setError("locality", "Locality is required")
+      }
+      if (address === "") {
+        setError("address", "Address is required")
+      }
+      if (city === "") {
+        setError("city", "City is required")
+      }
+      if (state === "") {
+        setError("state", "State is required")
+      }
+      if (!valid) {
+        e.preventDefault()
+      }
+    })
     const params = new URLSearchParams(window.location.search);
     if (params.get("saved") === "true") {
       Swal.fire({

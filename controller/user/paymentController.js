@@ -48,12 +48,12 @@ const loadPayment = async (req, res) => {
 
       const isUnavailable =
         !product ||
-        
-          product.isBlocked === true || 
+
+        product.isBlocked === true ||
         product.isListed === false ||
         !product.category ||
-        
-         product.category.isBlocked === true ||
+
+        product.category.isBlocked === true ||
         product.category.isListed === false ||
         product.quantity <= 0;
 
@@ -82,22 +82,22 @@ const loadPayment = async (req, res) => {
 
     let discount = 0;
 
-   
+
     if (req.session.appliedCoupon) {
 
       const coupon = await Coupon.findOne({ code: req.session.appliedCoupon.code });
 
       if (coupon) {
-       
+
         if (coupon.discountType === "percentage") {
           discount = (subtotal * coupon.discountValue) / 100;
-          if(discount >coupon.maxDiscount){
+          if (discount > coupon.maxDiscount) {
             discount = coupon.maxDiscount
           }
         } else {
           discount = coupon.discountValue;
         }
-      
+
         req.session.appliedCoupon.discountAmount = discount;
       } else {
         req.session.appliedCoupon = null;
@@ -127,7 +127,7 @@ const loadPayment = async (req, res) => {
       razorpayOrderId: razorpayOrder.id,
       razorpayAmount: amountInPaise,
       unavailableItems,
-      
+
     });
 
   } catch (err) {
@@ -156,7 +156,7 @@ const loadOrderFailed = (req, res) => {
 };
 const handlePaymentFail = async (req, res) => {
   try {
-    const { razorpay_order_id, paymentMethod, addressId } = req.body; 
+    const { razorpay_order_id, paymentMethod, addressId } = req.body;
     const userId = req.session.user._id;
 
     const cart = await Cart.findOne({ userId }).populate("items.productId");
@@ -174,7 +174,7 @@ const handlePaymentFail = async (req, res) => {
         productId: item.productId._id,
         quantity: item.quantity,
         price: item.productId.regularPrice,
-        salePrice: item.productId.salePrice || item.productId.regularPrice, 
+        salePrice: item.productId.salePrice || item.productId.regularPrice,
         status: "Cancelled"
       });
     });

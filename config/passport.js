@@ -9,37 +9,37 @@ passport.use(new GoogleStrategy({
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: "https://quoraonline.shop/auth/google/callback"
 },
-   async (accessToken, refreshToken, profile, done) => {
-    try {
-        let user = await User.findOne({ googleId: profile.id });
-        if (user) {
-            console.log("user found",user);
-            return done(null, user);
-        } else {
-            console.log("creating user");
-            user = new User({
-                name: profile.displayName,
-                email: profile.emails[0].value,
-                googleId: profile.id,
-            });
-            await user.save();
-            return done(null, user);
+    async (accessToken, refreshToken, profile, done) => {
+        try {
+            let user = await User.findOne({ googleId: profile.id });
+            if (user) {
+                console.log("user found", user);
+                return done(null, user);
+            } else {
+                console.log("creating user");
+                user = new User({
+                    name: profile.displayName,
+                    email: profile.emails[0].value,
+                    googleId: profile.id,
+                });
+                await user.save();
+                return done(null, user);
+            }
+        } catch (err) {
+            console.log("error happened in google passport", err);
+            return done(err, null);
         }
-    } catch (err) {
-        console.log("error happened in google passport",err);
-        return done(err, null);
-    }
-}));
-passport.serializeUser((user,done)=>{
-    done(null,user.id)
+    }));
+passport.serializeUser((user, done) => {
+    done(null, user.id)
 });
-passport.deserializeUser((id,done)=>{
+passport.deserializeUser((id, done) => {
     User.findById(id)
-    .then(user=>{
-        done(null,user)
-    })
-    .catch(err =>{
-        done(err,null)
-    })
+        .then(user => {
+            done(null, user)
+        })
+        .catch(err => {
+            done(err, null)
+        })
 })
-module.exports=passport;
+module.exports = passport;

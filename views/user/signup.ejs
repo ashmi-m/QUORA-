@@ -37,50 +37,50 @@
 
       <div class="right">
         <h1 class="title">Get started now</h1>
-        
+
 
         <% if (typeof error !=='undefined' && error) { %>
           <div class="error">
             <%= error %>
           </div>
           <% } %>
-             <form id="signform" action="/signup" method="POST" class="signup-form">
+            <form id="signform" action="/signup" method="POST" class="signup-form">
               <label>Name</label>
               <input type="text" id="name" name="name" placeholder="Enter your Name">
-              <div id="error1" class="error-message"></div> 
+              <div id="error1" class="error-message"></div>
               <label>Phone Number</label>
               <input type="text" id="phone" name="phone" placeholder="Enter your phone number">
               <div id="error3" class="error-message"></div>
 
               <label>Email address</label>
               <input type="email" id="email" name="email" placeholder="Enter your Email">
-               
+
 
               <label>Referral Code (optional)</label>
-<input type="text" id="refCode" name="refCode" placeholder="Enter referral code if any">
+              <input type="text" id="refCode" name="refCode" placeholder="Enter referral code if any">
 
-<div id="error6" class="error-message"></div>
+              <div id="error6" class="error-message"></div>
 
               <label>Password</label>
-               <div class="password-box">
-               <input type="password" id="password" name="password" placeholder="Enter your Password"/>
-               <i class="fa-solid fa-eye" id="togglePassword"></i>
-               </div>
+              <div class="password-box">
+                <input type="password" id="password" name="password" placeholder="Enter your Password" />
+                <i class="fa-solid fa-eye" id="togglePassword"></i>
+              </div>
               <div id="error4" class="error-message"></div>
 
               <label>Confirm Password</label>
               <div class="password-box">
-              <input type="password" id="confirm-password" name="confirmPassword" placeholder="Confirm Password"/>
-              <i class="fa-solid fa-eye" id="toggleConfirmPassword"></i>
+                <input type="password" id="confirm-password" name="confirmPassword" placeholder="Confirm Password" />
+                <i class="fa-solid fa-eye" id="toggleConfirmPassword"></i>
               </div>
               <div id="error5" class="error-message"></div>
 
-              <div id="error2" class="error-message"></div> 
-               <% if (locals.message && message.length> 0) { %>
+              <div id="error2" class="error-message"></div>
+              <% if (locals.message && message.length> 0) { %>
                 <div class="alert alert-danger text-center">
                   <%= message %>
                 </div>
-                <% } %> 
+                <% } %>
 
 
                   <label class="terms">
@@ -94,12 +94,12 @@
                   <a href="/auth/google" class="btn google-btn">
                     <img src="/images/image 2.png" alt="google"> Sign in with Google
                   </a>
-                 
+
 
                   <p class="have-account">Have an account? <a href="/login">Sign in</a></p>
             </form>
       </div>
-      </div>
+    </div>
     </div>
   </main>
 
@@ -117,68 +117,68 @@
     const error4 = document.getElementById("error4");
     const error5 = document.getElementById("error5");
 
-function nameValidate() {
-  const nameVal = nameid.value.trim();
-  const pattern = /^[A-Za-z\s]{3,20}$/;
+    function nameValidate() {
+      const nameVal = nameid.value.trim();
+      const pattern = /^[A-Za-z\s]{3,20}$/;
 
-  if (nameVal === "") {
-    error1.textContent = "Name is required";
-    error1.style.display = "block";
-    return false;
-  } else if (!pattern.test(nameVal)) {
-    error1.textContent = "Name must be 3–20 characters and contain only alphabets";
-    error1.style.display = "block";
-    return false;
-  }
+      if (nameVal === "") {
+        error1.textContent = "Name is required";
+        error1.style.display = "block";
+        return false;
+      } else if (!pattern.test(nameVal)) {
+        error1.textContent = "Name must be 3–20 characters and contain only alphabets";
+        error1.style.display = "block";
+        return false;
+      }
 
-  error1.style.display = "none";
-  return true;
-}
-
-     function emailValidate() {
-    const emailVal = document.getElementById("email").value.trim();
-    const error2 = document.getElementById("error2");
-
-  
-    const pattern = /^[a-zA-Z][a-zA-Z0-9._%+-]{2,}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-
-    if (!pattern.test(emailVal)) {
-      error2.textContent = "Please enter a valid email (example: user@gmail.com)";
-      error2.style.display = "block";
-      return false;
+      error1.style.display = "none";
+      return true;
     }
-    error2.style.display = "none";
-    return true;
+
+    function emailValidate() {
+      const emailVal = document.getElementById("email").value.trim();
+      const error2 = document.getElementById("error2");
+
+
+      const pattern = /^[a-zA-Z][a-zA-Z0-9._%+-]{2,}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+
+      if (!pattern.test(emailVal)) {
+        error2.textContent = "Please enter a valid email (example: user@gmail.com)";
+        error2.style.display = "block";
+        return false;
+      }
+      error2.style.display = "none";
+      return true;
 
     }
-   
-function phoneValidate() {
-  const phoneVal = phoneid.value.trim();
 
-  if (!/^\d{10}$/.test(phoneVal)) {
-    error3.textContent = "Phone number must contain exactly 10 digits.";
-    error3.style.display = "block";
-    return false;
-  }
+    function phoneValidate() {
+      const phoneVal = phoneid.value.trim();
 
-  const sequentialAsc = "01234567890123456789";
-  const sequentialDesc = "98765432109876543210";
+      if (!/^\d{10}$/.test(phoneVal)) {
+        error3.textContent = "Phone number must contain exactly 10 digits.";
+        error3.style.display = "block";
+        return false;
+      }
 
-  if (sequentialAsc.includes(phoneVal) || sequentialDesc.includes(phoneVal)) {
-    error3.textContent = "Sequential phone numbers are not allowed.";
-    error3.style.display = "block";
-    return false;
-  }
+      const sequentialAsc = "01234567890123456789";
+      const sequentialDesc = "98765432109876543210";
 
-  if (/^(\d)\1{9}$/.test(phoneVal)) {
-    error3.textContent = "Repeated digits are not allowed.";
-    error3.style.display = "block";
-    return false;
-  }
+      if (sequentialAsc.includes(phoneVal) || sequentialDesc.includes(phoneVal)) {
+        error3.textContent = "Sequential phone numbers are not allowed.";
+        error3.style.display = "block";
+        return false;
+      }
 
-  error3.style.display = "none";
-  return true;
-}
+      if (/^(\d)\1{9}$/.test(phoneVal)) {
+        error3.textContent = "Repeated digits are not allowed.";
+        error3.style.display = "block";
+        return false;
+      }
+
+      error3.style.display = "none";
+      return true;
+    }
     function passwordValidate() {
       const passVal = passid.value;
       const cpassVal = cpassid.value;
@@ -215,9 +215,9 @@ function phoneValidate() {
       if (!checkbox.checked) {
         Swal.fire({
           icon: "warning",
-      title: "Terms Not Accepted",
-      text: "Please check the terms & policy to proceed.",
-      confirmButtonColor: "#3085d6",
+          title: "Terms Not Accepted",
+          text: "Please check the terms & policy to proceed.",
+          confirmButtonColor: "#3085d6",
 
         })
 
@@ -225,45 +225,45 @@ function phoneValidate() {
       }
       return true;
     }
-signform.addEventListener("submit", function (e) {
+    signform.addEventListener("submit", function (e) {
 
-  const validName = nameValidate();
-  const validEmail = emailValidate();
-  const validPhone = phoneValidate();
-  const validPassword = passwordValidate();
-  if (!(validName && validEmail && validPhone && validPassword)) {
-    e.preventDefault();
-    return;
-  }
-  const validTerms = termsValidate();
+      const validName = nameValidate();
+      const validEmail = emailValidate();
+      const validPhone = phoneValidate();
+      const validPassword = passwordValidate();
+      if (!(validName && validEmail && validPhone && validPassword)) {
+        e.preventDefault();
+        return;
+      }
+      const validTerms = termsValidate();
 
-  if (!validTerms) {
-    e.preventDefault();
-  }
+      if (!validTerms) {
+        e.preventDefault();
+      }
 
-});
+    });
 
-  
-   
+
+
     nameid.addEventListener("blur", nameValidate);
     emailid.addEventListener("blur", emailValidate);
     phoneid.addEventListener("blur", phoneValidate);
     passid.addEventListener("blur", passwordValidate);
     cpassid.addEventListener("blur", passwordValidate);
-  
 
 
-      document.getElementById("togglePassword").onclick = () => {
-    passid.type = passid.type === "password" ? "text" : "password";
-    togglePassword.classList.toggle("fa-eye");
-    togglePassword.classList.toggle("fa-eye-slash");
-  };
 
-  document.getElementById("toggleConfirmPassword").onclick = () => {
-    cpassid.type = cpassid.type === "password" ? "text" : "password";
-    toggleConfirmPassword.classList.toggle("fa-eye");
-    toggleConfirmPassword.classList.toggle("fa-eye-slash");
-  };
+    document.getElementById("togglePassword").onclick = () => {
+      passid.type = passid.type === "password" ? "text" : "password";
+      togglePassword.classList.toggle("fa-eye");
+      togglePassword.classList.toggle("fa-eye-slash");
+    };
+
+    document.getElementById("toggleConfirmPassword").onclick = () => {
+      cpassid.type = cpassid.type === "password" ? "text" : "password";
+      toggleConfirmPassword.classList.toggle("fa-eye");
+      toggleConfirmPassword.classList.toggle("fa-eye-slash");
+    };
 
   </script>
 </body>

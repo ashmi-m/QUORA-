@@ -233,13 +233,13 @@
             margin-right: 6px;
         }
 
-        /* Hover effect */
+
         .btn-resend:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(108, 92, 231, 0.5);
         }
 
-        /* Disabled state */
+
         .btn-resend:disabled {
             background: #ccc;
             cursor: not-allowed;
@@ -304,9 +304,7 @@
 
 <body>
     <div class="container-fluid main-container">
-        <!-- <a href="#" class="forgot-otp">
-            <i class="fas fa-arrow-left me-2"></i>forgot OTP
-        </a> -->
+
 
         <div class="row w-100">
             <div class="d-flex align-items-center justify-content-center sign">
@@ -448,9 +446,9 @@
                                     icon: "success",
                                     title: 'Success',
                                     text: res.message || "OTP Verified Successfully!"
-                               }).then(() => {
-    window.location.href = '/';  
-});
+                                }).then(() => {
+                                    window.location.href = '/';
+                                });
                             } else {
                                 Swal.fire({
                                     icon: "error",
@@ -469,47 +467,47 @@
                         });
                 }
                 function ResendOTP() {
-    // ✅ REMOVED the if(time > 0) guard - button disabled state already handles this
-    resendBtn.disabled = true;
-    clearInterval(timerInterval);
-    time = 120;
-    startTimer();
 
- fetch('/resend-otp', {
-    method: 'POST',
-    credentials: 'same-origin',   // ✅ THIS FIXES YOUR ISSUE
-    headers: {
-        'Content-type': 'application/json'
-    }
-})
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'OTP Sent',
-                    text: data.message || "OTP resent successfully!"
-                });
-            } else {
-                // ✅ ADDED - handle failure case too
-                resendBtn.disabled = false; // re-enable if send failed
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Failed',
-                    text: data.message || "Failed to resend OTP."
-                });
-            }
-        })
-        .catch(err => {
-            console.error(err);
-            resendBtn.disabled = false; // ✅ re-enable on network error too
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Failed to resend OTP. Please try again.'
-            });
-        });
-}
+                    resendBtn.disabled = true;
+                    clearInterval(timerInterval);
+                    time = 120;
+                    startTimer();
+
+                    fetch('/resend-otp', {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Content-type': 'application/json'
+                        }
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'OTP Sent',
+                                    text: data.message || "OTP resent successfully!"
+                                });
+                            } else {
+
+                                resendBtn.disabled = false;
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Failed',
+                                    text: data.message || "Failed to resend OTP."
+                                });
+                            }
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            resendBtn.disabled = false;
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Failed to resend OTP. Please try again.'
+                            });
+                        });
+                }
             </script>
 </body>
 

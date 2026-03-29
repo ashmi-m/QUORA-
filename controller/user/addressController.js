@@ -72,7 +72,7 @@ const addAddressFromProfile = async (req, res) => {
       name,
       phone: mobile,
       city,
-       altPhone: mobile,
+      altPhone: mobile,
       state,
       landMark: landmark,
       pincode
@@ -199,8 +199,8 @@ const updateAddress = async (req, res) => {
       type
     } = req.body;
 
-    const existAddress = await Address.findOne({userId,"addresses._id": addressId});
-    console.log("check the address",existAddress)
+    const existAddress = await Address.findOne({ userId, "addresses._id": addressId });
+    console.log("check the address", existAddress)
 
     const result = await Address.updateOne(
       { userId, "addresses._id": addressId },
@@ -267,8 +267,8 @@ const loadManageAddressPage = async (req, res) => {
     }
 
     const userId = req.session.user._id;
-   const user = await User.findById(userId)
-   console.log(user)
+    const user = await User.findById(userId)
+    console.log(user)
     const addressDoc = await Address.findOne({ userId }).lean();
 
     res.render("manageAddress", {

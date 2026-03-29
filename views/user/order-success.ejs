@@ -1,26 +1,26 @@
 <%- include("../partials/user/header") %>
-<link rel="stylesheet" href="/css/order-success.css">
+  <link rel="stylesheet" href="/css/order-success.css">
 
-<div class="order-success-container">
-  <div class="order-success-box">
-    <div class="icon-success">
-      <i class="fa fa-check-circle"></i>
-    </div>
+  <div class="order-success-container">
+    <div class="order-success-box">
+      <div class="icon-success">
+        <i class="fa fa-check-circle"></i>
+      </div>
 
-    <h2>Thank you for shopping</h2>
+      <h2>Thank you for shopping</h2>
 
-    <% if (paymentMethod === "Razorpay") { %>
-      <p>Your payment was successful using Razorpay.</p>
-      <p>Your order has been placed successfully.</p>
-    <% } else { %>
-      <p>Your order has been placed using Cash on Delivery.</p>
-    <% } %>
+      <% if (paymentMethod==="Razorpay" ) { %>
+        <p>Your payment was successful using Razorpay.</p>
+        <p>Your order has been placed successfully.</p>
+        <% } else { %>
+          <p>Your order has been placed using Cash on Delivery.</p>
+          <% } %>
 
-    <div class="order-success-buttons">
-      <a href="<%= ordersPage %>" class="btn-view-orders">View Orders</a>
-      <a href="/" class="btn-continue">Continue Shopping</a>
+            <div class="order-success-buttons">
+              <a href="<%= ordersPage %>" class="btn-view-orders">View Orders</a>
+              <a href="/" class="btn-continue">Continue Shopping</a>
+            </div>
     </div>
   </div>
-</div>
 
-<%- include("../partials/user/footer") %>
+  <%- include("../partials/user/footer") %>

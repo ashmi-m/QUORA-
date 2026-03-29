@@ -18,7 +18,7 @@ const userAuth = async (req, res, next) => {
     const user = await User.findById(userId);
 
     if (!user || user.isBlocked) {
-      req.session.destroy(() => {});
+      req.session.destroy(() => { });
       if (req.originalUrl.startsWith("/cart")) {
         return res.status(401).json({ message: "User blocked" });
       }
@@ -40,24 +40,24 @@ const userAuth = async (req, res, next) => {
 };
 
 const adminAuth = (req, res, next) => {
-    if (req.session && req.session.admin) {
-        
-        return next();
-    } else {
-        
-        return res.redirect("/admin/login");
-    }
+  if (req.session && req.session.admin) {
+
+    return next();
+  } else {
+
+    return res.redirect("/admin/login");
+  }
 };
 const preventAuthPages = (req, res, next) => {
-    if (req.session.user|| req.isAuthenticated()) {
-        return res.redirect("/");   
-    }
-    next();
+  if (req.session.user || req.isAuthenticated()) {
+    return res.redirect("/");
+  }
+  next();
 };
 module.exports = {
-    userAuth,
-    adminAuth,
-       preventAuthPages
+  userAuth,
+  adminAuth,
+  preventAuthPages
 };
 
 

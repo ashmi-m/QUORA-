@@ -41,7 +41,7 @@
 }
 
 .order-card:hover {
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .order-image img {
@@ -80,13 +80,32 @@
   margin-bottom: 5px;
 }
 
-.status.placed { background-color: orange; }
-.status.paid { background-color: blue; }
-.status.delivered { background-color: green; }
-.status.cancelled { background-color: red; }
-.status.Shipped{background:  Purple (#6f42c1);}
-.status.returnes{ background-color: rgb(227, 164, 46); }
-.cancel-btn, .details-btn {
+.status.placed {
+  background-color: orange;
+}
+
+.status.paid {
+  background-color: blue;
+}
+
+.status.delivered {
+  background-color: green;
+}
+
+.status.cancelled {
+  background-color: red;
+}
+
+.status.Shipped {
+  background: Purple (#6f42c1);
+}
+
+.status.returnes {
+  background-color: rgb(227, 164, 46);
+}
+
+.cancel-btn,
+.details-btn {
   padding: 5px 10px;
   border: none;
   border-radius: 4px;
@@ -104,6 +123,7 @@
 .details-btn {
   background-color: #3085d6;
 }
+
 .pagination {
   display: flex;
   justify-content: center;
@@ -128,6 +148,7 @@
 .pagination button:hover {
   background-color: #eee;
 }
+
 #clearBtn {
   padding: 6px 10px;
   border: none;
@@ -136,7 +157,7 @@
   border-radius: 4px;
   cursor: pointer;
 }
+
 #clearBtn:hover {
   background-color: #999;
 }
-

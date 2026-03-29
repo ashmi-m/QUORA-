@@ -1,181 +1,188 @@
 <%- include("../partials/user/header") %>
 
-<!DOCTYPE html>
-<html lang="en">
+  <!DOCTYPE html>
+  <html lang="en">
 
-<head>
-  <meta charset="UTF-8">
-  <title>Manage Addresses | Quora</title>
-  <link rel="stylesheet" href="/css/profile.css">
-  <link rel="stylesheet" href="/css/manageAddress.css">
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-</head>
+  <head>
+    <meta charset="UTF-8">
+    <title>Manage Addresses | Quora</title>
+    <link rel="stylesheet" href="/css/profile.css">
+    <link rel="stylesheet" href="/css/manageAddress.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  </head>
 
-<body>
+  <body>
 
 
 
-  <div class="profile-container">
+    <div class="profile-container">
 
-       <%- include("../partials/user/profile-sidebar", { user, activePage: 'address' }) %>
-    <div class="profile-content">
-      <div class="address-wrapper">
-        <div class="address-header">
-          <h2>Manage Addresses</h2>
-          <a href="/add-address-profile" class="add-address-btn">
-            + Add New Address
-          </a>
-        </div>
-
-        <% if (!addresses || addresses.length === 0) { %>
-          <p style="margin-top:20px;">No address found</p>
-        <% } %>
-
-        <% addresses.forEach(addr => { %>
-          <div class="address-card" id="address-<%= addr._id %>">
-            <div class="address-info">
-              <div class="address-left">
-                <div class="address-name"><%= addr.name.toUpperCase() %></div>
-                <div class="address-phone"><%= addr.phone %></div>
-              </div>
-
-              <div class="address-actions">
-                <button class="dots-btn">⋮</button>
-                <div class="dropdown-menu">
-                  <a href="/edit-address/<%= addr._id %>" class="edit-btn">Edit</a>
-                  <button class="delete-btn" data-id="<%= addr._id %>">Delete</button>
-                </div>
-              </div>
+      <%- include("../partials/user/profile-sidebar", { user, activePage: 'address' }) %>
+        <div class="profile-content">
+          <div class="address-wrapper">
+            <div class="address-header">
+              <h2>Manage Addresses</h2>
+              <a href="/add-address-profile" class="add-address-btn">
+                + Add New Address
+              </a>
             </div>
 
-            <p class="address-text">
-              <%= addr.address %>, <%= addr.city %>, <%= addr.state %> - <%= addr.pincode %>,  <%= addr.locality %>
+            <% if (!addresses || addresses.length===0) { %>
+              <p style="margin-top:20px;">No address found</p>
+              <% } %>
 
-            </p>
+                <% addresses.forEach(addr=> { %>
+                  <div class="address-card" id="address-<%= addr._id %>">
+                    <div class="address-info">
+                      <div class="address-left">
+                        <div class="address-name">
+                          <%= addr.name.toUpperCase() %>
+                        </div>
+                        <div class="address-phone">
+                          <%= addr.phone %>
+                        </div>
+                      </div>
 
-            <span class="address-type"><%= addr.addressType || 'Home' %></span>
+                      <div class="address-actions">
+                        <button class="dots-btn">⋮</button>
+                        <div class="dropdown-menu">
+                          <a href="/edit-address/<%= addr._id %>" class="edit-btn">Edit</a>
+                          <button class="delete-btn" data-id="<%= addr._id %>">Delete</button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <p class="address-text">
+                      <%= addr.address %>, <%= addr.city %>, <%= addr.state %> - <%= addr.pincode %>, <%= addr.locality
+                                %>
+
+                    </p>
+
+                    <span class="address-type">
+                      <%= addr.addressType || 'Home' %>
+                    </span>
+                  </div>
+                  <% }) %>
+
+                    <div id="pagination" class="pagination"></div>
           </div>
-        <% }) %>
-
-        <div id="pagination" class="pagination"></div>
-      </div>
+        </div>
     </div>
-  </div>
 
-  <footer>© 2025 Quora - All Rights Reserved</footer>
+    <footer>© 2025 Quora - All Rights Reserved</footer>
 
-  <script>
-    const ITEMS_PER_PAGE = 5;
-    let currentPage = 1;
+    <script>
+      const ITEMS_PER_PAGE = 5;
+      let currentPage = 1;
 
-    const addressWrapper = document.querySelector(".address-wrapper");
-    const addressCards = Array.from(document.querySelectorAll(".address-card"));
-    const pagination = document.getElementById("pagination");
+      const addressWrapper = document.querySelector(".address-wrapper");
+      const addressCards = Array.from(document.querySelectorAll(".address-card"));
+      const pagination = document.getElementById("pagination");
 
-    function showPage(page) {
-      const start = (page - 1) * ITEMS_PER_PAGE;
-      const end = start + ITEMS_PER_PAGE;
+      function showPage(page) {
+        const start = (page - 1) * ITEMS_PER_PAGE;
+        const end = start + ITEMS_PER_PAGE;
 
-      addressCards.forEach((card, index) => {
-        card.style.display = index >= start && index < end ? "block" : "none";
-      });
-
-      renderPagination(page);
-    }
-
-    function renderPagination(activePage) {
-      const totalPages = Math.ceil(addressCards.length / ITEMS_PER_PAGE);
-      pagination.innerHTML = "";
-
-      if (totalPages <= 1) return;
-
-      for (let i = 1; i <= totalPages; i++) {
-        const btn = document.createElement("button");
-        btn.innerText = i;
-        btn.classList.add("page-btn");
-        if (i === activePage) btn.classList.add("active");
-
-        btn.addEventListener("click", () => {
-          currentPage = i;
-          showPage(currentPage);
+        addressCards.forEach((card, index) => {
+          card.style.display = index >= start && index < end ? "block" : "none";
         });
 
-        pagination.appendChild(btn);
+        renderPagination(page);
       }
-    }
 
-    showPage(currentPage);
+      function renderPagination(activePage) {
+        const totalPages = Math.ceil(addressCards.length / ITEMS_PER_PAGE);
+        pagination.innerHTML = "";
 
-   
-    document.addEventListener("click", e => {
-      if (e.target.classList.contains("dots-btn")) {
-        e.stopPropagation();
-        document.querySelectorAll(".dropdown-menu")
-          .forEach(menu => menu.classList.remove("show"));
-        e.target.nextElementSibling.classList.toggle("show");
-      } else {
-        document.querySelectorAll(".dropdown-menu")
-          .forEach(menu => menu.classList.remove("show"));
-      }
-    });
+        if (totalPages <= 1) return;
 
+        for (let i = 1; i <= totalPages; i++) {
+          const btn = document.createElement("button");
+          btn.innerText = i;
+          btn.classList.add("page-btn");
+          if (i === activePage) btn.classList.add("active");
 
-    document.querySelectorAll(".delete-btn").forEach(btn => {
-      btn.addEventListener("click", async () => {
-        const id = btn.dataset.id;
-
-        const confirm = await Swal.fire({
-          title: "Delete address?",
-          text: "This action cannot be undone",
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonColor: "#d33",
-          cancelButtonColor: "#3085d6",
-          confirmButtonText: "Delete"
-        });
-
-        if (confirm.isConfirmed) {
-          const res = await fetch(`/address/delete/${id}`, { method: "DELETE" });
-          const data = await res.json();
-
-          if (data.success) {
-            document.getElementById(`address-${id}`).remove();
-            Swal.fire("Deleted!", "Address removed", "success");
-
-            const index = addressCards.findIndex(card => card.id === `address-${id}`);
-            if (index > -1) {
-              addressCards.splice(index, 1);
-            }
+          btn.addEventListener("click", () => {
+            currentPage = i;
             showPage(currentPage);
-          } else {
-            Swal.fire("Error", "Delete failed", "error");
-          }
+          });
+
+          pagination.appendChild(btn);
+        }
+      }
+
+      showPage(currentPage);
+
+
+      document.addEventListener("click", e => {
+        if (e.target.classList.contains("dots-btn")) {
+          e.stopPropagation();
+          document.querySelectorAll(".dropdown-menu")
+            .forEach(menu => menu.classList.remove("show"));
+          e.target.nextElementSibling.classList.toggle("show");
+        } else {
+          document.querySelectorAll(".dropdown-menu")
+            .forEach(menu => menu.classList.remove("show"));
         }
       });
-    });
 
-  
-    const logoutBtn = document.getElementById("logoutBtn");
-    if (logoutBtn) {
-      logoutBtn.addEventListener("click", () => {
-        Swal.fire({
-          title: "Are you sure?",
-          text: "You will be logged out of your account",
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonColor: "#d33",
-          cancelButtonColor: "#3085d6",
-          confirmButtonText: "Yes, Logout",
-          cancelButtonText: "Cancel"
-        }).then((result) => {
-          if (result.isConfirmed) {
-            window.location.href = "/logout";
+
+      document.querySelectorAll(".delete-btn").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const id = btn.dataset.id;
+
+          const confirm = await Swal.fire({
+            title: "Delete address?",
+            text: "This action cannot be undone",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Delete"
+          });
+
+          if (confirm.isConfirmed) {
+            const res = await fetch(`/address/delete/${id}`, { method: "DELETE" });
+            const data = await res.json();
+
+            if (data.success) {
+              document.getElementById(`address-${id}`).remove();
+              Swal.fire("Deleted!", "Address removed", "success");
+
+              const index = addressCards.findIndex(card => card.id === `address-${id}`);
+              if (index > -1) {
+                addressCards.splice(index, 1);
+              }
+              showPage(currentPage);
+            } else {
+              Swal.fire("Error", "Delete failed", "error");
+            }
           }
         });
       });
-    }
-  </script>
 
-</body>
 
-</html>
+      const logoutBtn = document.getElementById("logoutBtn");
+      if (logoutBtn) {
+        logoutBtn.addEventListener("click", () => {
+          Swal.fire({
+            title: "Are you sure?",
+            text: "You will be logged out of your account",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, Logout",
+            cancelButtonText: "Cancel"
+          }).then((result) => {
+            if (result.isConfirmed) {
+              window.location.href = "/logout";
+            }
+          });
+        });
+      }
+    </script>
+
+  </body>
+
+  </html>

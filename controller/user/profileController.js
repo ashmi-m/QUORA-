@@ -13,7 +13,7 @@ const crypto = require("crypto");
 const emailVerificationCodes = new Map();
 async function sendVerificationEmail(email, code) {
   console.log("MAIL USER:", process.env.NODEMAILER_EMAIL);
-console.log("MAIL PASS LENGTH:", process.env.NODEMAILER_PASSWORD?.length);
+  console.log("MAIL PASS LENGTH:", process.env.NODEMAILER_PASSWORD?.length);
 
   try {
     const transporter = nodemailer.createTransport({
@@ -94,7 +94,7 @@ const changePassword = async (req, res) => {
       });
     }
 
-   
+
     const isSameAsOld = await bcrypt.compare(newPassword, user.password);
     if (isSameAsOld) {
       return res.json({
@@ -202,10 +202,10 @@ const verifyEmail = async (req, res) => {
 
     if (record.code !== code.trim()) return res.json({ success: false, message: "Invalid verification code" });
 
-   
+
     await User.findByIdAndUpdate(userId, { email: record.newEmail });
 
-   
+
     req.session.user.email = record.newEmail;
 
     emailVerificationCodes.delete(userId.toString());
@@ -216,53 +216,53 @@ const verifyEmail = async (req, res) => {
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
-const updateProfile = async(req,res)=>{
-  try{
+const updateProfile = async (req, res) => {
+  try {
     const userId = req.session.user._id;
     let { name, phone, gender } = req.body;
-     name = name ? name.trim() : ""
-     phone = phone ? phone.trim() : "";
-if (!/^\d{10}$/.test(phone)) {
-  return res.json({
-    success: false,
-    message: "Phone must be exactly 10 digits"
-  });
-}
+    name = name ? name.trim() : ""
+    phone = phone ? phone.trim() : "";
+    if (!/^\d{10}$/.test(phone)) {
+      return res.json({
+        success: false,
+        message: "Phone must be exactly 10 digits"
+      });
+    }
 
-if (/^(\d)\1{9}$/.test(phone)) {
-  return res.json({
-    success: false,
-    message: "Repeated digits are not allowed"
-  });
-}
+    if (/^(\d)\1{9}$/.test(phone)) {
+      return res.json({
+        success: false,
+        message: "Repeated digits are not allowed"
+      });
+    }
 
-const asc = "01234567890123456789";
-const desc = "98765432109876543210";
+    const asc = "01234567890123456789";
+    const desc = "98765432109876543210";
 
-if (asc.includes(phone) || desc.includes(phone)) {
-  return res.json({
-    success: false,
-    message: "Sequential numbers are not allowed"
-  });
-}
-     const namePattern = /^[A-Za-z\s]{3,20}$/;
+    if (asc.includes(phone) || desc.includes(phone)) {
+      return res.json({
+        success: false,
+        message: "Sequential numbers are not allowed"
+      });
+    }
+    const namePattern = /^[A-Za-z\s]{3,20}$/;
     if (!namePattern.test(name)) {
       return res.json({
         success: false,
         message: "Name must be 3–20 characters and contain only alphabets"
       });
     }
-    await User.findByIdAndUpdate(userId,{
+    await User.findByIdAndUpdate(userId, {
       name,
       phone,
       gender
     });
-       req.session.user.name = name;
+    req.session.user.name = name;
     req.session.user.phone = phone;
     req.session.user.gender = gender;
-     res.json({ success: true });
-  }catch(err){
-     console.error(err);
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
     res.json({ success: false });
   }
 }
@@ -273,6 +273,6 @@ module.exports = {
   changePassword,
   changeEmail,
   verifyEmail,
-    updateProfile
+  updateProfile
 };
 

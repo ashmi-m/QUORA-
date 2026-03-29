@@ -1,12 +1,12 @@
 <%- include("../partials/user/header") %>
-<link rel="stylesheet" href="/css/payment.css">
+  <link rel="stylesheet" href="/css/payment.css">
 
-<div class="breadcrumb">
-  Home / <strong>Products</strong>
-  
-</div>
-<% if (typeof unavailableItems !== "undefined" && unavailableItems.length > 0) { %>
-  <div style="
+  <div class="breadcrumb">
+    Home / <strong>Products</strong>
+
+  </div>
+  <% if (typeof unavailableItems !=="undefined" && unavailableItems.length> 0) { %>
+    <div style="
     background: #fff3cd;
     border: 1px solid #ffc107;
     border-radius: 8px;
@@ -16,229 +16,236 @@
     color: #856404;
     font-family: sans-serif;
   ">
-    <strong>⚠️ The following items were removed — they are blocked or no longer available:</strong>
-    <ul style="margin: 8px 0 0 18px;">
-      <% unavailableItems.forEach(function(name) { %>
-        <li><%= name %></li>
-      <% }) %>
-    </ul>
-    <p style="margin: 8px 0 0;">
-      Please <a href="/cart" style="color: #856404; font-weight: bold;">go back to your cart</a> and remove them before ordering.
-    </p>
-  </div>
-<% } %>
-
-
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-
-<form id="paymentForm">
-
-  <input type="hidden" name="addressId" value="<%= address._id %>">
-
-  <div class="payment-container">
-<div class="payment-methods">
-  <h3>Select payment method</h3>
-
-  <label class="payment-option">
-    <input type="radio" name="paymentMethod" value="Razorpay" checked>
-    <span>Razorpay</span>
-  </label>
-
-  <label class="payment-option">
-    <input type="radio" name="paymentMethod" value="Wallet">
-    <span>Wallet (Balance: ₹<%= user.wallet ? user.wallet.toFixed(2) : '0.00' %>)</span>
-  </label>
-
-  <label class="payment-option">
-    <input type="radio" name="paymentMethod" value="COD">
-    <span>Cash on Delivery</span>
-  </label>
-</div>
-    <div class="order-summary">
-      <h3>Order summary</h3>
-
-      <% cartItems.forEach(item => { %>
-        <div class="summary-row">
-          <span><%= item.productId.productName %> × <%= item.quantity %></span>
-          <span>₹ <%= ( (item.productId.salePrice || item.productId.regularPrice) * item.quantity ) %></span>
-        </div>
-      <% }) %>
-        <div class="summary-row">
-          <span>Delivery charge</span>
-      <span><%= deliveryCharge %></span>
-        </div>
-      <hr>
-
-      <div class="summary-row total">
-        <strong>Total</strong>
-        <strong>₹ <%= total %></strong>
-      </div>
-      <button type="button" id="placeOrderBtn" class="place-order-btn">
-        Place Order
-      </button>
-
-      <p class="secure-text">
-        🔒 Safe and secure payments
+      <strong>⚠️ The following items were removed — they are blocked or no longer available:</strong>
+      <ul style="margin: 8px 0 0 18px;">
+        <% unavailableItems.forEach(function(name) { %>
+          <li>
+            <%= name %>
+          </li>
+          <% }) %>
+      </ul>
+      <p style="margin: 8px 0 0;">
+        Please <a href="/cart" style="color: #856404; font-weight: bold;">go back to your cart</a> and remove them
+        before ordering.
       </p>
     </div>
-
-  </div>
-</form>
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-<script>
-const paymentData = {
-  key: "<%= razorpayKey %>",
-  orderId: "<%= razorpayOrderId %>",
-  amount: <%- JSON.stringify(razorpayAmount) %>,
-  addressId: "<%= address._id %>",
-  name: "<%= user?.name || '' %>",
-  email: "<%= user?.email || '' %>",
-  phone: "<%= user?.phone || '' %>"
-};
-
-document.getElementById("placeOrderBtn").addEventListener("click", async function () {
-
-  const selectedMethod = document.querySelector("input[name='paymentMethod']:checked").value;
+    <% } %>
 
 
-  if (selectedMethod === "COD") {
-    const res = await fetch("/checkout/payment/place", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        addressId: paymentData.addressId,
-        paymentMethod: "COD"
-      })
-    });
 
-    const data = await res.json();
-
-    if (data.success) {
-      Swal.fire("Success", "Order placed successfully", "success")
-        .then(() => window.location.href = "/order-success");
-    } else {
-      Swal.fire("Error", data.message || "Order failed", "error");
-    }
-    return;
-  }
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
-  if (selectedMethod === "Wallet") {
-    const walletBalance = <%= user.wallet || 0 %>;
+      <form id="paymentForm">
 
-    if (walletBalance <= 0) {
-      Swal.fire({
-        icon: "warning",
-        title: "Wallet Empty",
-        text: "Your wallet balance is ₹0.00. Please add money to your wallet first.",
-        confirmButtonText: "Add Money",
-        showCancelButton: true,
-        cancelButtonText: "Cancel"
-      }).then((result) => {
-        if (result.isConfirmed) {
-          window.location.href = "/wallet";
-        }
-      });
-      return;
-    }
+        <input type="hidden" name="addressId" value="<%= address._id %>">
 
-    if (walletBalance < (paymentData.amount / 100)) {
-      Swal.fire({
-        icon: "warning",
-        title: "Insufficient Balance",
-        text: `Your wallet balance is ₹${walletBalance.toFixed(2)}, but order total is ₹${(paymentData.amount / 100).toFixed(2)}. Please add money to continue.`,
-        confirmButtonText: "Add Money",
-        showCancelButton: true,
-        cancelButtonText: "Cancel"
-      }).then((result) => {
-        if (result.isConfirmed) {
-          window.location.href = "/wallet";
-        }
-      });
-      return;
-    }
+        <div class="payment-container">
+          <div class="payment-methods">
+            <h3>Select payment method</h3>
 
-    const res = await fetch("/checkout/payment/place", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        addressId: paymentData.addressId,
-        paymentMethod: "Wallet"
-      })
-    });
+            <label class="payment-option">
+              <input type="radio" name="paymentMethod" value="Razorpay" checked>
+              <span>Razorpay</span>
+            </label>
 
-    const data = await res.json();
+            <label class="payment-option">
+              <input type="radio" name="paymentMethod" value="Wallet">
+              <span>Wallet (Balance: ₹<%= user.wallet ? user.wallet.toFixed(2) : '0.00' %>)</span>
+            </label>
 
-    if (data.success) {
-      Swal.fire("Success", "Order placed using Wallet", "success")
-        .then(() => window.location.href = "/order-success?method=Wallet");
-    } else {
-      Swal.fire("Error", data.message || "Order failed", "error");
-    }
-    return;
-  }
+            <label class="payment-option">
+              <input type="radio" name="paymentMethod" value="COD">
+              <span>Cash on Delivery</span>
+            </label>
+          </div>
+          <div class="order-summary">
+            <h3>Order summary</h3>
 
-  const options = {
-    key: paymentData.key,
-    amount: Number(paymentData.amount),
-    currency: "INR",
-    order_id: paymentData.orderId,
-    name: "QUORA",
-    description: "Order Payment",
+            <% cartItems.forEach(item=> { %>
+              <div class="summary-row">
+                <span>
+                  <%= item.productId.productName %> × <%= item.quantity %>
+                </span>
+                <span>₹ <%= ( (item.productId.salePrice || item.productId.regularPrice) * item.quantity ) %></span>
+              </div>
+              <% }) %>
+                <div class="summary-row">
+                  <span>Delivery charge</span>
+                  <span>
+                    <%= deliveryCharge %>
+                  </span>
+                </div>
+                <hr>
 
-    prefill: {
-      name: paymentData.name,
-      email: paymentData.email,
-      contact: paymentData.phone
-    },
+                <div class="summary-row total">
+                  <strong>Total</strong>
+                  <strong>₹ <%= total %></strong>
+                </div>
+                <button type="button" id="placeOrderBtn" class="place-order-btn">
+                  Place Order
+                </button>
 
-    handler: async function (response) {
-      const res = await fetch("/checkout/payment/place", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          razorpay_order_id: response.razorpay_order_id,
-          razorpay_payment_id: response.razorpay_payment_id,
-          razorpay_signature: response.razorpay_signature,
-          addressId: paymentData.addressId,
-          paymentMethod: "Razorpay"
-        })
-      });
+                <p class="secure-text">
+                  🔒 Safe and secure payments
+                </p>
+          </div>
 
-      const data = await res.json();
+        </div>
+      </form>
+      <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+      <script>
+        const paymentData = {
+          key: "<%= razorpayKey %>",
+          orderId: "<%= razorpayOrderId %>",
+          amount: <% - JSON.stringify(razorpayAmount) %>,
+          addressId: "<%= address._id %>",
+          name: "<%= user?.name || '' %>",
+          email: "<%= user?.email || '' %>",
+          phone: "<%= user?.phone || '' %>"
+        };
 
-      if (data.success) {
-        window.location.href = "/order-success?method=Razorpay";
-      } else {
-        Swal.fire("Error", "Payment verification failed", "error");
-      }
-    },
+        document.getElementById("placeOrderBtn").addEventListener("click", async function () {
 
-    theme: { color: "#3399cc" }
-  };
+          const selectedMethod = document.querySelector("input[name='paymentMethod']:checked").value;
 
-  const rzp = new Razorpay(options);
 
-rzp.on("payment.failed", async function (response) {
-  await fetch("/checkout/payment/fail", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      razorpay_order_id: response.error.metadata.order_id,
-      paymentMethod: "Razorpay",
-       addressId: paymentData.addressId 
-    })
-  });
+          if (selectedMethod === "COD") {
+            const res = await fetch("/checkout/payment/place", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                addressId: paymentData.addressId,
+                paymentMethod: "COD"
+              })
+            });
 
-  window.location.href = "/order-failed";
-});
+            const data = await res.json();
 
-  rzp.open();
-});
-</script>
+            if (data.success) {
+              Swal.fire("Success", "Order placed successfully", "success")
+                .then(() => window.location.href = "/order-success");
+            } else {
+              Swal.fire("Error", data.message || "Order failed", "error");
+            }
+            return;
+          }
 
-<%- include("../partials/user/footer") %>
+
+          if (selectedMethod === "Wallet") {
+            const walletBalance = <%= user.wallet || 0 %>;
+
+            if (walletBalance <= 0) {
+              Swal.fire({
+                icon: "warning",
+                title: "Wallet Empty",
+                text: "Your wallet balance is ₹0.00. Please add money to your wallet first.",
+                confirmButtonText: "Add Money",
+                showCancelButton: true,
+                cancelButtonText: "Cancel"
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  window.location.href = "/wallet";
+                }
+              });
+              return;
+            }
+
+            if (walletBalance < (paymentData.amount / 100)) {
+              Swal.fire({
+                icon: "warning",
+                title: "Insufficient Balance",
+                text: `Your wallet balance is ₹${walletBalance.toFixed(2)}, but order total is ₹${(paymentData.amount / 100).toFixed(2)}. Please add money to continue.`,
+                confirmButtonText: "Add Money",
+                showCancelButton: true,
+                cancelButtonText: "Cancel"
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  window.location.href = "/wallet";
+                }
+              });
+              return;
+            }
+
+            const res = await fetch("/checkout/payment/place", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                addressId: paymentData.addressId,
+                paymentMethod: "Wallet"
+              })
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+              Swal.fire("Success", "Order placed using Wallet", "success")
+                .then(() => window.location.href = "/order-success?method=Wallet");
+            } else {
+              Swal.fire("Error", data.message || "Order failed", "error");
+            }
+            return;
+          }
+
+          const options = {
+            key: paymentData.key,
+            amount: Number(paymentData.amount),
+            currency: "INR",
+            order_id: paymentData.orderId,
+            name: "QUORA",
+            description: "Order Payment",
+
+            prefill: {
+              name: paymentData.name,
+              email: paymentData.email,
+              contact: paymentData.phone
+            },
+
+            handler: async function (response) {
+              const res = await fetch("/checkout/payment/place", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                  addressId: paymentData.addressId,
+                  paymentMethod: "Razorpay"
+                })
+              });
+
+              const data = await res.json();
+
+              if (data.success) {
+                window.location.href = "/order-success?method=Razorpay";
+              } else {
+                Swal.fire("Error", "Payment verification failed", "error");
+              }
+            },
+
+            theme: { color: "#3399cc" }
+          };
+
+          const rzp = new Razorpay(options);
+
+          rzp.on("payment.failed", async function (response) {
+            await fetch("/checkout/payment/fail", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                razorpay_order_id: response.error.metadata.order_id,
+                paymentMethod: "Razorpay",
+                addressId: paymentData.addressId
+              })
+            });
+
+            window.location.href = "/order-failed";
+          });
+
+          rzp.open();
+        });
+      </script>
+
+      <%- include("../partials/user/footer") %>

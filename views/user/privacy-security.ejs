@@ -6,64 +6,64 @@
 
   <style>
     .my-swal-container {
-  z-index: 10000 !important;
-}
+      z-index: 10000 !important;
+    }
   </style>
 
   <body>
 
     <div class="profile-container">
 
-     <%- include("../partials/user/profile-sidebar", { user, activePage: 'security' }) %>
+      <%- include("../partials/user/profile-sidebar", { user, activePage: 'security' }) %>
 
-      <main class="profile-content">
+        <main class="profile-content">
 
-        <div class="page-header">
-          <h2>🔒 Privacy & Security</h2>
-          <p>Manage your account security settings and change your password or email address</p>
-        </div>
-
-        <% if (isGoogleUser) { %>
-          <div class="security-card google-card">
-            <div class="lock-icon">🔒</div>
-            <h3>Google Account Linked</h3>
-
-            <p>
-              Your account is connected to your Google account. For security reasons,
-              <strong>you cannot change your password and email address through this portal</strong>.
-            </p>
-
-            <p>
-              All security settings including password and email changes must be managed through your
-              <strong>Google Account settings</strong>.
-            </p>
-
-            <a href="https://myaccount.google.com/security" target="_blank" class="security-btn">
-              🔐 Go to Google Account Security
-            </a>
+          <div class="page-header">
+            <h2>🔒 Privacy & Security</h2>
+            <p>Manage your account security settings and change your password or email address</p>
           </div>
-          <% } else { %>
-            <div class="security-options">
-              <div class="security-card option-card">
-                <div class="card-icon">🔑</div>
-                <div class="card-content">
-                  <h3>Change Password</h3>
-                  <p>Update your password to keep your account secure</p>
-                </div>
-                <button class="action-btn" onclick="openPasswordModal()">Change</button>
-              </div>
-              <div class="security-card option-card">
-                <div class="card-icon">📧</div>
-                <div class="card-content">
-                  <h3>Change Email Address</h3>
-                  <p>Update your email for account recovery and notifications</p>
-                </div>
-                <button class="action-btn" onclick="openEmailModal()">Change</button>
-              </div>
-            </div>
-            <% } %>
 
-      </main>
+          <% if (isGoogleUser) { %>
+            <div class="security-card google-card">
+              <div class="lock-icon">🔒</div>
+              <h3>Google Account Linked</h3>
+
+              <p>
+                Your account is connected to your Google account. For security reasons,
+                <strong>you cannot change your password and email address through this portal</strong>.
+              </p>
+
+              <p>
+                All security settings including password and email changes must be managed through your
+                <strong>Google Account settings</strong>.
+              </p>
+
+              <a href="https://myaccount.google.com/security" target="_blank" class="security-btn">
+                🔐 Go to Google Account Security
+              </a>
+            </div>
+            <% } else { %>
+              <div class="security-options">
+                <div class="security-card option-card">
+                  <div class="card-icon">🔑</div>
+                  <div class="card-content">
+                    <h3>Change Password</h3>
+                    <p>Update your password to keep your account secure</p>
+                  </div>
+                  <button class="action-btn" onclick="openPasswordModal()">Change</button>
+                </div>
+                <div class="security-card option-card">
+                  <div class="card-icon">📧</div>
+                  <div class="card-content">
+                    <h3>Change Email Address</h3>
+                    <p>Update your email for account recovery and notifications</p>
+                  </div>
+                  <button class="action-btn" onclick="openEmailModal()">Change</button>
+                </div>
+              </div>
+              <% } %>
+
+        </main>
 
     </div>
     <div id="passwordModal" class="modal-overlay">
@@ -276,8 +276,8 @@
                 icon: "error",
                 title: "Error",
                 text: data.message || "Could not update password",
-                customClass : {
-                  container : "my-swal-container"
+                customClass: {
+                  container: "my-swal-container"
                 }
               });
             }
@@ -338,7 +338,7 @@
             const res = await fetch("/userprofile/change-email", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ currentEmail,newEmail }),
+              body: JSON.stringify({ currentEmail, newEmail }),
             });
             const data = await res.json();
             if (data.success === true) {

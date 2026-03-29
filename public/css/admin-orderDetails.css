@@ -7,7 +7,7 @@
 .order-details-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.55);
+  background: rgba(0, 0, 0, 0.55);
 }
 
 .order-details-modal {
@@ -23,8 +23,13 @@
 }
 
 @keyframes slideIn {
-  from { transform: translateX(100%); }
-  to { transform: translateX(0); }
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
 }
 
 .btn-close {

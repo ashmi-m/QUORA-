@@ -3,8 +3,8 @@ const env = require("dotenv").config();
 
 const connectDB = async () => {
     try {
-        await mongoose.connect(process.env.MONGODB_URI,{
-            dbName : "quora"
+        await mongoose.connect(process.env.MONGODB_URI, {
+            dbName: "quora"
         });
         console.log("DB Connected");
 

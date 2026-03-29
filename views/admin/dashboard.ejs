@@ -1,260 +1,284 @@
 <%- include("../partials/admin/header", { active: 'dashboard' }) %>
 
-<style>
-  .dash-content {
-    margin-left: 220px;
-    margin-top: 60px;
-    padding: 30px;
-    background: #f4f6f9;
-    min-height: calc(100vh - 60px);
-    box-sizing: border-box;
-  }
+  <style>
+    .dash-content {
+      margin-left: 220px;
+      margin-top: 60px;
+      padding: 30px;
+      background: #f4f6f9;
+      min-height: calc(100vh - 60px);
+      box-sizing: border-box;
+    }
 
-  .dash-content h2 {
-    font-size: 24px;
-    font-weight: 700;
-    color: #1e1e2d;
-    margin: 0 0 24px 0;
-  }
+    .dash-content h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1e1e2d;
+      margin: 0 0 24px 0;
+    }
 
-  .dash-filter-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 24px;
-  }
+    .dash-filter-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
 
-  .dash-filter-row select {
-    padding: 8px 16px;
-    border: 1.5px solid #dde1f0;
-    border-radius: 8px;
-    font-size: 14px;
-    background: #fff;
-    cursor: pointer;
-  }
+    .dash-filter-row select {
+      padding: 8px 16px;
+      border: 1.5px solid #dde1f0;
+      border-radius: 8px;
+      font-size: 14px;
+      background: #fff;
+      cursor: pointer;
+    }
 
-  .dash-stat-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 18px;
-    margin-bottom: 24px;
-  }
+    .dash-stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 24px;
+    }
 
-  .dash-stat-card {
-    background: #fff;
-    border-radius: 12px;
-    padding: 20px 22px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  }
+    .dash-stat-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px 22px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
 
-  .dash-stat-card .s-icon {
-    font-size: 20px;
-    margin-bottom: 8px;
-  }
+    .dash-stat-card .s-icon {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
 
-  .dash-stat-card .s-label {
-    font-size: 11px;
-    font-weight: 600;
-    color: #9094a6;
-    text-transform: uppercase;
-    margin-bottom: 6px;
-    display: block;
-  }
+    .dash-stat-card .s-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #9094a6;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      display: block;
+    }
 
-  .dash-stat-card .s-value {
-    font-size: 26px;
-    font-weight: 700;
-    color: #1e1e2d;
-  }
+    .dash-stat-card .s-value {
+      font-size: 26px;
+      font-weight: 700;
+      color: #1e1e2d;
+    }
 
-  .dash-chart-card {
-    background: #fff;
-    border-radius: 12px;
-    padding: 24px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    margin-top: 24px;
-  }
+    .dash-chart-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      margin-top: 24px;
+    }
 
-  .dash-chart-card h4 {
-    font-size: 16px;
-    font-weight: 700;
-    color: #1e1e2d;
-    margin: 0 0 18px 0;
-  }
+    .dash-chart-card h4 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e1e2d;
+      margin: 0 0 18px 0;
+    }
 
-  .dash-chart-wrapper {
-    position: relative;
-    height: 300px;
-    width: 100%;
-  }
-  .dash-three-col {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 24px;
-    margin-top: 24px;
-  }
+    .dash-chart-wrapper {
+      position: relative;
+      height: 300px;
+      width: 100%;
+    }
 
-  .rank-card {
-    background: #fff;
-    border-radius: 14px;
-    padding: 24px 20px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
-    border-top: 4px solid #3b5cff;
-    display: flex;
-    flex-direction: column;
-  }
+    .dash-three-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 24px;
+      margin-top: 24px;
+    }
 
-  .rank-card h4 {
-    font-size: 16px;
-    font-weight: 700;
-    color: #1e1e2d;
-    margin: 0 0 16px 0;
-    text-align: center;
-  }
+    .rank-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 24px 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+      border-top: 4px solid #3b5cff;
+      display: flex;
+      flex-direction: column;
+    }
 
-  .rank-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    overflow-y: auto;
-    max-height: 340px;
-  }
-  .rank-list::-webkit-scrollbar { width: 4px; }
-  .rank-list::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
-  .rank-list::-webkit-scrollbar-thumb { background: #c5cadd; border-radius: 4px; }
+    .rank-card h4 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e1e2d;
+      margin: 0 0 16px 0;
+      text-align: center;
+    }
 
-  .rank-list li {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 4px;
-    border-bottom: 1px solid #f0f0f0;
-    gap: 10px;
-  }
+    .rank-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      overflow-y: auto;
+      max-height: 340px;
+    }
 
-  .rank-list li:last-child {
-    border-bottom: none;
-  }
+    .rank-list::-webkit-scrollbar {
+      width: 4px;
+    }
 
-  .rank-left {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex: 1;
-    min-width: 0;
-  }
+    .rank-list::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
 
-  .rank-num {
-    font-size: 13px;
-    font-weight: 700;
-    color: #6b6f82;
-    min-width: 20px;
-  }
+    .rank-list::-webkit-scrollbar-thumb {
+      background: #c5cadd;
+      border-radius: 4px;
+    }
 
-  .rank-name {
-    font-size: 13px;
-    color: #1e1e2d;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+    .rank-list li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 4px;
+      border-bottom: 1px solid #f0f0f0;
+      gap: 10px;
+    }
 
-  .sold-badge {
-    background: #3b5cff;
-    color: #fff;
-    font-size: 12px;
-    font-weight: 700;
-    padding: 3px 11px;
-    border-radius: 20px;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-  .rank-num.n1 { color: #f5a623; font-size: 15px; }
-  .rank-num.n2 { color: #9b9b9b; font-size: 14px; }
-  .rank-num.n3 { color: #c47c3e; font-size: 14px; }
+    .rank-list li:last-child {
+      border-bottom: none;
+    }
 
-  .rank-empty {
-    text-align: center;
-    color: #9094a6;
-    font-size: 13px;
-    padding: 20px 0;
-  }
-</style>
+    .rank-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 0;
+    }
 
-<div class="dash-content">
+    .rank-num {
+      font-size: 13px;
+      font-weight: 700;
+      color: #6b6f82;
+      min-width: 20px;
+    }
 
-  <div class="dash-filter-row">
-    <h2>Dashboard</h2>
-    <select id="dashFilter">
-      <option value="daily">Daily</option>
-      <option value="weekly">Weekly</option>
-      <option value="monthly" selected>Monthly</option>
-      <option value="yearly">Yearly</option>
-    </select>
+    .rank-name {
+      font-size: 13px;
+      color: #1e1e2d;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sold-badge {
+      background: #3b5cff;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 11px;
+      border-radius: 20px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .rank-num.n1 {
+      color: #f5a623;
+      font-size: 15px;
+    }
+
+    .rank-num.n2 {
+      color: #9b9b9b;
+      font-size: 14px;
+    }
+
+    .rank-num.n3 {
+      color: #c47c3e;
+      font-size: 14px;
+    }
+
+    .rank-empty {
+      text-align: center;
+      color: #9094a6;
+      font-size: 13px;
+      padding: 20px 0;
+    }
+  </style>
+
+  <div class="dash-content">
+
+    <div class="dash-filter-row">
+      <h2>Dashboard</h2>
+      <select id="dashFilter">
+        <option value="daily">Daily</option>
+        <option value="weekly">Weekly</option>
+        <option value="monthly" selected>Monthly</option>
+        <option value="yearly">Yearly</option>
+      </select>
+    </div>
+    <div class="dash-stat-grid">
+      <div class="dash-stat-card">
+        <div class="s-icon">📦</div>
+        <span class="s-label">Total Orders</span>
+        <span class="s-value" id="statTotalOrders">—</span>
+      </div>
+      <div class="dash-stat-card">
+        <div class="s-icon">💰</div>
+        <span class="s-label">Total Revenue</span>
+        <span class="s-value" id="statRevenue">—</span>
+      </div>
+      <div class="dash-stat-card">
+        <div class="s-icon">✅</div>
+        <span class="s-label">Delivered</span>
+        <span class="s-value" id="statDelivered">—</span>
+      </div>
+      <div class="dash-stat-card">
+        <div class="s-icon">❌</div>
+        <span class="s-label">Cancelled</span>
+        <span class="s-value" id="statCancelled">—</span>
+      </div>
+    </div>
+    <div class="dash-chart-card">
+      <h4 id="chartTitle">Revenue — Monthly View</h4>
+      <div class="dash-chart-wrapper">
+        <canvas id="dashboardChart"></canvas>
+      </div>
+    </div>
+    <div class="dash-three-col">
+
+      <div class="rank-card">
+        <h4>Top 10 Products</h4>
+        <ul class="rank-list" id="topProductsList">
+          <li><span class="rank-empty">Loading...</span></li>
+        </ul>
+      </div>
+
+      <div class="rank-card">
+        <h4>Top Selling Categories</h4>
+        <ul class="rank-list" id="topCategoriesList">
+          <li><span class="rank-empty">Loading...</span></li>
+        </ul>
+      </div>
+
+      <div class="rank-card">
+        <h4>Top Selling Brands</h4>
+        <ul class="rank-list" id="topBrandsList">
+          <li><span class="rank-empty">Loading...</span></li>
+        </ul>
+      </div>
+
+    </div>
+
   </div>
-  <div class="dash-stat-grid">
-    <div class="dash-stat-card">
-      <div class="s-icon">📦</div>
-      <span class="s-label">Total Orders</span>
-      <span class="s-value" id="statTotalOrders">—</span>
-    </div>
-    <div class="dash-stat-card">
-      <div class="s-icon">💰</div>
-      <span class="s-label">Total Revenue</span>
-      <span class="s-value" id="statRevenue">—</span>
-    </div>
-    <div class="dash-stat-card">
-      <div class="s-icon">✅</div>
-      <span class="s-label">Delivered</span>
-      <span class="s-value" id="statDelivered">—</span>
-    </div>
-    <div class="dash-stat-card">
-      <div class="s-icon">❌</div>
-      <span class="s-label">Cancelled</span>
-      <span class="s-value" id="statCancelled">—</span>
-    </div>
-  </div>
-  <div class="dash-chart-card">
-    <h4 id="chartTitle">Revenue — Monthly View</h4>
-    <div class="dash-chart-wrapper">
-      <canvas id="dashboardChart"></canvas>
-    </div>
-  </div>
-  <div class="dash-three-col">
 
-    <div class="rank-card">
-      <h4>Top 10 Products</h4>
-      <ul class="rank-list" id="topProductsList">
-        <li><span class="rank-empty">Loading...</span></li>
-      </ul>
-    </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <div class="rank-card">
-      <h4>Top Selling Categories</h4>
-      <ul class="rank-list" id="topCategoriesList">
-        <li><span class="rank-empty">Loading...</span></li>
-      </ul>
-    </div>
+  <script>
 
-    <div class="rank-card">
-      <h4>Top Selling Brands</h4>
-      <ul class="rank-list" id="topBrandsList">
-        <li><span class="rank-empty">Loading...</span></li>
-      </ul>
-    </div>
-
-  </div>
-
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script>
-
-let chart;
-function buildListItem(index, name, sold) {
-  const numClass = index === 0 ? "n1" : index === 1 ? "n2" : index === 2 ? "n3" : "";
-  return `
+    let chart;
+    function buildListItem(index, name, sold) {
+      const numClass = index === 0 ? "n1" : index === 1 ? "n2" : index === 2 ? "n3" : "";
+      return `
     <li>
       <div class="rank-left">
         <span class="rank-num ${numClass}">${index + 1}.</span>
@@ -262,111 +286,111 @@ function buildListItem(index, name, sold) {
       </div>
       <span class="sold-badge">Sold:${sold}</span>
     </li>`;
-}
-async function loadChart(filter) {
-  const filterLabel = filter.charAt(0).toUpperCase() + filter.slice(1);
-  document.getElementById("chartTitle").textContent = "Revenue — " + filterLabel + " View";
-
-  const res  = await fetch("/admin/dashboard-chart?filter=" + filter);
-  const data = await res.json();
-
-  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-  const days   = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-
-  let labels, values;
-
-  if (filter === "yearly") {
-    labels = data.map(item => months[item._id - 1]);
-    values = data.map(item => item.revenue);
-  } else if (filter === "weekly") {
-    labels = data.map(item => days[item._id - 1] || "Day " + item._id);
-    values = data.map(item => item.revenue);
-  } else if (filter === "daily") {
-    labels = data.map(item => item._id + ":00");
-    values = data.map(item => item.revenue);
-  } else {
-    labels = data.map(item => "Day " + item._id);
-    values = data.map(item => item.revenue);
-  }
-
-  const total = values.reduce((a, b) => a + b, 0);
-  document.getElementById("statRevenue").textContent = "₹" + total.toLocaleString("en-IN");
-
-  const ctx = document.getElementById("dashboardChart");
-  if (chart) chart.destroy();
-
-  chart = new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: labels,
-      datasets: [{
-        label: "Revenue (₹)",
-        data: values,
-        backgroundColor: "rgba(59,92,255,0.75)",
-        borderRadius: 6
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: ctx => "₹" + ctx.parsed.y.toLocaleString("en-IN")
-          }
-        }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            callback: val => "₹" + val.toLocaleString("en-IN")
-          }
-        }
-      }
     }
-  });
-}
-async function loadStats() {
-  const res = await fetch("/admin/dashboard-stats");
-  if (!res.ok) return;
-  const data = await res.json();
-  document.getElementById("statTotalOrders").textContent = data.totalOrders || 0;
-  document.getElementById("statDelivered").textContent   = data.delivered   || 0;
-  document.getElementById("statCancelled").textContent   = data.cancelled   || 0;
-}
-async function loadTopProducts() {
-  const res  = await fetch("/admin/top-products");
-  const data = await res.json();
-  let html = "";
-  data.forEach((p, i) => { html += buildListItem(i, p.name, p.totalSold); });
-  document.getElementById("topProductsList").innerHTML =
-    html || '<li><span class="rank-empty">No data found</span></li>';
-}
-async function loadTopCategories() {
-  const res  = await fetch("/admin/top-categories");
-  const data = await res.json();
-  let html = "";
-  data.forEach((c, i) => { html += buildListItem(i, c.name, c.totalSold); });
-  document.getElementById("topCategoriesList").innerHTML =
-    html || '<li><span class="rank-empty">No data found</span></li>';
-}
-async function loadTopBrands() {
-  const res  = await fetch("/admin/top-brands");
-  const data = await res.json();
-  let html = "";
-  data.forEach((b, i) => { html += buildListItem(i, b.name, b.totalSold); });
-  document.getElementById("topBrandsList").innerHTML =
-    html || '<li><span class="rank-empty">No data found</span></li>';
-}
+    async function loadChart(filter) {
+      const filterLabel = filter.charAt(0).toUpperCase() + filter.slice(1);
+      document.getElementById("chartTitle").textContent = "Revenue — " + filterLabel + " View";
 
-document.getElementById("dashFilter")
-  .addEventListener("change", (e) => loadChart(e.target.value));
-loadChart("monthly");
-loadStats();
-loadTopProducts();
-loadTopCategories();
-loadTopBrands();
+      const res = await fetch("/admin/dashboard-chart?filter=" + filter);
+      const data = await res.json();
 
-</script>
+      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+      let labels, values;
+
+      if (filter === "yearly") {
+        labels = data.map(item => months[item._id - 1]);
+        values = data.map(item => item.revenue);
+      } else if (filter === "weekly") {
+        labels = data.map(item => days[item._id - 1] || "Day " + item._id);
+        values = data.map(item => item.revenue);
+      } else if (filter === "daily") {
+        labels = data.map(item => item._id + ":00");
+        values = data.map(item => item.revenue);
+      } else {
+        labels = data.map(item => "Day " + item._id);
+        values = data.map(item => item.revenue);
+      }
+
+      const total = values.reduce((a, b) => a + b, 0);
+      document.getElementById("statRevenue").textContent = "₹" + total.toLocaleString("en-IN");
+
+      const ctx = document.getElementById("dashboardChart");
+      if (chart) chart.destroy();
+
+      chart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: labels,
+          datasets: [{
+            label: "Revenue (₹)",
+            data: values,
+            backgroundColor: "rgba(59,92,255,0.75)",
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: ctx => "₹" + ctx.parsed.y.toLocaleString("en-IN")
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: val => "₹" + val.toLocaleString("en-IN")
+              }
+            }
+          }
+        }
+      });
+    }
+    async function loadStats() {
+      const res = await fetch("/admin/dashboard-stats");
+      if (!res.ok) return;
+      const data = await res.json();
+      document.getElementById("statTotalOrders").textContent = data.totalOrders || 0;
+      document.getElementById("statDelivered").textContent = data.delivered || 0;
+      document.getElementById("statCancelled").textContent = data.cancelled || 0;
+    }
+    async function loadTopProducts() {
+      const res = await fetch("/admin/top-products");
+      const data = await res.json();
+      let html = "";
+      data.forEach((p, i) => { html += buildListItem(i, p.name, p.totalSold); });
+      document.getElementById("topProductsList").innerHTML =
+        html || '<li><span class="rank-empty">No data found</span></li>';
+    }
+    async function loadTopCategories() {
+      const res = await fetch("/admin/top-categories");
+      const data = await res.json();
+      let html = "";
+      data.forEach((c, i) => { html += buildListItem(i, c.name, c.totalSold); });
+      document.getElementById("topCategoriesList").innerHTML =
+        html || '<li><span class="rank-empty">No data found</span></li>';
+    }
+    async function loadTopBrands() {
+      const res = await fetch("/admin/top-brands");
+      const data = await res.json();
+      let html = "";
+      data.forEach((b, i) => { html += buildListItem(i, b.name, b.totalSold); });
+      document.getElementById("topBrandsList").innerHTML =
+        html || '<li><span class="rank-empty">No data found</span></li>';
+    }
+
+    document.getElementById("dashFilter")
+      .addEventListener("change", (e) => loadChart(e.target.value));
+    loadChart("monthly");
+    loadStats();
+    loadTopProducts();
+    loadTopCategories();
+    loadTopBrands();
+
+  </script>

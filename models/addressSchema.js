@@ -9,7 +9,7 @@ const addressSchema = new Schema({
     ref: "User",
     required: true
   },
-  addresses: [  
+  addresses: [
     {
       addressType: {
         type: String,
@@ -39,7 +39,7 @@ const addressSchema = new Schema({
         type: String,
         required: true
       },
-      
+
       altPhone: {
         type: String,
         required: true

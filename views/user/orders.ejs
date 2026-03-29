@@ -1,254 +1,259 @@
 <%- include("../partials/user/header") %>
-<link rel="stylesheet" href="/css/orders.css">
-<link rel="stylesheet" href="/css/profile.css">
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="/css/orders.css">
+  <link rel="stylesheet" href="/css/profile.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<div class="profile-container">
-   <%- include("../partials/user/profile-sidebar", { user, activePage: 'orders' }) %>
-  
+  <div class="profile-container">
+    <%- include("../partials/user/profile-sidebar", { user, activePage: 'orders' }) %>
 
-  <div class="profile-content">
-    <div class="orders-wrapper">
-      <section class="orders-content">
-        <div class="orders-header">
-          <h2>My Orders</h2>
-          <div class="search-bar">
-            <input type="text" id="searchInput" placeholder="Search orders">
-            <button id="searchBtn">🔍</button>
-            <button id="clearBtn" style="display:none;">❌</button>
-          </div>
-        </div>
 
-        <% if (!orders || orders.length === 0) { %>
-          <p>No orders found</p>
-        <% } %>
-
-        <div id="ordersList">
-          <% orders.forEach(order => { %>
-            <%
-              /* Collect all product names for search filtering */
-              const allProductNames = order.products
-                .map(item => item.productId?.productName?.toLowerCase() || '')
-                .join(' ');
-            %>
-            <div class="order-card" data-product-name="<%= allProductNames %>">
-              <div class="order-info" style="width:100%">
-                <p class="order-id">
-                  <strong>Order ID:</strong> <%= order.orderId %>
-                </p>
-
-                <p class="date">
-                  Ordered on
-                  <%= new Date(order.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) %>
-                </p>
-
-                <span class="status <%= order.status.toLowerCase() %>">
-                  ● <%= order.status %>
-                </span>
-
-                <p class="small">
-                  Payment: <%= order.paymentMethod %>
-                </p>
-
-               
-                <div class="order-products-list">
-                  <% order.products.forEach(item => { %>
-                    <div class="order-product-row">
-                      <div class="order-image">
-                        <img src="<%= item.productId?.productImage?.[0] || '/images/no-image.png' %>" alt="product">
-                      </div>
-                      <div class="order-product-info">
-                        <h4><%= item.productId?.productName || "Product unavailable" %></h4>
-                        <p class="price">₹ <%= item.salePrice %></p>
-                        <p class="small">Qty: <%= item.quantity %></p>
-                        <% if (item.status) { %>
-                          <span class="status <%= item.status.toLowerCase().replace(/ /g, '-') %>">
-                            ● <%= item.status %>
-                          </span>
-                        <% } %>
-                      </div>
-                    </div>
-                  <% }) %>
-                </div>
-
-                <div style="margin-top:10px;">
-                  <% if (order.status === "Placed" || order.status === "Paid") { %>
-                    <button class="cancel-btn" onclick="confirmCancel('<%= order._id %>')">
-                      Cancel
-                    </button>
-                  <% } %>
-
-                  <a href="/orders/<%= order._id %>" class="details-btn">
-                    Details
-                  </a>
-                </div>
+      <div class="profile-content">
+        <div class="orders-wrapper">
+          <section class="orders-content">
+            <div class="orders-header">
+              <h2>My Orders</h2>
+              <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Search orders">
+                <button id="searchBtn">🔍</button>
+                <button id="clearBtn" style="display:none;">❌</button>
               </div>
             </div>
-          <% }) %>
+
+            <% if (!orders || orders.length===0) { %>
+              <p>No orders found</p>
+              <% } %>
+
+                <div id="ordersList">
+                  <% orders.forEach(order=> { %>
+                    <% /* Collect all product names for search filtering */ const allProductNames=order.products
+                      .map(item=> item.productId?.productName?.toLowerCase() || '')
+                      .join(' ');
+                      %>
+                      <div class="order-card" data-product-name="<%= allProductNames %>">
+                        <div class="order-info" style="width:100%">
+                          <p class="order-id">
+                            <strong>Order ID:</strong>
+                            <%= order.orderId %>
+                          </p>
+
+                          <p class="date">
+                            Ordered on
+                            <%= new Date(order.createdAt).toLocaleDateString("en-IN", { day: "2-digit" , month: "short"
+                              , year: "numeric" }) %>
+                          </p>
+
+                          <span class="status <%= order.status.toLowerCase() %>">
+                            ● <%= order.status %>
+                          </span>
+
+                          <p class="small">
+                            Payment: <%= order.paymentMethod %>
+                          </p>
+
+
+                          <div class="order-products-list">
+                            <% order.products.forEach(item=> { %>
+                              <div class="order-product-row">
+                                <div class="order-image">
+                                  <img src="<%= item.productId?.productImage?.[0] || '/images/no-image.png' %>"
+                                    alt="product">
+                                </div>
+                                <div class="order-product-info">
+                                  <h4>
+                                    <%= item.productId?.productName || "Product unavailable" %>
+                                  </h4>
+                                  <p class="price">₹ <%= item.salePrice %>
+                                  </p>
+                                  <p class="small">Qty: <%= item.quantity %>
+                                  </p>
+                                  <% if (item.status) { %>
+                                    <span class="status <%= item.status.toLowerCase().replace(/ /g, '-') %>">
+                                      ● <%= item.status %>
+                                    </span>
+                                    <% } %>
+                                </div>
+                              </div>
+                              <% }) %>
+                          </div>
+
+                          <div style="margin-top:10px;">
+                            <% if (order.status==="Placed" || order.status==="Paid" ) { %>
+                              <button class="cancel-btn" onclick="confirmCancel('<%= order._id %>')">
+                                Cancel
+                              </button>
+                              <% } %>
+
+                                <a href="/orders/<%= order._id %>" class="details-btn">
+                                  Details
+                                </a>
+                          </div>
+                        </div>
+                      </div>
+                      <% }) %>
+                </div>
+
+
+                <div class="pagination" id="pagination"></div>
+          </section>
         </div>
-             
-
-        <div class="pagination" id="pagination"></div>
-      </section>
-    </div>
+      </div>
   </div>
-</div>
 
-<style>
-  .order-products-list {
-    margin-top: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
+  <style>
+    .order-products-list {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
 
-  .order-product-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 8px;
-    border: 1px solid #f0f0f0;
-    border-radius: 6px;
-    background: #fafafa;
-  }
+    .order-product-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 8px;
+      border: 1px solid #f0f0f0;
+      border-radius: 6px;
+      background: #fafafa;
+    }
 
-  .order-product-info h4 {
-    margin: 0 0 4px 0;
-  }
+    .order-product-info h4 {
+      margin: 0 0 4px 0;
+    }
 
-  .order-product-info .price {
-    font-weight: bold;
-    margin-bottom: 3px;
-  }
+    .order-product-info .price {
+      font-weight: bold;
+      margin-bottom: 3px;
+    }
 
-  .order-product-info .small {
-    font-size: 12px;
-    color: #555;
-  }
-</style>
+    .order-product-info .small {
+      font-size: 12px;
+      color: #555;
+    }
+  </style>
 
-<script>
-  const ITEMS_PER_PAGE = 5;
-  let currentPage = 1;
+  <script>
+    const ITEMS_PER_PAGE = 5;
+    let currentPage = 1;
 
-  const ordersList = document.getElementById("ordersList");
-  const pagination = document.getElementById("pagination");
-  const searchInput = document.getElementById("searchInput");
-  const searchBtn = document.getElementById("searchBtn");
-  const clearBtn = document.getElementById("clearBtn");
+    const ordersList = document.getElementById("ordersList");
+    const pagination = document.getElementById("pagination");
+    const searchInput = document.getElementById("searchInput");
+    const searchBtn = document.getElementById("searchBtn");
+    const clearBtn = document.getElementById("clearBtn");
 
- 
 
-  function getVisibleCards() {
-    return Array.from(
-      ordersList.getElementsByClassName("order-card")
-    ).filter(card => card.dataset.visible !== "false");
-  }
 
-  function showPage(page) {
-    const cards = getVisibleCards();
-    const start = (page - 1) * ITEMS_PER_PAGE;
-    const end = start + ITEMS_PER_PAGE;
+    function getVisibleCards() {
+      return Array.from(
+        ordersList.getElementsByClassName("order-card")
+      ).filter(card => card.dataset.visible !== "false");
+    }
 
-    cards.forEach((card, index) => {
-      card.style.display =
-        index >= start && index < end ? "flex" : "none";
-    });
+    function showPage(page) {
+      const cards = getVisibleCards();
+      const start = (page - 1) * ITEMS_PER_PAGE;
+      const end = start + ITEMS_PER_PAGE;
 
-    renderPagination(cards.length, page);
-  }
-
-  function renderPagination(totalItems, page) {
-    pagination.innerHTML = "";
-    const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
-
-    for (let i = 1; i <= totalPages; i++) {
-      const btn = document.createElement("button");
-      btn.textContent = i;
-      btn.classList.toggle("active", i === page);
-
-      btn.addEventListener("click", () => {
-        currentPage = i;
-        showPage(currentPage);
+      cards.forEach((card, index) => {
+        card.style.display =
+          index >= start && index < end ? "flex" : "none";
       });
 
-      pagination.appendChild(btn);
+      renderPagination(cards.length, page);
     }
-  }
 
-  function filterOrders() {
-    const searchValue = searchInput.value.toLowerCase();
-    const cards = ordersList.getElementsByClassName("order-card");
-    clearBtn.style.display = searchValue ? "inline-block" : "none";
+    function renderPagination(totalItems, page) {
+      pagination.innerHTML = "";
+      const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
 
-    Array.from(cards).forEach(card => {
-      const productName = card.getAttribute("data-product-name");
-      const isMatch = productName.includes(searchValue);
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        btn.classList.toggle("active", i === page);
 
-      card.dataset.visible = isMatch ? "true" : "false";
-      card.style.display = "none";
+        btn.addEventListener("click", () => {
+          currentPage = i;
+          showPage(currentPage);
+        });
+
+        pagination.appendChild(btn);
+      }
+    }
+
+    function filterOrders() {
+      const searchValue = searchInput.value.toLowerCase();
+      const cards = ordersList.getElementsByClassName("order-card");
+      clearBtn.style.display = searchValue ? "inline-block" : "none";
+
+      Array.from(cards).forEach(card => {
+        const productName = card.getAttribute("data-product-name");
+        const isMatch = productName.includes(searchValue);
+
+        card.dataset.visible = isMatch ? "true" : "false";
+        card.style.display = "none";
+      });
+
+      currentPage = 1;
+      showPage(currentPage);
+    }
+
+    clearBtn.addEventListener("click", () => {
+      searchInput.value = "";
+      clearBtn.style.display = "none";
+
+      Array.from(ordersList.getElementsByClassName("order-card")).forEach(card => {
+        card.dataset.visible = "true";
+      });
+
+      currentPage = 1;
+      showPage(currentPage);
     });
 
-    currentPage = 1;
-    showPage(currentPage);
-  }
+    searchBtn.addEventListener("click", filterOrders);
+    searchInput.addEventListener("keyup", filterOrders);
 
-  clearBtn.addEventListener("click", () => {
-    searchInput.value = "";
-    clearBtn.style.display = "none";
+
+
+    function confirmCancel(orderId) {
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, cancel it!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          cancelOrder(orderId);
+        }
+      });
+    }
+
+    function cancelOrder(orderId) {
+      fetch(`/user/cancel/${orderId}`, { method: "PUT" })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            Swal.fire(
+              'Cancelled!',
+              'Your order has been cancelled.',
+              'success'
+            ).then(() => location.reload());
+          } else {
+            Swal.fire(
+              'Error!',
+              'Cannot cancel this order',
+              'error'
+            );
+          }
+        });
+    }
 
     Array.from(ordersList.getElementsByClassName("order-card")).forEach(card => {
       card.dataset.visible = "true";
     });
 
-    currentPage = 1;
     showPage(currentPage);
-  });
-
-  searchBtn.addEventListener("click", filterOrders);
-  searchInput.addEventListener("keyup", filterOrders);
-
- 
-
-  function confirmCancel(orderId) {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: "You won't be able to revert this!",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Yes, cancel it!'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        cancelOrder(orderId);
-      }
-    });
-  }
-
-  function cancelOrder(orderId) {
-    fetch(`/user/cancel/${orderId}`, { method: "PUT" })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          Swal.fire(
-            'Cancelled!',
-            'Your order has been cancelled.',
-            'success'
-          ).then(() => location.reload());
-        } else {
-          Swal.fire(
-            'Error!',
-            'Cannot cancel this order',
-            'error'
-          );
-        }
-      });
-  }
-
-  Array.from(ordersList.getElementsByClassName("order-card")).forEach(card => {
-    card.dataset.visible = "true";
-  });
-
-  showPage(currentPage);
-</script>
+  </script>

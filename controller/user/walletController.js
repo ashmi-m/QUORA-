@@ -78,7 +78,7 @@ const addMoneyToWallet = async (req, res) => {
     if (generated_signature !== razorpay_signature) {
       return res.json({ success: false, message: "Payment verification failed" });
     }
-    const creditAmount = Number(amount) / 100; 
+    const creditAmount = Number(amount) / 100;
 
     const updatedUser = await User.findByIdAndUpdate(
       userId,
