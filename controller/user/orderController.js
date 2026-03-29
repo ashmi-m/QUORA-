@@ -209,7 +209,7 @@ const { salePrice, effectiveOffer } = applyOffer(updatedProduct);
         salePrice: salePrice,
         discount: itemDiscount,
       offerApplied: effectiveOffer,
-        status: "Placed"
+status: paymentMethod === "Razorpay" ? "Processing" : "Placed"
       });
     }
     
@@ -387,21 +387,7 @@ const cancelSingleProduct = async (req, res) => {
 
     await order.save();
 if (order.paymentMethod !== "COD") {
- 
-const activeTotal = order.products
-  .filter(p => p.status !== "Cancelled")
-  .reduce((sum, p) => sum + ((p.salePrice ?? p.price) * p.quantity), 0);
-
-
-const productTotal = (product.salePrice ?? product.price) * product.quantity;
-
-const couponDiscount = order.couponDiscount || 0;
-
-const productCouponShare = activeTotal > 0
-  ? (productTotal / activeTotal) * couponDiscount
-  : 0;
-
-const refundAmount = productTotal - productCouponShare;
+  const refundAmount = (product.salePrice ?? product.price) * product.quantity;
 
   await walletController.creditWallet(
     order.userId,
@@ -570,7 +556,6 @@ drawLabel("Order ID", `${order.orderId}`, margin, y);
    let total = 0;
 let rowNum = 0;
 const couponDiscount = order.couponDiscount || 0;
-
 const activeTotal = order.products
   .filter(p => p.status !== "Cancelled")
   .reduce((sum, p) => sum + (p.salePrice * p.quantity), 0);
@@ -581,7 +566,6 @@ order.products.forEach((item, index) => {
   const name = item.productId?.productName || "Product";
   const qty = item.quantity;
   const rawSubtotal = item.salePrice * qty;
-
   const itemCouponShare = activeTotal > 0 
     ? Math.round((rawSubtotal / activeTotal) * couponDiscount) 
     : 0;

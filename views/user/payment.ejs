@@ -221,9 +221,21 @@ document.getElementById("placeOrderBtn").addEventListener("click", async functio
 
   const rzp = new Razorpay(options);
 
-  rzp.on("payment.failed", function () {
-    window.location.href = "/order-failed";
+rzp.on("payment.failed", async function (response) {
+  await fetch("/checkout/payment/fail", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      razorpay_order_id: response.error.metadata.order_id,
+      paymentMethod: "Razorpay",
+       addressId: paymentData.addressId 
+    })
   });
+
+  window.location.href = "/order-failed";
+});
 
   rzp.open();
 });

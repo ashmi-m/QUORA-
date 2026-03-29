@@ -132,6 +132,6 @@ router.get("/wallet", walletController.loadWallet);
 router.post("/wallet/create-order", walletController.createWalletOrder);
 router.post("/wallet/add", walletController.addMoneyToWallet);
 router.get('/about', addressController.loadAboutPage);
-
+router.post("/checkout/payment/fail", paymentController.handlePaymentFail);
 module.exports = router;
 

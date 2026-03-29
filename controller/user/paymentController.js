@@ -154,9 +154,62 @@ const loadOrderFailed = (req, res) => {
     ordersPage: "/orders"
   });
 };
+const handlePaymentFail = async (req, res) => {
+  try {
+    const { razorpay_order_id, paymentMethod, addressId } = req.body; 
+    const userId = req.session.user._id;
+
+    const cart = await Cart.findOne({ userId }).populate("items.productId");
+    if (!cart) return res.json({ success: false });
+
+    const addressDoc = await Address.findOne({ userId });
+    const selectedAddressId = addressId || req.session.selectedAddress;
+    const selectedAddress = addressDoc?.addresses?.find(
+      a => a._id.toString() === selectedAddressId?.toString()
+    );
+
+    let products = [];
+    cart.items.forEach(item => {
+      products.push({
+        productId: item.productId._id,
+        quantity: item.quantity,
+        price: item.productId.regularPrice,
+        salePrice: item.productId.salePrice || item.productId.regularPrice, 
+        status: "Cancelled"
+      });
+    });
+
+    const newOrder = new Order({
+      userId,
+      products,
+      totalAmount: 0,
+      paymentMethod,
+      razorpayOrderId: razorpay_order_id,
+      status: "Payment Failed",
+      address: selectedAddress ? {
+        addressType: selectedAddress.addressType,
+        name: selectedAddress.name,
+        city: selectedAddress.city,
+        landMark: selectedAddress.landMark,
+        state: selectedAddress.state,
+        pincode: selectedAddress.pincode,
+        phone: selectedAddress.phone,
+        altPhone: selectedAddress.altPhone
+      } : {}
+    });
+
+    await newOrder.save();
+    res.json({ success: true });
+
+  } catch (err) {
+    console.error(err);
+    res.json({ success: false });
+  }
+};
 
 module.exports = {
   loadPayment,
   loadOrderSuccess,
-  loadOrderFailed
+  loadOrderFailed,
+  handlePaymentFail
 };
