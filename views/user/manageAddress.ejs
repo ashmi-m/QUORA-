@@ -12,9 +12,6 @@
   </head>
 
   <body>
-
-
-
     <div class="profile-container">
 
       <%- include("../partials/user/profile-sidebar", { user, activePage: 'address' }) %>
@@ -160,8 +157,6 @@
           }
         });
       });
-
-
       const logoutBtn = document.getElementById("logoutBtn");
       if (logoutBtn) {
         logoutBtn.addEventListener("click", () => {

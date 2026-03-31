@@ -159,8 +159,8 @@
         document.getElementById("customDates").style.display =
           val === "custom" ? "flex" : "none";
       }
-      const salesData = <% - JSON.stringify(chartData) %>;
-      const statusData = <% - JSON.stringify(statusData) %>;
+const salesData = <%- JSON.stringify(chartData) %>;
+const statusData = <%- JSON.stringify(statusData) %>;
 
       new Chart(document.getElementById("salesChart"), {
         type: "bar",
