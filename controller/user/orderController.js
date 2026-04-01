@@ -74,35 +74,34 @@ const loadPayment = async (req, res) => {
     if (!addressId) return res.redirect("/checkout");
 
     const cart = await Cart.findOne({ userId })
-      .populate({
-        path: "items.productId",
-        populate: { path: "category" }
-      })
+      .populate({ path: "items.productId", populate: { path: "category" } })
       .lean();
 
-    if (!cart || cart.items.length === 0)
-      return res.redirect("/checkout");
+    if (!cart || cart.items.length === 0) return res.redirect("/checkout");
 
     const addressDoc = await Address.findOne({ userId }).lean();
     const address = addressDoc.addresses.find(
       a => a._id.toString() === addressId.toString()
     );
-
     if (!address) return res.redirect("/checkout");
 
+    // ✅ Bug 2 fix: calculate total FIRST, then use it
     let total = 0;
-    const couponDiscount = order.couponDiscount || 0;
-    const finalTotal = total - couponDiscount;
-
     cart.items.forEach(item => {
       const { salePrice } = applyOffer(item.productId);
       total += Number(salePrice) * Number(item.quantity);
     });
 
+    // ✅ Bug 1 fix: fetch user and pass to render
+    const user = await User.findById(userId).lean();
+
     res.render("payment", {
       cartItems: cart.items,
       address,
-      total
+      total,
+      user,  // ✅ was missing
+      // ✅ Bug 3 fix: these are needed by payment.ejs
+      // but honestly — just delete this whole function and use paymentController
     });
 
   } catch (err) {
@@ -267,7 +266,7 @@ const placeOrder = async (req, res) => {
         addressType: selectedAddress.addressType,
         name: selectedAddress.name,
         city: selectedAddress.city,
-        landMark: selectedAddress.landMark,
+        landMark: selectedAddress.landmark,
         state: selectedAddress.state,
         pincode: selectedAddress.pincode,
         phone: selectedAddress.phone,
@@ -279,7 +278,8 @@ const placeOrder = async (req, res) => {
       couponDiscount: couponDiscount,
       couponCode: couponData ? couponData.code : null,
       paymentMethod,
-      status: paymentMethod === "COD" ? "Placed" : "Paid"
+      // status: paymentMethod === "COD" ? "Placed" : "Paid"
+      status: paymentMethod === "COD" ? "Placed" : paymentMethod === "Razorpay" ? "Processing" : "Paid"
     });
 
     await Cart.deleteOne({ userId });

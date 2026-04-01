@@ -98,7 +98,7 @@
         const paymentData = {
           key: "<%= razorpayKey %>",
           orderId: "<%= razorpayOrderId %>",
-          amount: <% - JSON.stringify(razorpayAmount) %>,
+amount: <%- JSON.stringify(razorpayAmount) %>,
           addressId: "<%= address._id %>",
           name: "<%= user?.name || '' %>",
           email: "<%= user?.email || '' %>",
