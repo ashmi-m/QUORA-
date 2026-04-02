@@ -160,7 +160,7 @@
           <div class="form-group">
             <label>Edit Photos</label>
             <div class="image-upload-container">
-              <input type="file" name="productImages" multiple />
+<input type="file" name="images" multiple />
               <% if (product.productImage && product.productImage.length> 0) { %>
                 <% product.productImage.forEach((img, i)=> { %>
                   <div class="preview-wrapper" id="previewWrapper<%= i %>">

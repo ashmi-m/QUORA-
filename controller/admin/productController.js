@@ -219,16 +219,85 @@ const getEditProductPage = async (req, res) => {
   }
 };
 
+// const updateProduct = async (req, res) => {
+//   try {
+//     console.log("req.params", req.params)
+//     const { id } = req.params;
+//     const updates = req.body;
+
+//     let imageUrls = [];
+//     if (req.files && req.files.length > 0) {
+//       for (const file of req.files) {
+//         const resizedBuffer = await sharp(file.buffer)
+//           .resize(440, 440, { fit: "inside" })
+//           .toBuffer();
+
+//         const uploadResult = await new Promise((resolve, reject) => {
+//           const stream = cloudinary.uploader.upload_stream(
+//             { folder: "quora_products" },
+//             (err, result) => {
+//               if (err) return reject(err);
+//               resolve(result);
+//             }
+//           );
+//           stream.end(resizedBuffer);
+//         });
+
+//         imageUrls.push(uploadResult.secure_url);
+//       }
+//     }
+
+//     const product = await Product.findById(id);
+//     if (!product) return res.redirect("/admin/products");
+
+//     product.productName = updates.productName;
+//     product.description = updates.description;
+//     product.regularPrice = parseFloat(updates.regularPrice) || 0;
+//     product.salePrice = updates.salePrice
+//       ? parseFloat(updates.salePrice)
+//       : null;
+//     product.category = updates.category;
+//     product.brand = updates.brand;
+//     product.quantity = parseInt(updates.quantity, 10) || 0;
+
+//     if (imageUrls.length > 0) {
+//       product.productImage = imageUrls;
+//     }
+
+//     await product.save();
+//     res.redirect("/admin/products?editSuccess=true");
+//   } 
+//   catch (err) {
+//     console.error("Error updating product:", err);
+//     res.redirect("/admin/pageerror");
+//   }
+// };
 const updateProduct = async (req, res) => {
   try {
-    console.log("req.params", req.params)
     const { id } = req.params;
     const updates = req.body;
 
-    let imageUrls = [];
+    const product = await Product.findById(id);
+    if (!product) return res.redirect("/admin/products");
+
+    // ✅ Get existing images sent from the form (the ones not deleted)
+    let existingImages = updates.existingImages || [];
+    if (!Array.isArray(existingImages)) {
+      existingImages = [existingImages]; // ensure it's always an array
+    }
+
+    // ✅ Upload new files if any
+    const newImageUrls = [];
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
-        const resizedBuffer = await sharp(file.buffer)
+        // Already uploaded to Cloudinary by multer-storage-cloudinary
+        if (file.path && file.path.startsWith("http")) {
+          newImageUrls.push(file.path);
+          continue;
+        }
+
+        // For local disk files - resize then upload
+        const resizedBuffer = await sharp(file.path)
           .resize(440, 440, { fit: "inside" })
           .toBuffer();
 
@@ -243,34 +312,31 @@ const updateProduct = async (req, res) => {
           stream.end(resizedBuffer);
         });
 
-        imageUrls.push(uploadResult.secure_url);
+        newImageUrls.push(uploadResult.secure_url);
       }
     }
 
-    const product = await Product.findById(id);
-    if (!product) return res.redirect("/admin/products");
+    // ✅ Merge: keep existing (non-deleted) images + add new ones
+    product.productImage = [...existingImages, ...newImageUrls];
 
+    // Update other fields
     product.productName = updates.productName;
     product.description = updates.description;
     product.regularPrice = parseFloat(updates.regularPrice) || 0;
-    product.salePrice = updates.salePrice
-      ? parseFloat(updates.salePrice)
-      : null;
+    product.salePrice = updates.salePrice ? parseFloat(updates.salePrice) : null;
     product.category = updates.category;
     product.brand = updates.brand;
     product.quantity = parseInt(updates.quantity, 10) || 0;
 
-    if (imageUrls.length > 0) {
-      product.productImage = imageUrls;
-    }
-
     await product.save();
     res.redirect("/admin/products?editSuccess=true");
+
   } catch (err) {
-    console.error("Error updating product:", err);
+    console.error("Error updating product:", err.message, err.stack);
     res.redirect("/admin/pageerror");
   }
 };
+
 const deleteImage = async (req, res) => {
   try {
     const { productId, image } = req.body;
