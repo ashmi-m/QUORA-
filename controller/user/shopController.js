@@ -144,7 +144,8 @@ const loadShopPage = async (req, res) => {
       priceRange: selectedPriceRange,
       searchQuery,
       totalPages,
-      currentPage: page,
+      // currentPage: page,
+      currentPage,
     });
 
   } catch (error) {
