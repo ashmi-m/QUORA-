@@ -30,8 +30,8 @@ module.exports = async (req, res, next) => {
         cartCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
       }
     }
-console.log("✅ setUser middleware running...");
-    console.log("CART COUNT:", cartCount); // debug
+
+    
 
     res.locals.cartCount = cartCount;
 
