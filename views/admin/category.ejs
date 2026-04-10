@@ -21,7 +21,7 @@
       border-radius: 5px;
       border: 1px solid #ccc;
       margin-bottom: 15px;
-      float: right;
+      /* float: right; */
     }
 
     table {
@@ -179,7 +179,25 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 15px;
+      gap: 8px;
     }
+
+.actions input[type="search"] {
+  width: 220px;
+  padding: 6px 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin: 0; /* remove bottom gap */
+}
+
+.actions button[type="submit"] {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #5a4d41;
+  color: white;
+  cursor: pointer;
+}
 
     .modal-content input,
     .modal-content textarea {

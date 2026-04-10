@@ -107,15 +107,12 @@
             <% } %>
         </a>
 
-        <a href="/cart" class="header-icon">
-          <i class="fa fa-shopping-cart"></i>
-          <% if (typeof cartCount !=="undefined" && cartCount> 0) { %>
-            <small class="badge">
-              <%= cartCount %>
-            </small>
-            <% } %>
-        </a>
-
+      <a href="/cart" class="header-icon">
+  <i class="fa fa-shopping-cart"></i>
+  <small class="badge">
+    <%= cartCount %>
+  </small>
+</a>
 
 
         <div class="dropdown">

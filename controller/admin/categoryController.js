@@ -97,15 +97,16 @@ const postEditCategory = async (req, res) => {
     });
 
     if (existing) {
-      return res.status(400).json({
-        success: false,
-        error: "Category already exists"
-      });
+      // return res.status(400).json({
+      //   success: false,
+      //   error: "Category already exists"
+      // });
+      return res.send("Category already exists");
     }
 
     await Category.findByIdAndUpdate(id, { name, description });
-    res.status(200).json({ success: true, message: "Category updated successfully" });
-
+    // res.status(200).json({ success: true, message: "Category updated successfully" });
+res.redirect("/admin/categories");
 
   } catch (error) {
     console.error("Error updating category:", error);

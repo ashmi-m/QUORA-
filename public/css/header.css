@@ -44,3 +44,21 @@
   font-size: 16px;
   cursor: pointer;
 }
+
+
+
+
+.header-icon {
+  position: relative;
+}
+
+.badge {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  background: red;
+  color: white;
+  font-size: 12px;
+  padding: 4px 7px;
+  border-radius: 50%;
+}
