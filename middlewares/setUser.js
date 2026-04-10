@@ -10,7 +10,7 @@
 // }
 
 const Cart = require("../models/cartSchema");
-
+const Wishlist = require("../models/wishlistSchema");
 module.exports = async (req, res, next) => {
   try {
 
@@ -22,6 +22,7 @@ module.exports = async (req, res, next) => {
     res.locals.user = user;
 
     let cartCount = 0;
+        let wishlistCount = 0; 
 
     if (user) {
       const cart = await Cart.findOne({ userId: user._id }).lean();
@@ -29,17 +30,22 @@ module.exports = async (req, res, next) => {
       if (cart && cart.items.length > 0) {
         cartCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
       }
+   const wishlist = await Wishlist.findOne({ userId: user._id }).lean();
+      if (wishlist && wishlist.items.length > 0) {
+        wishlistCount = wishlist.items.length;
+      }
     }
-
     
 
     res.locals.cartCount = cartCount;
+     res.locals.wishlistCount = wishlistCount;
 
     next();
 
   } catch (err) {
     console.error("setUser error:", err);
     res.locals.cartCount = 0;
+      res.locals.wishlistCount = 0;
     next();
   }
 };
